@@ -1,0 +1,26 @@
+{
+	"name": "saswaf",
+	"version": "0.1.0",
+	"description": "Share A Screen With A Friend",
+	"keywords": [
+		"screen sharing",
+		"fun",
+		"friends"
+	],
+	"homepage": "http://saswaf.com",
+	"engines": {
+		"node": "12.x"
+	},
+	"main": "index.js",
+	"scripts": {
+		"start": "node index.js"
+	},
+	"dependencies": {
+		"ejs": "^2.5.6",
+		"express": "^4.15.2"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/robertianburton/saswaf.git"
+	}
+}
