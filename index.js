@@ -1,3 +1,4 @@
+import adapter from 'webrtc-adapter';
 const express = require('express');
 const path = require('path');
 const PORT = process.env.PORT || 5000;

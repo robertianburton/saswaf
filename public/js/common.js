@@ -9,6 +9,7 @@ function setNavbar() {
 }
 
 $( document ).ready(function() {
-    console.log( "ready!" );
+    console.log( "Common JS Starting Up..." );
     setNavbar();
+    console.log( "Common JS Startup Complete." );
 });
