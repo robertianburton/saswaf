@@ -1,17 +1,29 @@
 <html lang="en">
-	<head>
-		<% include ../partials/header.ejs %>
-	</head>
-	<body>
-		<% include ../partials/navbar.ejs %>
-		<main role="main" class="container">
-
-		  <div class="starter-template">
-		    <h1>Share A Screen With A Friend</h1>
-		    <p class="lead">Right in the title.<br> Give it a go.</p>
-		  </div>
-
-		</main>
-		<% include ../partials/footer.ejs %>
-	</body>
+<head>
+	<% include ../partials/header.ejs %>
+	<link rel="stylesheet" type="text/css" href="/stylesheets/chat.css" />
+</head>
+<body>
+	<% include ../partials/navbar.ejs %>
+	<main role="main" class="container">
+		<div>
+			<h1>Simple Chat System</h1>
+			<h2>Username: <span id="userNameElem">N/A</span></h2>
+		</div>
+		<div class="overflow-auto bg-dark text-light px-2" id="chatLogElem">
+			<p>Welcome.</p>
+		</div>
+		<form class="form-inline">
+			<div class="input-group w-75">
+				<input type="text" class="form-control" id="chatTextBoxElem" placeholder="Enter message">
+			</div>
+			<div class="input-group">
+				<button class="btn btn-primary" id="chatSubmitElem">Submit</button>
+			</div>
+		</form>
+	</main>
+	<% include ../partials/footer.ejs %>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+	<script src="/js/chat.js"></script>
+</body>
 </html>
