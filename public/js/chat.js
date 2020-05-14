@@ -1,3 +1,4 @@
+
 (function() {
 
     var counter = 0;
@@ -50,13 +51,17 @@
     };
 
     const userListChange = (userNameList) => {
-        chatLogElem.innerHTML += `<p><span class="font-weight-bold">Server: </span>User List Change! Users: ` 
+        chatLogElem.innerHTML += `<p class="m-0">`
+        + new Date().toLocaleTimeString('en-GB')
+        + ` <span class="font-weight-bold">Server:</span> User List Change! Users: ` 
         + userNameList.join(', ')
         + `</p>`;
     };
 
     const addNewMessage = (data) => {
-        chatLogElem.innerHTML += `<p><span class="font-weight-bold">${data.sender}: </span>${data.message}</p>`
+        chatLogElem.innerHTML += `<p class="m-0">`
+        + new Date().toLocaleTimeString('en-GB')
+        + ` <span class="font-weight-bold">${data.sender}:</span> ${data.message}</p>`
     };
 
     function scroll() {
