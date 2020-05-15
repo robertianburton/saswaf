@@ -9,7 +9,8 @@ const app = express()
 	.set('view engine', 'ejs')
 	.get('/', (req, res) => res.render('pages/index'))
 	.get('/soundcheck', (req, res) => res.render('pages/soundcheck'))
-	.get('/chat', (req, res) => res.render('pages/chat'));
+	.get('/chat', (req, res) => res.render('pages/chat'))
+	.get('/screen', (req, res) => res.render('pages/screen'));
 
 const server = app.listen(PORT, () => console.log(`Listening on ${ PORT }`));
 
@@ -30,6 +31,11 @@ io.on("connection", function (socket) {
   socket.on("chat message", function (data) {
   	io.emit("chat message", data);
   	console.log("New message from "+ data.sender);
+  });
+
+  socket.on("message", function (data) {
+  	io.emit("message", data);
+  	console.log("New generic message");
   });
 
   socket.on("disconnect", () => {
