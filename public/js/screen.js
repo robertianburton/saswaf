@@ -96,7 +96,13 @@
     // Mostly from https://www.html5rocks.com/en/tutorials/webrtc/basics/#simpleRTCPeerConnectionExample
     // handles JSON.stringify/parse
     const signaling = io();
-    const constraints = {audio: true, video: true};
+    const constraints = {video: true,
+                 audio: {
+                    echoCancellation: false,
+                    autoGainControl: false,
+                    googAutoGainControl: false,
+                    noiseSuppression: false}
+            };
     const configuration = {
         iceServers: [{urls: [
         'stun:stun.l.google.com:19302',
@@ -145,7 +151,14 @@
         let captureStream = null;
 
         try {
-            captureStream = await navigator.mediaDevices.getDisplayMedia({video: true, audio: true});
+            captureStream = await navigator.mediaDevices.getDisplayMedia(
+                {video: true,
+                 audio: {
+                    echoCancellation: false,
+                    autoGainControl: false,
+                    googAutoGainControl: false,
+                    noiseSuppression: false}
+            });
             videoElem.srcObject = captureStream;
         } catch(err) {
             console.error("Error: " + err);
