@@ -10,7 +10,8 @@ const app = express()
 	.get('/', (req, res) => res.render('pages/index'))
 	.get('/soundcheck', (req, res) => res.render('pages/soundcheck'))
 	.get('/chat', (req, res) => res.render('pages/chat'))
-	.get('/screen', (req, res) => res.render('pages/screen'));
+	.get('/screen', (req, res) => res.render('pages/screen'))
+	.get('/audience', (req, res) => res.render('pages/audience'));
 
 const server = app.listen(PORT, () => console.log(`Listening on ${ PORT }`));
 
@@ -34,7 +35,7 @@ io.on("connection", function (socket) {
   });
 
   socket.on("message", function (data) {
-  	io.emit("message", data);
+  	socket.broadcast.emit("message", data);
   	console.log("New generic message");
   });
 

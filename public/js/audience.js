@@ -153,8 +153,6 @@
     };
 
     signaling.on("message", async ({desc, candidate}) => {
-        console.log(desc);
-        console.log(candidate);
       try {
         if (desc) {
           // if we get an offer, we need to reply with an answer
