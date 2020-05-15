@@ -101,7 +101,10 @@
                     echoCancellation: false,
                     autoGainControl: false,
                     googAutoGainControl: false,
-                    noiseSuppression: false}
+                    noiseSuppression: false,
+                    sampleRate: 44100,
+                    sampleSize: 16
+                }
             };
     const configuration = {
         iceServers: [{urls: [
