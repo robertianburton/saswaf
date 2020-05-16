@@ -1,95 +1,46 @@
 (function() {
 
-    var videoElem = null;
-    var startbutton = null;
-    var buttonVideoStart = null;
-    var buttonVideoEnd = null;
     var buttonVideoSizeSource = null;
     var buttonVideoSizePage = null;
     var buttonVideoSizeResponsive = null;
-    var buttonVideoStartShare = null;
-    var counter = 0;
-    var videoElem = null;
-    var videoLocalElem = null;
     var videoRemoteElem = null;
 
     function startup() {
         console.log("Screen JS Starting Up...");
 
-        videoElem = document.getElementById('videoElem');
-        videoLocalElem = document.getElementById('videoLocalElem');
         videoRemoteElem = document.getElementById('videoRemoteElem');
-
-        buttonVideoStart = document.getElementById('buttonVideoStart');
-        buttonVideoStart.addEventListener('click', function(ev){
-            startCapture();
-            ev.preventDefault();
-        }, false);
-
-        buttonVideoEnd = document.getElementById('buttonVideoEnd');
-        buttonVideoEnd.addEventListener('click', function(ev){
-            stopCapture();
-            ev.preventDefault();
-        }, false);
 
         buttonVideoSizeSource = document.getElementById('buttonVideoSizeSource');
         buttonVideoSizeSource.addEventListener('click', function(ev){
-            videoElem.style.width = "auto";
-            videoElem.scrollIntoView();
+            videoRemoteElem.style.width = "auto";
+            videoRemoteElem.scrollIntoView();
             ev.preventDefault();
         }, false);
 
         buttonVideoSizeResponsive = document.getElementById('buttonVideoSizeResponsive');
         buttonVideoSizeResponsive.addEventListener('click', function(ev){
-            videoElem.style.width = "100%";
+            videoRemoteElem.style.width = "100%";
 
-            ev.preventDefault();
-        }, false);
-
-        buttonVideoStartShare = document.getElementById('buttonVideoStartShare');
-        buttonVideoStartShare.addEventListener('click', function(ev){
-            start();
             ev.preventDefault();
         }, false);
 
         buttonVideoSizePage = document.getElementById('buttonVideoSizePage');
         buttonVideoSizePage.addEventListener('click', function(ev){
-            videoElem.style.width = window.innerWidth;
+            videoRemoteElem.style.width = window.innerWidth;
 
             var docH = $( document ).height();
             var vidH = $('#videoElem').height();
-            var videoScale = ($('#videoElem').width() / $('#videoElem').height());
+            var videoScale = ($('#videoElem').width() / $('#videoRemoteElem').height());
             var topH = docH-vidH;
             var workableH = Math.floor((window.innerHeight-topH-0)*videoScale);
 
-            videoElem.style.width = workableH + "px";
-            videoElem.scrollIntoView();
+            videoRemoteElem.style.width = workableH + "px";
+            videoRemoteElem.scrollIntoView();
             ev.preventDefault();
         }, false);
 
         console.log("Screen JS Startup Complete.");
     }
-
-
-    async function startCapture() {
-        let captureStream = null;
-
-        try {
-            captureStream = await navigator.mediaDevices.getDisplayMedia({video: true, audio: true});
-            videoElem.srcObject = captureStream;
-        } catch(err) {
-            console.error("Error: " + err);
-        }
-    }
-
-    async function stopCapture(ev) {
-        let tracks = videoElem.srcObject.getTracks();
-
-        tracks.forEach(track => track.stop());
-        captureStream = null;
-        videoElem.srcObject = null;
-    }
-
 
 
 
@@ -127,48 +78,35 @@
       videoRemoteElem.srcObject = event.streams[0];
     };
 
-    // call start() to initiate
-    async function start() {
-      try {
-        // get local stream, show it in self-view and add it to be sent
-        const stream =
-          await navigator.mediaDevices.getDisplayMedia(constraints);
-        stream.getTracks().forEach((track) =>
-          pc.addTrack(track, stream));
-        videoLocalElem.srcObject = stream;
-      } catch (err) {
-        console.error(err);
-      }
-    };
-
-    async function startCaptureTwo() {
-        let captureStream = null;
-
-        try {
-            captureStream = await navigator.mediaDevices.getDisplayMedia({video: true, audio: true});
-            videoElem.srcObject = captureStream;
-        } catch(err) {
-            console.error("Error: " + err);
-        }
-    };
-
     signaling.on("message", async ({desc, candidate}) => {
+        console.log("DEBUG STEP 0");
+        console.log(desc);
+        console.log(candidate);
       try {
         if (desc) {
+            console.log("DEBUG STEP 1");
           // if we get an offer, we need to reply with an answer
           if (desc.type === 'offer') {
+            console.log("DEBUG STEP 2");
             await pc.setRemoteDescription(desc);
+            console.log("DEBUG STEP 3");
             //const stream = await navigator.mediaDevices.getDisplayMedia(constraints);
             //stream.getTracks().forEach((track) => pc.addTrack(track, stream));
             await pc.setLocalDescription(await pc.createAnswer());
+            console.log("DEBUG STEP 4");
             signaling.emit("message",{desc: pc.localDescription});
+            console.log("DEBUG STEP 5");
           } else if (desc.type === 'answer') {
+            console.log("DEBUG STEP 6");
             await pc.setRemoteDescription(desc);
+            console.log("DEBUG STEP 7");
           } else {
             console.log('Unsupported SDP type.');
           }
         } else if (candidate) {
+            console.log("DEBUG STEP 8");
           await pc.addIceCandidate(candidate);
+          console.log("DEBUG STEP 9");
         }
       } catch (err) {
         console.error(err);
