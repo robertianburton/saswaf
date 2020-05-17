@@ -20,7 +20,7 @@ const io = socket(server);
 const activeUsers = new Set();
 
 io.on("connection", function (socket) {
-  console.log("Made socket connection");
+  console.log("Made socket connection: " + socket.id);
 
   socket.on("new user", function (data) {
   	socket.userId = data;
@@ -34,9 +34,14 @@ io.on("connection", function (socket) {
   	console.log("New message from "+ data.sender);
   });
 
-  socket.on("message", function (data) {
-  	socket.broadcast.emit("message", data);
-  	console.log("New generic message");
+  socket.on("screenSignalFromHost", (data) => {
+  	io.to(data.toId).emit('screenSignalFromHost', data)
+  	console.log("New Screen Signal From Host: " + socket.id);
+  });
+
+  socket.on("screenSignalFromAudience", function (data) {
+  	socket.broadcast.emit("screenSignalFromAudience", data);
+  	console.log("New Screen Signal From Audience: " + socket.id);
   });
 
   socket.on("disconnect", () => {

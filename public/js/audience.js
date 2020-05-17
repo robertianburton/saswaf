@@ -4,6 +4,8 @@
     var buttonVideoSizePage = null;
     var buttonVideoSizeResponsive = null;
     var videoRemoteElem = null;
+    var screenHostId = null;
+    let makingOffer = false;
 
     function startup() {
         console.log("Screen JS Starting Up...");
@@ -39,6 +41,10 @@
             ev.preventDefault();
         }, false);
 
+        console.log("Socket ID: " + signaling.id);
+
+        /*start();*/
+
         console.log("Screen JS Startup Complete.");
     }
 
@@ -58,19 +64,52 @@
     const pc = new RTCPeerConnection(configuration);
 
     // send any ice candidates to the other peer
-    pc.onicecandidate = ({candidate}) => signaling.emit("message",{candidate});
+    pc.onicecandidate = (data) => {
+        console.log("OnIceCandidate...");
+        console.log(data);
+        signaling.emit(
+            "screenSignalFromAudience",
+            {
+                fromId: signaling.id,
+                candidate: data.candidate
+            }
+        )
+    };
 
     // let the "negotiationneeded" event trigger offer generation
     pc.onnegotiationneeded = async () => {
+        console.log("onnegotiationneeded 1");
+      try {
+        console.log("onnegotiationneeded 2");
+        makingOffer = true;
+        await pc.setLocalDescription(await pc.createOffer());
+        // send the offer to the other peer
+        signaling.emit("screenSignalFromAudience",
+        {
+            fromId: signaling.id,
+            desc: pc.localDescription
+        });
+        console.log("onnegotiationneeded 3");
+      } catch (err) {
+        console.error(err);
+      } finally {
+        makingOffer = false;
+      }
+    };
+
+    async function start() {
       try {
         await pc.setLocalDescription(await pc.createOffer());
         // send the offer to the other peer
-        signaling.emit("message",{desc: pc.localDescription});
+        signaling.emit("screenSignalFromAudience",
+        {
+            fromId: signaling.id,
+            desc: pc.localDescription
+        });
       } catch (err) {
         console.error(err);
       }
     };
-
         // once remote track media arrives, show it in remote video element
     pc.ontrack = (event) => {
       // don't set srcObject again if it is already set.
@@ -78,34 +117,34 @@
       videoRemoteElem.srcObject = event.streams[0];
     };
 
-    signaling.on("message", async ({desc, candidate}) => {
+    signaling.on("screenSignalFromHost", async (data) => {
         console.log("DEBUG STEP 0");
-        console.log(desc);
-        console.log(candidate);
+        console.log(data.desc);
+        console.log(data.candidate);
       try {
-        if (desc) {
+        if (data.desc) {
             console.log("DEBUG STEP 1");
           // if we get an offer, we need to reply with an answer
-          if (desc.type === 'offer') {
+          if (data.desc.type === 'offer') {
             console.log("DEBUG STEP 2");
-            await pc.setRemoteDescription(desc);
+            await pc.setRemoteDescription(data.desc);
             console.log("DEBUG STEP 3");
-            //const stream = await navigator.mediaDevices.getDisplayMedia(constraints);
-            //stream.getTracks().forEach((track) => pc.addTrack(track, stream));
             await pc.setLocalDescription(await pc.createAnswer());
             console.log("DEBUG STEP 4");
-            signaling.emit("message",{desc: pc.localDescription});
+            signaling.emit("screenSignalFromAudience",{
+                fromId: signaling.id,
+                desc: pc.localDescription});
             console.log("DEBUG STEP 5");
-          } else if (desc.type === 'answer') {
+          } else if (data.desc.type === 'answer') {
             console.log("DEBUG STEP 6");
-            await pc.setRemoteDescription(desc);
+            await pc.setRemoteDescription(data.desc);
             console.log("DEBUG STEP 7");
           } else {
             console.log('Unsupported SDP type.');
           }
-        } else if (candidate) {
-            console.log("DEBUG STEP 8");
-          await pc.addIceCandidate(candidate);
+        } else if (data.candidate) {
+          console.log("DEBUG STEP 8");
+          await pc.addIceCandidate(data.candidate);
           console.log("DEBUG STEP 9");
         }
       } catch (err) {
