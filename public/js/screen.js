@@ -8,6 +8,9 @@
     var videoLocalElem = null;
     var stream = null;
     var connections= [];
+    let polite = false;
+    var tracks = [];
+    var sharing = false;
 
     function startup() {
         console.log("Screen JS Starting Up...");
@@ -83,15 +86,40 @@
 
     // call start() to initiate
     async function start() {
+
+        console.log("Starting Video Share... ");
       try {
         // get local stream, show it in self-view and add it to be sent
-        Array.prototype.forEach.call(connections, (connection) => {
-            stream.getTracks().forEach((track) => connection.addTrack(track, stream));
-        });
-        
+        console.log(connections);
+
+        /*for (var key in connections) {
+
+            console.log("Working on this connection: ");
+            console.log(connections[key]);
+            var senders = connections[key].getSenders();
+            try {
+                senders.forEach((sender) => {connections[key].removeTrack(sender)});
+            } catch (err) {
+                console.error(err)
+            }
+            connections[key].close();
+        };*/
+
+        for (var key in connections) {
+            console.log("Working on this connection: ");
+            console.log(connections[key]);
+            try {
+                stream.getTracks().forEach((track) => connections[key].addTrack(track, stream));
+        } catch (err) {
+            console.error(err)
+        }
+        };
+        console.log("Printing Tracks");
+        console.log(tracks);
       } catch (err) {
         console.error(err);
       }
+      sharing = true;
     };
 
 
@@ -126,35 +154,70 @@
               }
             };
 
+                console.log("start 1");
+              try {
+                console.log("start 2");
+                makingOffer = true;
+                await connections[data.fromId].setLocalDescription(await pc.createOffer());
+                // send the offer to the other peer
+                signaling.emit("screenSignalFromHost",
+                {
+                    fromId: signaling.id,
+                    toId: data.fromId,
+                    desc: connections[data.fromId].localDescription
+                });
+                console.log("start 3");
+              } catch (err) {
+                console.error(err);
+              } finally {
+                makingOffer = false;
+              };
+
             console.log("Added connection to Socket ID: " + data.fromId);
             console.log(connections[data.fromId]);
         };
 
-      try {
-        if (data.desc) {
-          // if we get an offer, we need to reply with an answer
-          if (data.desc.type === 'offer') {
-            console.log("Processing Offer");
-            await connections[data.fromId].setRemoteDescription(data.desc);
-            console.log("Processing Offer 2");
-            await connections[data.fromId].setLocalDescription(await pc.createAnswer());
-            console.log("Processing Offer 3");
-            signaling.emit("screenSignalFromHost",{
-                toId: data.fromId,
-                desc: connections[data.fromId].localDescription});
-            console.log("Processing Offer 4");
-          } else if (data.desc.type === 'answer') {
-            console.log("Processing Answer");
-            await connections[data.fromId].setRemoteDescription(data.desc);
-          } else {
-            console.log('Unsupported SDP type.');
-          }
-        } else if (data.candidate) {
-          await connections[data.fromId].addIceCandidate(data.candidate);
+        try {
+            console.log("Try Block 1");
+            if (data.desc) {
+                console.log("Try Block 2");
+                  const offerCollision = (data.desc.type == "offer") &&
+                                         (makingOffer || connections[data.fromId].signalingState != "stable");
+                                         console.log("Try Block 3");
+                  ignoreOffer = !polite && offerCollision;
+                  if (ignoreOffer) {
+                    return;
+                  }
+                  console.log("Try Block 4");
+                  await connections[data.fromId].setRemoteDescription(data.desc);
+                  console.log("Try Block 5");
+                  if (data.desc.type =="offer") {
+                    await pc.setLocalDescription();
+                    signaling.emit("screenSignalFromHost",{
+                        fromId: signaling.id,
+                        toId: data.fromId,
+                        desc: connections[data.fromId].localDescription});
+                    console.log("Try Block 6");
+                  }
+                  console.log("Try Block 7");
+                  /*if(sharing===true) {
+                      stream.getTracks().forEach((track) => {tracks +=connections[data.fromId].addTrack(track, stream)});
+                  }*/
+                  console.log("Doing Offer Stuff");
+            } else if (data.candidate) {
+                  try {
+                    await connections[data.fromId].addIceCandidate(data.candidate);
+                  } catch(err) {
+                    if (!ignoreOffer) {
+                      throw err;
+                    }
+                  }
+            }
+            console.log("Peer Connection...");
+            console.log(connections[data.fromId]);
+        } catch(err) {
+            console.error(err);
         }
-      } catch (err) {
-        console.error(err);
-      };
 
     });
 

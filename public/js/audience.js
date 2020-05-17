@@ -6,9 +6,11 @@
     var videoRemoteElem = null;
     var screenHostId = null;
     let makingOffer = false;
+    let ignoreOffer = false;
+    let polite = true;
 
     function startup() {
-        console.log("Screen JS Starting Up...");
+        console.log("Audience JS Starting Up...");
 
         videoRemoteElem = document.getElementById('videoRemoteElem');
 
@@ -43,9 +45,9 @@
 
         console.log("Socket ID: " + signaling.id);
 
-        /*start();*/
+        start();
 
-        console.log("Screen JS Startup Complete.");
+        console.log("Audience JS Startup Complete.");
     }
 
 
@@ -98,7 +100,10 @@
     };
 
     async function start() {
+        console.log("start 1");
       try {
+        console.log("start 2");
+        makingOffer = true;
         await pc.setLocalDescription(await pc.createOffer());
         // send the offer to the other peer
         signaling.emit("screenSignalFromAudience",
@@ -106,8 +111,11 @@
             fromId: signaling.id,
             desc: pc.localDescription
         });
+        console.log("start 3");
       } catch (err) {
         console.error(err);
+      } finally {
+        makingOffer = false;
       }
     };
         // once remote track media arrives, show it in remote video element
@@ -117,41 +125,44 @@
       videoRemoteElem.srcObject = event.streams[0];
     };
 
-    signaling.on("screenSignalFromHost", async (data) => {
-        console.log("DEBUG STEP 0");
-        console.log(data.desc);
-        console.log(data.candidate);
+
+    signaling.on("screenSignalFromHost", async (data) =>  {
+        console.log("Received from Host. Printing data...");
+        console.log(data);
       try {
         if (data.desc) {
-            console.log("DEBUG STEP 1");
-          // if we get an offer, we need to reply with an answer
-          if (data.desc.type === 'offer') {
-            console.log("DEBUG STEP 2");
-            await pc.setRemoteDescription(data.desc);
-            console.log("DEBUG STEP 3");
-            await pc.setLocalDescription(await pc.createAnswer());
-            console.log("DEBUG STEP 4");
+
+          const offerCollision = (data.desc.type == "offer") &&
+                                 (makingOffer || pc.signalingState != "stable");
+
+          ignoreOffer = !polite && offerCollision;
+          if (ignoreOffer) {
+            return;
+          }
+
+          await pc.setRemoteDescription(data.desc);
+          if (data.desc.type =="offer") {
+            await pc.setLocalDescription();
             signaling.emit("screenSignalFromAudience",{
                 fromId: signaling.id,
                 desc: pc.localDescription});
-            console.log("DEBUG STEP 5");
-          } else if (data.desc.type === 'answer') {
-            console.log("DEBUG STEP 6");
-            await pc.setRemoteDescription(data.desc);
-            console.log("DEBUG STEP 7");
-          } else {
-            console.log('Unsupported SDP type.');
           }
+          console.log("Doing Offer Stuff");
         } else if (data.candidate) {
-          console.log("DEBUG STEP 8");
-          await pc.addIceCandidate(data.candidate);
-          console.log("DEBUG STEP 9");
+          try {
+            await pc.addIceCandidate(data.candidate);
+          } catch(err) {
+            if (!ignoreOffer) {
+              throw err;
+            }
+          }
         }
-      } catch (err) {
+        console.log("Peer Connection...");
+        console.log(pc);
+      } catch(err) {
         console.error(err);
       }
     });
-
 
 
 
