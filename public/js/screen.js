@@ -125,6 +125,7 @@
 
     signaling.on("screenSignalFromAudience", async (data) => {
         console.log("Receiving Audience Signal. Printing Data...");
+        console.log("Debug Alan 02 " + getTime());
         console.log(data);
 
         if(!connections[data.fromId]) {
@@ -180,6 +181,7 @@
         try {
             console.log("Try Block 1");
             if (data.desc) {
+                console.log("Debug Alan 03 " + getTime());
                 console.log("Try Block 2");
                   const offerCollision = (data.desc.type == "offer") &&
                                          (makingOffer || connections[data.fromId].signalingState != "stable");
@@ -188,6 +190,7 @@
                   if (ignoreOffer) {
                     return;
                   }
+                  console.log("Debug Alan 04 " + getTime());
                   console.log("Try Block 4");
                   await connections[data.fromId].setRemoteDescription(data.desc);
                   console.log("Try Block 5");
