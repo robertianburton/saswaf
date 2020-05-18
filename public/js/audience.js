@@ -107,11 +107,14 @@
         await pc.setLocalDescription(await pc.createOffer());
         // send the offer to the other peer
         console.log("Debug Alan 05 " + (new Date().getTime()));
-        signaling.emit("screenSignalFromAudience",
-        {
+        var dataTemp = {
             fromId: signaling.id,
             desc: pc.localDescription
-        });
+        };
+        console.log("This is what is being sent:");
+        console.log(dataTemp);
+        signaling.emit("screenSignalFromAudience",
+        dataTemp);
         console.log("start 3");
         console.log("Debug Alan 01 " + (new Date().getTime()));
       } catch (err) {
@@ -127,7 +130,11 @@
       videoRemoteElem.srcObject = event.streams[0];
     };
 
-
+    signaling.on("screenSignalFromAudience", async (data) =>  {
+        console.log("Debug Alan 07 " + (new Date().getTime()));
+        console.log("Got something from another audience member.");
+        console.log(data);
+    };
     signaling.on("screenSignalFromHost", async (data) =>  {
         console.log("Received from Host. Printing data...");
         console.log(data);
