@@ -106,14 +106,14 @@
         makingOffer = true;
         await pc.setLocalDescription(await pc.createOffer());
         // send the offer to the other peer
-        console.log("Debug Alan 05 " + getTime());
+        console.log("Debug Alan 05 " + (new Date().getTime()));
         signaling.emit("screenSignalFromAudience",
         {
             fromId: signaling.id,
             desc: pc.localDescription
         });
         console.log("start 3");
-        console.log("Debug Alan 01 " + getTime());
+        console.log("Debug Alan 01 " + (new Date().getTime()));
       } catch (err) {
         console.error(err);
       } finally {
