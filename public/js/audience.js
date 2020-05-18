@@ -134,7 +134,7 @@
         console.log("Debug Alan 07 " + (new Date().getTime()));
         console.log("Got something from another audience member.");
         console.log(data);
-    };
+    });
     signaling.on("screenSignalFromHost", async (data) =>  {
         console.log("Received from Host. Printing data...");
         console.log(data);
