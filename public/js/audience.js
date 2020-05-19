@@ -56,13 +56,18 @@
     // handles JSON.stringify/parse
     const signaling = io();
     const constraints = {audio: true, video: true};
-    const configuration = {
+    const configurationA = {
+        iceServers: [{urls: [
+        'stun:stun.robertianburton.com:3478'
+    ]}]};
+    const configurationB = {
         iceServers: [{urls: [
         'stun:stun.l.google.com:19302',
         'stun:stun1.l.google.com:19302',
         'stun:stun2.l.google.com:19302',
         'stun:stun.l.google.com:19302?transport=udp',
     ]}]};
+    const configuration = configurationA;
     const pc = new RTCPeerConnection(configuration);
 
     // send any ice candidates to the other peer
@@ -135,6 +140,7 @@
         console.log("Got something from another audience member.");
         console.log(data);
     });
+    
     signaling.on("screenSignalFromHost", async (data) =>  {
         console.log("Received from Host. Printing data...");
         console.log(data);
