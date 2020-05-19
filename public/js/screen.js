@@ -11,6 +11,7 @@
     let polite = false;
     var tracks = [];
     var sharing = false;
+    let makingOffer = false;
 
     function startup() {
         console.log("Screen JS Starting Up...");
@@ -145,7 +146,7 @@
 
             connections[data.fromId].onnegotiationneeded = async () => {
                 console.log("onnegotiationneeded trigger");
-                let makingOffer = false;
+                makingOffer = false;
               try {
                 makingOffer = true;
                 await connections[data.fromId].setLocalDescription(await connections[data.fromId].createOffer());
