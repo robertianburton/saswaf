@@ -201,26 +201,31 @@
                   await connections[data.fromId].setRemoteDescription(data.desc);
                   console.log("Try Block 5");
                   if (data.desc.type =="offer") {
+                    console.log("Try Block 6A");
                     await pc.setLocalDescription();
                     signaling.emit("screenSignalFromHost",{
                         fromId: signaling.id,
                         toId: data.fromId,
                         desc: connections[data.fromId].localDescription});
-                    console.log("Try Block 6");
+                    console.log("Try Block 6B");
                   }
                   console.log("Try Block 7");
-                  /*if(sharing===true) {
-                      stream.getTracks().forEach((track) => {tracks +=connections[data.fromId].addTrack(track, stream)});
-                  }*/
+                  if(!connections[data.fromId].saswafIsSendingToThis) {
+                    stream.getTracks().forEach((track) => connections[data.fromId].addTrack(track, stream));
+                    connections[data.fromId].saswafIsSendingToThis = true
+                    }
                   console.log("Doing Offer Stuff");
             } else if (data.candidate) {
+                console.log("Try Block 8");
                   try {
                     await connections[data.fromId].addIceCandidate(data.candidate);
+                    console.log("Try Block 9");
                   } catch(err) {
                     if (!ignoreOffer) {
-                      throw err;
+                      console.error(err);
                     }
                   }
+                  console.log("Try Block 10");
             }
             console.log("Peer Connection...");
             console.log(connections[data.fromId]);
