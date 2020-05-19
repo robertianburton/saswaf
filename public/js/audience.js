@@ -59,7 +59,12 @@
     const configurationA = {
         iceServers: [{urls: [
         'stun:stun.robertianburton.com:3478'
-    ]}]};
+    ]},
+    {
+      'url': 'turn:turn.45.55.43.60:3478?transport=udp',
+      'credential': 'testpassword',
+      'username': 'testuser'
+    },]};
     const configurationB = {
         iceServers: [{urls: [
         'stun:stun.l.google.com:19302',
