@@ -82,7 +82,7 @@
             "turns:us-turn2.xirsys.com:443?transport=tcp",      
          "turns:us-turn2.xirsys.com:5349?transport=tcp"   ]}]
 };
-    const configuration = configurationB;
+    const configuration = configurationC;
     var pc = new RTCPeerConnection(configuration);
 
     // send any ice candidates to the other peer
