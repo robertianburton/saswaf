@@ -10,6 +10,7 @@ const app = express()
 	.get('/', (req, res) => res.render('pages/index'))
 	.get('/soundcheck', (req, res) => res.render('pages/soundcheck'))
 	.get('/chat', (req, res) => res.render('pages/chat'))
+	.get('/equal', (req, res) => res.render('pages/equal'))
 	.get('/screen', (req, res) => res.render('pages/screen'))
 	.get('/audience', (req, res) => res.render('pages/audience'));
 
@@ -42,6 +43,11 @@ io.on("connection", function (socket) {
   socket.on("screenSignalFromAudience", function (data) {
   	socket.broadcast.emit("screenSignalFromAudience", data);
   	console.log("New Screen Signal From Audience: " + socket.id);
+  });
+
+  socket.on("screenSignalFromEqual", (data) => {
+  	socket.broadcast.emit("screenSignalFromEqual", data);
+  	console.log("New Screen Signal From Equal: " + socket.id);
   });
 
   socket.on("disconnect", () => {

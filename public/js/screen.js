@@ -148,7 +148,7 @@
         if(!connections[data.fromId]) {
             connections[data.fromId] = new RTCPeerConnection(configuration);
 
-            connections[data.fromId].onicecandidate = (data) => {
+            connections[data.fromId].onicecandidate = async (data) => {
                 console.log("onicecandidate trigger");
                 signaling.emit("screenSignalFromHost",{
                     toId: data.fromId,
