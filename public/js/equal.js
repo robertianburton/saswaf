@@ -82,7 +82,7 @@
             "turns:us-turn2.xirsys.com:443?transport=tcp",      
          "turns:us-turn2.xirsys.com:5349?transport=tcp"   ]}]
 };
-    const configuration = configurationC;
+    const configuration = configurationB;
     var pc = new RTCPeerConnection(configuration);
 
     // send any ice candidates to the other peer
@@ -181,7 +181,7 @@
         stream = null;
         pc.close();
         pc = new RTCPeerConnection(configuration);
-        nowStreaming = false;
+        nowStreaming = 0;
     };
     /*signaling.on("screenSignalFromEqual", async (data) =>  {
         console.log("Debug Alan 07 " + (new Date().getTime()));
@@ -226,10 +226,11 @@
         console.log(nowStreaming);
         console.log(nowStreaming===0);
         if(nowStreaming===0) {
+            nowStreaming = 1;
             stream = await navigator.mediaDevices.getDisplayMedia(constraints);
             stream.getTracks().forEach((track) => pc.addTrack(track, stream));
             videoLocalElem.srcObject = stream;
-            nowStreaming = 1;
+            nowStreaming = 2;
         };
         console.log("Done! 192");
       } catch(err) {
