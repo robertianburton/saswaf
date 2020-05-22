@@ -72,16 +72,24 @@
         'stun:stun.l.google.com:19302?transport=udp',
     ]}]};
     const configurationC = {
-        iceServers: [{   urls: [ "stun:us-turn2.xirsys.com" ]}, {   username: 
-            "k3IAtn2K1yMCrpypkP_CJCyEV7m3FHThFwcUnIxp_4i8-ZuFR4JQN0zqjllYFBXYAAAAAF7DZDF5YWtldHlTYXhlcw==",  
-             credential: "6f541688-998b-11ea-8e17-0242ac140004",   urls: [   
-            "turn:us-turn2.xirsys.com:80?transport=udp",    
-            "turn:us-turn2.xirsys.com:3478?transport=udp", 
-            "turn:us-turn2.xirsys.com:80?transport=tcp",     
-            "turn:us-turn2.xirsys.com:3478?transport=tcp", 
-            "turns:us-turn2.xirsys.com:443?transport=tcp",      
-         "turns:us-turn2.xirsys.com:5349?transport=tcp"   ]}]
-};
+        iceServers: [
+            {
+                urls: [ "stun:us-turn2.xirsys.com" ]
+            },
+            {   
+                username: "k3IAtn2K1yMCrpypkP_CJCyEV7m3FHThFwcUnIxp_4i8-ZuFR4JQN0zqjllYFBXYAAAAAF7DZDF5YWtldHlTYXhlcw==",  
+                credential: "6f541688-998b-11ea-8e17-0242ac140004",
+                urls: [   
+                    "turn:us-turn2.xirsys.com:80?transport=udp",    
+                    "turn:us-turn2.xirsys.com:3478?transport=udp", 
+                    "turn:us-turn2.xirsys.com:80?transport=tcp",     
+                    "turn:us-turn2.xirsys.com:3478?transport=tcp", 
+                    "turns:us-turn2.xirsys.com:443?transport=tcp",      
+                    "turns:us-turn2.xirsys.com:5349?transport=tcp"
+                ]
+            }
+        ]
+    };
     const configuration = configurationC;
     var pc = new RTCPeerConnection(configuration);
 
@@ -100,7 +108,7 @@
 
     // let the "negotiationneeded" event trigger offer generation
     pc.onnegotiationneeded = async () => {
-        console.log("onnegotiationneeded");
+        console.log("onnegotiationneeded...");
       try {
         makingOffer = true;
         await pc.setLocalDescription(await pc.createOffer());
@@ -117,28 +125,17 @@
       }
     };
 
+    // Mostly https://stackoverflow.com/questions/43978975/not-receiving-video-onicecandidate-is-not-executing
     async function start() {
-        console.log("start 1");
-      try {
-        console.log("start 2");
-        makingOffer = true;
-        await pc.setLocalDescription(await pc.createOffer());
-        // send the offer to the other peer
-        var dataTemp = {
-            fromId: signaling.id,
-            desc: pc.localDescription
-        };
-        console.log("This is what is being sent:");
-        console.log(dataTemp);
-        signaling.emit("screenSignalFromEqual",
-        dataTemp);
-        console.log("start 3");
-      } catch (err) {
-        console.error(err);
-      } finally {
-        makingOffer = false;
-      }
+      return pc.createOffer().then(function (offer) {
+        return pc.setLocalDescription(offer);
+      })
+      .then(function () {
+        signaling.emit("screenSignalFromEqual",{fromId: signaling.id,desc: pc.localDescription});
+      })
+      .catch(function (err){console.error(err)});
     };
+
         // once remote track media arrives, show it in remote video element
     pc.ontrack = (event) => {
       // don't set srcObject again if it is already set.
@@ -220,11 +217,8 @@
             }
           }
         }
-        console.log("Peer Connection...");
+        console.log("239 Peer Connection...");
         console.log(pc);
-        console.log("Now streaming:");
-        console.log(nowStreaming);
-        console.log(nowStreaming===0);
         if(nowStreaming===0) {
             nowStreaming = 1;
             stream = await navigator.mediaDevices.getDisplayMedia(constraints);
@@ -232,7 +226,6 @@
             videoLocalElem.srcObject = stream;
             nowStreaming = 2;
         };
-        console.log("Done! 192");
       } catch(err) {
         console.error(err);
       }
