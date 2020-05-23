@@ -68,7 +68,17 @@
     // Mostly from https://www.html5rocks.com/en/tutorials/webrtc/basics/#simpleRTCPeerConnectionExample
     // handles JSON.stringify/parse
     const signaling = io();
-    const constraints = {audio: true, video: true};
+    const constraints = {
+        video: true,
+        audio: {
+            echoCancellation: false,
+            autoGainControl: false,
+            googAutoGainControl: false,
+            noiseSuppression: false,
+            sampleRate: 44100,
+            sampleSize: 16
+        }
+    };
     const configurationA = {
         iceServers: [
             {
