@@ -76,7 +76,8 @@
             googAutoGainControl: false,
             noiseSuppression: false,
             sampleRate: 44100,
-            sampleSize: 16
+            sampleSize: 16,
+            channelCount: 2
         }
     };
     const configurationA = {
