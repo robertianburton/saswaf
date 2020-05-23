@@ -71,13 +71,14 @@
     const constraints = {
         video: true,
         audio: {
-            echoCancellation: false,
-            autoGainControl: false,
-            googAutoGainControl: false,
-            noiseSuppression: false,
-            sampleRate: 44100,
-            sampleSize: 16,
-            channelCount: 2
+            'channelCount': {'exact': 2},
+            'echoCancellation': false,
+            'autoGainControl': false,
+            'googAutoGainControl': false,
+            'noiseSuppression': false,
+            'sampleRate': 44100,
+            'sampleSize': 16
+            
         }
     };
     const configurationA = {
