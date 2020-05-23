@@ -3,6 +3,7 @@
     var buttonVideoSizeSource = null;
     var buttonVideoSizePage = null;
     var buttonVideoSizeResponsive = null;
+    var buttonLogConnection = null;
     var videoRemoteElem = null;
     var videoLocalElem = null;
     var screenHostId = null;
@@ -10,6 +11,7 @@
     let ignoreOffer = false;
     var nowStreaming = 0;
     var stream = null;
+    var pc = null;
     let polite = true;
 
     function startup() {
@@ -47,6 +49,13 @@
             ev.preventDefault();
         }, false);
 
+        buttonLogConnection = document.getElementById('buttonLogConnection');
+        buttonLogConnection.addEventListener('click', function(ev){
+            console.log("Log Connection");
+            console.log(pc);
+            ev.preventDefault();
+        }, false);
+
         console.log("Socket ID: " + signaling.id);
 
         start();
@@ -61,9 +70,18 @@
     const signaling = io();
     const constraints = {audio: true, video: true};
     const configurationA = {
-        iceServers: [{urls: [
-        'stun:stun.robertianburton.com:3478'
-    ]}]};
+        iceServers: [
+            {
+                urls: ['stun:stun.robertianburton.com:3478']
+            },
+            {
+                username: "testuser",
+                credential: "testpassword",
+                urls: [
+                    "turn:turn.robertianburton.com:3478"
+                ]
+            }
+    ]};
     const configurationB = {
         iceServers: [{urls: [
         'stun:stun.l.google.com:19302',
@@ -90,11 +108,11 @@
             }
         ]
     };
-    const configuration = configurationC;
-    var pc = new RTCPeerConnection(configuration);
+    const configuration = configurationA;
+    
 
     // send any ice candidates to the other peer
-    pc.onicecandidate = (data) => {
+    function onIceCandidate(data) {
         console.log("onicecandidate...");
         console.log(data);
         signaling.emit(
@@ -107,7 +125,7 @@
     };
 
     // let the "negotiationneeded" event trigger offer generation
-    pc.onnegotiationneeded = async () => {
+   async function onNegotiationNeeded() {
         console.log("onnegotiationneeded...");
       try {
         makingOffer = true;
@@ -127,23 +145,25 @@
 
     // Mostly https://stackoverflow.com/questions/43978975/not-receiving-video-onicecandidate-is-not-executing
     async function start() {
-      return pc.createOffer().then(function (offer) {
-        return pc.setLocalDescription(offer);
-      })
-      .then(function () {
-        signaling.emit("screenSignalFromEqual",{fromId: signaling.id,desc: pc.localDescription});
-      })
-      .catch(function (err){console.error(err)});
+        console.log("Start");
+        checkPeerConnection();
+        return pc.createOffer().then(function (offer) {
+            return pc.setLocalDescription(offer);
+        })
+        .then(function () {
+            signaling.emit("screenSignalFromEqual",{fromId: signaling.id,desc: pc.localDescription});
+        })
+        .catch(function (err){console.error(err)});
     };
 
         // once remote track media arrives, show it in remote video element
-    pc.ontrack = (event) => {
+    function onTrack(event) {
       // don't set srcObject again if it is already set.
       if (videoRemoteElem.srcObject) return;
       videoRemoteElem.srcObject = event.streams[0];
     };
 
-    pc.onconnectionstatechange = function(event) {
+    function onConnectionStateChange(event) {
         switch(pc.connectionState) {
             case "connected": 
                 console.log("Connection Connected!");
@@ -167,6 +187,15 @@
         }
     }   
 
+    function checkPeerConnection() {
+        if(!pc) {
+            pc = new RTCPeerConnection(configuration);
+            pc.onconnectionstatechange = onConnectionStateChange;
+            pc.ontrack = onTrack;
+            pc.onnegotiationneeded = onNegotiationNeeded;
+            pc.onicecandidate = onIceCandidate;
+        }
+    };
     function shutdown() {
         
         
@@ -187,6 +216,50 @@
     });*/
     
     signaling.on("screenSignalFromEqual", async (data) =>  {
+        if(!pc) {
+            pc = new RTCPeerConnection(configuration);
+            pc.onconnectionstatechange = onConnectionStateChange;
+            pc.ontrack = onTrack;
+            pc.onnegotiationneeded = onNegotiationNeeded;
+            pc.onicecandidate = onIceCandidate;
+        }
+        console.log("Received from Equal. Printing data...");
+        console.log(data);
+      try {
+        if (data.desc) {
+
+          const offerCollision = (data.desc.type == "offer") &&
+                                 (makingOffer || pc.signalingState != "stable");
+
+          ignoreOffer = !polite && offerCollision;
+          if (ignoreOffer) {
+            return;
+          };
+          await pc.setRemoteDescription(data.desc);
+          if (data.desc.type =="offer") {
+            await pc.setLocalDescription();
+            signaling.emit("screenSignalFromEqual",{
+                fromId: signaling.id,
+                desc: pc.localDescription});
+          }
+        } else if (data.candidate) {
+            await pc.addIceCandidate(data.candidate);
+        };
+        console.log("Peer Connection...");
+        console.log(pc);
+        if(nowStreaming===0) {
+            nowStreaming = 1;
+            stream = await navigator.mediaDevices.getDisplayMedia(constraints);
+            stream.getTracks().forEach((track) => pc.addTrack(track, stream));
+            videoLocalElem.srcObject = stream;
+            nowStreaming = 2;
+        };
+      } catch(err) {
+        console.error(err);
+      }
+    });
+
+    signaling.on("screenSignalFromTwo", async (data) =>  {
         console.log("Received from Equal. Printing data...");
         console.log(data);
       try {
@@ -230,8 +303,6 @@
         console.error(err);
       }
     });
-
-
 
     window.addEventListener('load', startup, false);
 })();
