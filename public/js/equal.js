@@ -49,6 +49,13 @@
             ev.preventDefault();
         }, false);
 
+        buttonStart = document.getElementById('buttonStart');
+        buttonStart.addEventListener('click', function(ev){
+            console.log("Start Button");
+            start();
+            ev.preventDefault();
+        }, false);
+
         buttonLogConnection = document.getElementById('buttonLogConnection');
         buttonLogConnection.addEventListener('click', function(ev){
             console.log("Log Connection");
@@ -57,8 +64,6 @@
         }, false);
 
         console.log("Socket ID: " + signaling.id);
-
-        start();
 
         console.log("Audience JS Startup Complete.");
     }
@@ -71,7 +76,19 @@
     const constraints = {
         video: true,
         audio: {
-            'channelCount': {'exact': 2},
+            'channelCount': {'ideal': 2},
+            'echoCancellation': false,
+            'autoGainControl': false,
+            'googAutoGainControl': false,
+            'noiseSuppression': false,
+            'sampleRate': 44100,
+            'sampleSize': 16
+            
+        }
+    };
+    const audioConstraints = {
+        audio: {
+            /*'channelCount': {'exact': 2},*/
             'echoCancellation': false,
             'autoGainControl': false,
             'googAutoGainControl': false,
@@ -90,9 +107,9 @@
                 username: "testuser",
                 credential: "testpassword",
                 urls: [
-                    "turn:turn.robertianburton.com:3478",
-                    "turn:turn.robertianburton.com:3478?transport=udp",
-                    "turn:turn.robertianburton.com:3478?transport=tcp"
+                    "turn:turn.45.55.43.60:3478",
+                    "turn:turn.45.55.43.60:3478?transport=udp",
+                    "turn:turn.45.55.43.60:3478?transport=tcp"
                 ]
             }
     ]};
@@ -159,7 +176,9 @@
 
     // Mostly https://stackoverflow.com/questions/43978975/not-receiving-video-onicecandidate-is-not-executing
     async function start() {
+
         console.log("Start");
+        nowStreaming = 1;
         checkPeerConnection();
         return pc.createOffer().then(function (offer) {
             return pc.setLocalDescription(offer);
@@ -215,9 +234,10 @@
         
         videoLocalElem.srcObject = null;
         videoRemoteElem.srcObject = null;
-        stream.getTracks().forEach(function(track) {
+        if(nowStreaming > 0) {stream.getTracks().forEach(function(track) {
           track.stop();
         });
+    }
         stream = null;
         pc.close();
         pc = new RTCPeerConnection(configuration);
@@ -261,18 +281,30 @@
         };
         console.log("Peer Connection...");
         console.log(pc);
-        if(nowStreaming===0) {
-            nowStreaming = 1;
+        if(nowStreaming===1) {
+            nowStreaming = 2;
+            /*stream = await navigator.mediaDevices.getUserMedia(constraints);*/
             stream = await navigator.mediaDevices.getDisplayMedia(constraints);
+            console.log("Capabilities:");
+            /*console.log(stream.getVideoTracks()[0].getCapabilities());*/
             stream.getTracks().forEach((track) => pc.addTrack(track, stream));
             videoLocalElem.srcObject = stream;
-            nowStreaming = 2;
+            nowStreaming = 3;
         };
       } catch(err) {
         console.error(err);
       }
     });
 
+    function listDevices() {
+        navigator.mediaDevices.enumerateDevices()
+        .then(data => console.log(
+            data.forEach(
+                async function (device) {
+            var txt = await device.getCapabilities();
+            console.log(device);console.log(txt)
+        })))
+    };
     signaling.on("screenSignalFromTwo", async (data) =>  {
         console.log("Received from Equal. Printing data...");
         console.log(data);

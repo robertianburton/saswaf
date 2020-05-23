@@ -59,12 +59,28 @@
         console.log("Soundcheck JS Startup Complete.");
     }
 
+    const constraintsA = {video: true, audio: true};
+    const constraintsB = {
+        video: true,
+        audio: {
+            'channelCount': {'ideal': 2},
+            'echoCancellation': false,
+            'autoGainControl': false,
+            'googAutoGainControl': false,
+            'noiseSuppression': false,
+            'sampleRate': 44100,
+            'sampleSize': 16
+            
+        }
+    };
 
     async function startCapture() {
         let captureStream = null;
 
         try {
-            captureStream = await navigator.mediaDevices.getDisplayMedia({video: true, audio: true});
+            captureStream = await navigator.mediaDevices.getDisplayMedia(constraintsB);
+            console.log("Capabilities:");
+            console.log(captureStream.getVideoTracks()[0]);
             videoElem.srcObject = captureStream;
         } catch(err) {
             console.error("Error: " + err);
