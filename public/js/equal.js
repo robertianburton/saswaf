@@ -229,73 +229,21 @@
             pc.onicecandidate = onIceCandidate;
         }
     };
+
     function shutdown() {
-        
-        
         videoLocalElem.srcObject = null;
         videoRemoteElem.srcObject = null;
-        if(nowStreaming > 0) {stream.getTracks().forEach(function(track) {
-          track.stop();
-        });
-    }
+        if(nowStreaming > 0) {
+            stream.getTracks().forEach(function(track) {
+                track.stop();
+            });
+        }
         stream = null;
         pc.close();
         pc = new RTCPeerConnection(configuration);
         nowStreaming = 0;
     };
-    /*signaling.on("screenSignalFromEqual", async (data) =>  {
-        console.log("Debug Alan 07 " + (new Date().getTime()));
-        console.log("Got something from another equal member.");
-        console.log(data);
-    });*/
     
-    signaling.on("screenSignalFromEqual", async (data) =>  {
-        if(!pc) {
-            pc = new RTCPeerConnection(configuration);
-            pc.onconnectionstatechange = onConnectionStateChange;
-            pc.ontrack = onTrack;
-            pc.onnegotiationneeded = onNegotiationNeeded;
-            pc.onicecandidate = onIceCandidate;
-        }
-        console.log("Received from Equal. Printing data...");
-        console.log(data);
-      try {
-        if (data.desc) {
-
-          const offerCollision = (data.desc.type == "offer") &&
-                                 (makingOffer || pc.signalingState != "stable");
-
-          ignoreOffer = !polite && offerCollision;
-          if (ignoreOffer) {
-            return;
-          };
-          await pc.setRemoteDescription(data.desc);
-          if (data.desc.type =="offer") {
-            await pc.setLocalDescription();
-            signaling.emit("screenSignalFromEqual",{
-                fromId: signaling.id,
-                desc: pc.localDescription});
-          }
-        } else if (data.candidate) {
-            await pc.addIceCandidate(data.candidate);
-        };
-        console.log("Peer Connection...");
-        console.log(pc);
-        if(nowStreaming===1) {
-            nowStreaming = 2;
-            /*stream = await navigator.mediaDevices.getUserMedia(constraints);*/
-            stream = await navigator.mediaDevices.getDisplayMedia(constraints);
-            console.log("Capabilities:");
-            /*console.log(stream.getVideoTracks()[0].getCapabilities());*/
-            stream.getTracks().forEach((track) => pc.addTrack(track, stream));
-            videoLocalElem.srcObject = stream;
-            nowStreaming = 3;
-        };
-      } catch(err) {
-        console.error(err);
-      }
-    });
-
     function listDevices() {
         navigator.mediaDevices.enumerateDevices()
         .then(data => console.log(
@@ -305,50 +253,48 @@
             console.log(device);console.log(txt)
         })))
     };
-    signaling.on("screenSignalFromTwo", async (data) =>  {
+
+    signaling.on("screenSignalFromEqual", async (data) =>  {
+        checkPeerConnection();
         console.log("Received from Equal. Printing data...");
         console.log(data);
-      try {
-        if (data.desc) {
+        try {
+            if (data.desc) {
 
-          const offerCollision = (data.desc.type == "offer") &&
-                                 (makingOffer || pc.signalingState != "stable");
+              const offerCollision = (data.desc.type == "offer") &&
+                                     (makingOffer || pc.signalingState != "stable");
 
-          ignoreOffer = !polite && offerCollision;
-          if (ignoreOffer) {
-            return;
-          }
-
-          await pc.setRemoteDescription(data.desc);
-          if (data.desc.type =="offer") {
-            await pc.setLocalDescription();
-            signaling.emit("screenSignalFromEqual",{
-                fromId: signaling.id,
-                desc: pc.localDescription});
-          }
-          console.log("Doing Offer Stuff");
-        } else if (data.candidate) {
-          try {
-            await pc.addIceCandidate(data.candidate);
-          } catch(err) {
-            if (!ignoreOffer) {
-              throw err;
-            }
-          }
+              ignoreOffer = !polite && offerCollision;
+              if (ignoreOffer) {
+                return;
+              };
+              await pc.setRemoteDescription(data.desc);
+              if (data.desc.type =="offer") {
+                await pc.setLocalDescription();
+                signaling.emit("screenSignalFromEqual",{
+                    fromId: signaling.id,
+                    desc: pc.localDescription});
+              }
+            } else if (data.candidate) {
+                await pc.addIceCandidate(data.candidate);
+            };
+            console.log("Peer Connection...");
+            console.log(pc);
+            if(nowStreaming===1) {
+                nowStreaming = 2;
+                /*stream = await navigator.mediaDevices.getUserMedia(constraints);*/
+                stream = await navigator.mediaDevices.getDisplayMedia(constraints);
+                console.log("Capabilities:");
+                /*console.log(stream.getVideoTracks()[0].getCapabilities());*/
+                stream.getTracks().forEach((track) => pc.addTrack(track, stream));
+                videoLocalElem.srcObject = stream;
+                nowStreaming = 3;
+            };
+        } catch(err) {
+            console.error(err);
         }
-        console.log("239 Peer Connection...");
-        console.log(pc);
-        if(nowStreaming===0) {
-            nowStreaming = 1;
-            stream = await navigator.mediaDevices.getDisplayMedia(constraints);
-            stream.getTracks().forEach((track) => pc.addTrack(track, stream));
-            videoLocalElem.srcObject = stream;
-            nowStreaming = 2;
-        };
-      } catch(err) {
-        console.error(err);
-      }
     });
+
 
     window.addEventListener('load', startup, false);
 })();
