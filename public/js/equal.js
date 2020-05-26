@@ -143,9 +143,29 @@
       }
     };
 
+    function handleGetUserMediaError(e) {
+    switch(e.name) {
+    case "NotFoundError":
+        alert("Unable to open your call because no camera and/or microphone" +
+            "were found.");
+        break;
+    case "SecurityError":
+    case "PermissionDeniedError":
+        // Do nothing; this is the same as the user canceling the call.
+        break;
+    default:
+        alert("Error opening your camera and/or microphone: " + e.message);
+        break;
+    }
+
+    closeVideoCall();
+    }
+
     // Mostly https://stackoverflow.com/questions/43978975/not-receiving-video-onicecandidate-is-not-executing
     async function start() {
-
+        if(nowStreaming>0) {
+            return;
+        };
         console.log("Start");
         nowStreaming = 1;
         checkPeerConnection();
@@ -253,7 +273,9 @@
             if(nowStreaming===1) {
                 nowStreaming = 2;
                 /*stream = await navigator.mediaDevices.getUserMedia(constraints);*/
-                stream = await navigator.mediaDevices.getDisplayMedia(constraints);
+                await navigator.mediaDevices.getDisplayMedia(constraints).then(function(getDisplayMediaResult) {
+                    stream = getDisplayMediaResult;
+                }).catch(handleGetUserMediaError);
                 console.log("Capabilities:");
                 /*console.log(stream.getVideoTracks()[0].getCapabilities());*/
                 stream.getTracks().forEach((track) => pc.addTrack(track, stream));
