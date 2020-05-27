@@ -173,7 +173,13 @@
             return pc.setLocalDescription(offer);
         })
         .then(function () {
-            signaling.emit("screenSignalFromEqual",{fromId: signaling.id,desc: pc.localDescription});
+            signaling.emit(
+                "screenSignalFromEqual",
+                {
+                    fromId: signaling.id,
+                    desc: pc.localDescription
+                }
+            );
         })
         .catch(function (err){console.error(err)});
     };
@@ -276,7 +282,7 @@
                 await navigator.mediaDevices.getDisplayMedia(constraints).then(function(getDisplayMediaResult) {
                     stream = getDisplayMediaResult;
                 }).catch(handleGetUserMediaError);
-                console.log("Capabilities:");
+                /*console.log("Capabilities:");*/
                 /*console.log(stream.getVideoTracks()[0].getCapabilities());*/
                 stream.getTracks().forEach((track) => pc.addTrack(track, stream));
                 videoLocalElem.srcObject = stream;
