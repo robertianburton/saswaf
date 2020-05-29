@@ -139,42 +139,42 @@
       sharing = true;
     };
 
+    async function handleOnicecandidate(data) {
+        console.log("onicecandidate trigger");
+        signaling.emit("screenSignalFromHost",{
+        toId: data.fromId,
+        candidate: data.candidate});
+    }
+
+    async function handleOnnegotiationneeded() {
+        console.log("onnegotiationneeded trigger");
+        makingOffer = false;
+        try {
+            makingOffer = true;
+            await connections[data.fromId].setLocalDescription(await connections[data.fromId].createOffer());
+            // send the offer to the other peer
+            signaling.emit("screenSignalFromHost",{
+                toId: data.fromId,
+                desc: connections[data.fromId].localDescription});
+        } catch (err) {
+            console.error(err);
+        } finally {
+            makingOffer = false;
+        }
+    }
 
     signaling.on("screenSignalFromAudience", async (data) => {
         console.log("Receiving Audience Signal. Printing Data...");
-        console.log("Debug Alan 02 " + (new Date().getTime()));
         console.log(data);
 
         if(!connections[data.fromId]) {
             connections[data.fromId] = new RTCPeerConnection(configuration);
 
-            connections[data.fromId].onicecandidate = async (data) => {
-                console.log("onicecandidate trigger");
-                signaling.emit("screenSignalFromHost",{
-                    toId: data.fromId,
-                    candidate: data.candidate});
-            };
+            connections[data.fromId].onicecandidate = handleOnicecandidate;
 
-            connections[data.fromId].onnegotiationneeded = async () => {
-                console.log("onnegotiationneeded trigger");
-                makingOffer = false;
-              try {
-                makingOffer = true;
-                await connections[data.fromId].setLocalDescription(await connections[data.fromId].createOffer());
-                // send the offer to the other peer
-                signaling.emit("screenSignalFromHost",{
-                    toId: data.fromId,
-                    desc: connections[data.fromId].localDescription});
-              } catch (err) {
-                console.error(err);
-              } finally {
-                makingOffer = false;
-              }
-            };
+            connections[data.fromId].onnegotiationneeded = handleOnnegotiationneeded;
 
-                console.log("start 1");
               try {
-                console.log("start 2");
                 makingOffer = true;
                 await connections[data.fromId].setLocalDescription(await pc.createOffer());
                 // send the offer to the other peer
@@ -184,7 +184,6 @@
                     toId: data.fromId,
                     desc: connections[data.fromId].localDescription
                 });
-                console.log("start 3");
               } catch (err) {
                 console.error(err);
               } finally {
@@ -196,47 +195,34 @@
         };
 
         try {
-            console.log("Try Block 1");
             if (data.desc) {
-                console.log("Debug Alan 03 " + (new Date().getTime()));
-                console.log("Try Block 2");
                   const offerCollision = (data.desc.type == "offer") &&
                                          (makingOffer || connections[data.fromId].signalingState != "stable");
-                                         console.log("Try Block 3");
                   ignoreOffer = !polite && offerCollision;
                   if (ignoreOffer) {
                     return;
                   }
-                  console.log("Debug Alan 04 " + (new Date().getTime()));
-                  console.log("Try Block 4");
                   await connections[data.fromId].setRemoteDescription(data.desc);
-                  console.log("Try Block 5");
                   if (data.desc.type =="offer") {
-                    console.log("Try Block 6A");
                     await pc.setLocalDescription();
                     signaling.emit("screenSignalFromHost",{
                         fromId: signaling.id,
                         toId: data.fromId,
                         desc: connections[data.fromId].localDescription});
-                    console.log("Try Block 6B");
                   }
-                  console.log("Try Block 7");
                   if(!connections[data.fromId].saswafIsSendingToThis) {
                     stream.getTracks().forEach((track) => connections[data.fromId].addTrack(track, stream));
                     connections[data.fromId].saswafIsSendingToThis = true
                     }
                   console.log("Doing Offer Stuff");
             } else if (data.candidate) {
-                console.log("Try Block 8");
                   try {
                     await connections[data.fromId].addIceCandidate(data.candidate);
-                    console.log("Try Block 9");
                   } catch(err) {
                     if (!ignoreOffer) {
                       console.error(err);
                     }
                   }
-                  console.log("Try Block 10");
             }
             console.log("Peer Connection...");
             console.log(connections[data.fromId]);
