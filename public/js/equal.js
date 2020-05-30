@@ -65,7 +65,7 @@
 
         console.log("Socket ID: " + signaling.id);
 
-        console.log("Audience JS Startup Complete.");
+        console.log("Equal JS Startup Complete.");
     }
 
 
