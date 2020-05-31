@@ -12,21 +12,23 @@ const app = express()
 	.get('/chat', (req, res) => res.render('pages/chat'))
 	.get('/equal', (req, res) => res.render('pages/equal'))
 	.get('/screen', (req, res) => res.render('pages/screen'))
-	.get('/audience', (req, res) => res.render('pages/audience'));
+	.get('/audience', (req, res) => res.render('pages/audience'))
+	.get('/host', (req, res) => res.render('pages/host'))
+	.get('/watch', (req, res) => res.render('pages/watch'));
 
 const server = app.listen(PORT, () => console.log(`Listening on ${ PORT }`));
 
 const io = socket(server);
 
-const activeUsers = new Set();
+const activeChatUsers = new Set();
 
 io.on("connection", function (socket) {
   console.log("Made socket connection: " + socket.id);
 
   socket.on("new user", function (data) {
   	socket.userId = data;
-  	activeUsers.add(data);
-  	io.emit("new user", [...activeUsers]);
+  	activeChatUsers.add(data);
+  	io.emit("new user", [...activeChatUsers]);
   	console.log("New user. Added: " + data);
   });
 
@@ -35,8 +37,8 @@ io.on("connection", function (socket) {
   	console.log("New message from "+ data.sender);
   });
 
-  socket.on("screenSignalFromHost", (data) => {
-  	io.to(data.toId).emit('screenSignalFromHost', data)
+  socket.on("screenSignalFromScreen", (data) => {
+  	io.to(data.toId).emit('screenSignalFromScreen', data)
   	console.log("New Screen Signal From Host: " + socket.id);
   });
 
@@ -50,8 +52,9 @@ io.on("connection", function (socket) {
   	console.log("New Screen Signal From Equal: " + socket.id);
   });
 
-  socket.on("disconnect", () => {
-  	activeUsers.delete(socket.userId);
-  	io.emit("user disconnected", socket.userId);
-  })
+  socket.on("disconnecting", (reason) => {
+  	activeChatUsers.delete(socket.userId);
+  	io.emit("user disconnecting", socket.userId);
+  	console.log("User disconnecting: " + socket.id + " because " + reason);
+  });
 });

@@ -75,7 +75,7 @@
     // send any ice candidates to the other peer
     pc.onicecandidate = (data) => {
         console.log("onicecandidate trigger");
-        signaling.emit("screenSignalFromHost",{candidate: data.candidate});
+        signaling.emit("screenSignalFromScreen",{candidate: data.candidate});
     };
 
     // let the "negotiationneeded" event trigger offer generation
@@ -84,7 +84,7 @@
       try {
         await pc.setLocalDescription(await pc.createOffer());
         // send the offer to the other peer
-        signaling.emit("screenSignalFromHost",{desc: pc.localDescription});
+        signaling.emit("screenSignalFromScreen",{desc: pc.localDescription});
       } catch (err) {
         console.error(err);
       }
@@ -141,7 +141,7 @@
 
     async function handleOnicecandidate(data) {
         console.log("onicecandidate trigger");
-        signaling.emit("screenSignalFromHost",{
+        signaling.emit("screenSignalFromScreen",{
         toId: data.fromId,
         candidate: data.candidate});
     }
@@ -153,7 +153,7 @@
             makingOffer = true;
             await connections[data.fromId].setLocalDescription(await connections[data.fromId].createOffer());
             // send the offer to the other peer
-            signaling.emit("screenSignalFromHost",{
+            signaling.emit("screenSignalFromScreen",{
                 toId: data.fromId,
                 desc: connections[data.fromId].localDescription});
         } catch (err) {
@@ -178,7 +178,7 @@
                 makingOffer = true;
                 await connections[data.fromId].setLocalDescription(await pc.createOffer());
                 // send the offer to the other peer
-                signaling.emit("screenSignalFromHost",
+                signaling.emit("screenSignalFromScreen",
                 {
                     fromId: signaling.id,
                     toId: data.fromId,
@@ -205,7 +205,7 @@
                   await connections[data.fromId].setRemoteDescription(data.desc);
                   if (data.desc.type =="offer") {
                     await pc.setLocalDescription();
-                    signaling.emit("screenSignalFromHost",{
+                    signaling.emit("screenSignalFromScreen",{
                         fromId: signaling.id,
                         toId: data.fromId,
                         desc: connections[data.fromId].localDescription});
