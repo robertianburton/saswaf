@@ -4,6 +4,7 @@
     var buttonVideoSizePage = null;
     var buttonVideoSizeResponsive = null;
     var buttonLogConnection = null;
+    var userIdField = null;
     var videoRemoteElem = null;
     var videoLocalElem = null;
     var screenHostId = null;
@@ -63,7 +64,14 @@
             ev.preventDefault();
         }, false);
 
+        userIdField = document.getElementById('userIdField');
+        userIdField.innerHTML=": "+signaling.id;
+
         console.log("Socket ID: " + signaling.id);
+
+        sendAddHostToServer();
+
+
 
         console.log("Host JS Startup Complete.");
     }
@@ -110,10 +118,18 @@
     ]}]};
     const configuration = configurationA;
     
+    function sendToServer(data) {
+        signaling.emit("signalToServer",data);
+    };
 
+    function sendAddHostToServer() {
+        /*userName = user || `User${Math.floor(Math.random() * 1000000)}`;*/
+        sendToServer({'type':'addHost', 'id':signaling.id});
+    };
 
 
     // Mostly https://stackoverflow.com/questions/43978975/not-receiving-video-onicecandidate-is-not-executing
+
 
 
     window.addEventListener('load', startup, false);

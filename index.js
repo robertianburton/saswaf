@@ -4,57 +4,94 @@ const socket = require("socket.io");
 const PORT = process.env.PORT || 5000;
 
 const app = express()
-	.use(express.static(path.join(__dirname, 'public')))
-	.set('views', path.join(__dirname, 'views'))
-	.set('view engine', 'ejs')
-	.get('/', (req, res) => res.render('pages/index'))
-	.get('/soundcheck', (req, res) => res.render('pages/soundcheck'))
-	.get('/chat', (req, res) => res.render('pages/chat'))
-	.get('/equal', (req, res) => res.render('pages/equal'))
-	.get('/screen', (req, res) => res.render('pages/screen'))
-	.get('/audience', (req, res) => res.render('pages/audience'))
-	.get('/host', (req, res) => res.render('pages/host'))
-	.get('/watch', (req, res) => res.render('pages/watch'));
+    .use(express.static(path.join(__dirname, 'public')))
+    .set('views', path.join(__dirname, 'views'))
+    .set('view engine', 'ejs')
+    .get('/', (req, res) => res.render('pages/index'))
+    .get('/soundcheck', (req, res) => res.render('pages/soundcheck'))
+    .get('/chat', (req, res) => res.render('pages/chat'))
+    .get('/equal', (req, res) => res.render('pages/equal'))
+    .get('/screen', (req, res) => res.render('pages/screen'))
+    .get('/audience', (req, res) => res.render('pages/audience'))
+    .get('/host', (req, res) => res.render('pages/host'))
+    .get('/watch', (req, res) => res.render('pages/watch'));
 
-const server = app.listen(PORT, () => console.log(`Listening on ${ PORT }`));
+const server = app.listen(PORT, () => printToConsole(`Listening on ${ PORT }`));
 
 const io = socket(server);
 
 const activeChatUsers = new Set();
 
+const hostList = new Set();
+
+function formatDate(date, format) {
+    date = date.toJSON().split(/[:/.TZ-]/);
+    return format.replace(/[ymdhisu]/g, function (letter) {
+        return date['ymdhisu'.indexOf(letter)];
+    });
+};
+
+function printToConsole(data) {
+    console.log(formatDate(new Date(), 'y-m-d h:i:s.u'));
+    console.log(data);
+};
+
+function sendHostList(socket) {
+    printToConsole(hostList);
+    socket.broadcast.emit("signalFromServer", {type: 'hostList', hostList: Array.from(hostList)});
+
+};
+
 io.on("connection", function (socket) {
-  console.log("Made socket connection: " + socket.id);
+    printToConsole("Made socket connection: " + socket.id);
 
-  socket.on("new user", function (data) {
-  	socket.userId = data;
-  	activeChatUsers.add(data);
-  	io.emit("new user", [...activeChatUsers]);
-  	console.log("New user. Added: " + data);
-  });
+    socket.on("new user", function (data) {
+        socket.userId = data;
+        activeChatUsers.add(data);
+        io.emit("new user", [...activeChatUsers]);
+        printToConsole("New user. Added: " + data);
+    });
 
-  socket.on("chat message", function (data) {
-  	io.emit("chat message", data);
-  	console.log("New message from "+ data.sender);
-  });
+    socket.on("chat message", function (data) {
+        io.emit("chat message", data);
+        printToConsole("New message from "+ data.sender);
+    });
 
-  socket.on("screenSignalFromScreen", (data) => {
-  	io.to(data.toId).emit('screenSignalFromScreen', data)
-  	console.log("New Screen Signal From Host: " + socket.id);
-  });
+    socket.on("screenSignalFromScreen", (data) => {
+        io.to(data.toId).emit('screenSignalFromScreen', data)
+        printToConsole("New Screen Signal From Host: " + socket.id);
+    });
 
-  socket.on("screenSignalFromAudience", function (data) {
-  	socket.broadcast.emit("screenSignalFromAudience", data);
-  	console.log("New Screen Signal From Audience: " + socket.id);
-  });
+    socket.on("screenSignalFromAudience", function (data) {
+        socket.broadcast.emit("screenSignalFromAudience", data);
+        printToConsole("New Screen Signal From Audience: " + socket.id);
+    });
 
-  socket.on("screenSignalFromEqual", (data) => {
-  	socket.broadcast.emit("screenSignalFromEqual", data);
-  	console.log("New Screen Signal From Equal: " + socket.id);
-  });
+    socket.on("screenSignalFromEqual", (data) => {
+        socket.broadcast.emit("screenSignalFromEqual", data);
+        printToConsole("New Screen Signal From Equal: " + socket.id);
+    });
 
-  socket.on("disconnecting", (reason) => {
-  	activeChatUsers.delete(socket.userId);
-  	io.emit("user disconnecting", socket.userId);
-  	console.log("User disconnecting: " + socket.id + " because " + reason);
-  });
+    socket.on("signalToServer", (data) => {
+        printToConsole(data.type);
+        if(data.type==='addHost') {
+            printToConsole("addHostToServer: " + socket.id);
+            hostList.add(data.id);
+            printToConsole("hostList:");
+            printToConsole(hostList);
+            sendHostList(socket);
+        } else if(data.type==='requestHostList') {
+            printToConsole("Heeeee");
+            sendHostList(socket);
+        };
+
+    });
+
+    socket.on("disconnecting", (reason) => {
+        hostList.delete(socket.id);
+        activeChatUsers.delete(socket.userId);
+        io.emit("user disconnecting", socket.userId);
+        printToConsole("User disconnecting: " + socket.id + " because " + reason);
+        sendHostList(socket);
+    });
 });

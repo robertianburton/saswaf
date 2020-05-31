@@ -7,7 +7,7 @@
     var videoRemoteElem = null;
     var pc = null;
     var hostListButtons = null;
-    var tempHostList = ['John','Rich','Ecklineere','Suzenneth'];
+    var hostList = [];
 
     function startup() {
         console.log("Watch JS Starting Up...");
@@ -52,6 +52,7 @@
 
         hostListButtons = document.getElementById('hostListButtons');
 
+        sendToServer({'type':'requestHostList'});
         fillHostList();
 
         console.log("Socket ID: " + signaling.id);
@@ -97,15 +98,29 @@
     ]}]};
     const configuration = configurationA;
     
+    function sendToServer(data) {
+        signaling.emit("signalToServer",data);
+    };
+
     function fillHostList() {
         hostListButtons.innerHTML = "";
-        tempHostList.forEach(
-            (host) => {
-                 hostListButtons.innerHTML +='<button type="button" class="list-group-item list-group-item-action">'+host+'</button>';
-            }
-        );
-       
+        if(hostList.length>0) {
+            hostList.forEach(
+                (host) => {
+                     hostListButtons.innerHTML +='<button type="button" class="list-group-item list-group-item-action">'+host+'</button>';
+                }
+            );
+        }
     };
+
+    signaling.on("signalFromServer", async (data) =>  {
+        console.log("Received from Server. Printing data...");
+        console.log(data);
+        if(data.type="hostList") {
+            hostList = data.hostList;
+            fillHostList();
+        };
+    });
 
     window.addEventListener('load', startup, false);
 })();
