@@ -5,13 +5,9 @@
     var buttonVideoSizeResponsive = null;
     var buttonLogConnection = null;
     var videoRemoteElem = null;
-    var screenHostId = null;
-    let makingOffer = false;
-    let ignoreOffer = false;
-    var nowStreaming = 0;
-    var stream = null;
     var pc = null;
-    let polite = true;
+    var hostListButtons = null;
+    var tempHostList = ['John','Rich','Ecklineere','Suzenneth'];
 
     function startup() {
         console.log("Watch JS Starting Up...");
@@ -47,13 +43,6 @@
             ev.preventDefault();
         }, false);
 
-        buttonStart = document.getElementById('buttonStart');
-        buttonStart.addEventListener('click', function(ev){
-            console.log("Start Button");
-            start();
-            ev.preventDefault();
-        }, false);
-
         buttonLogConnection = document.getElementById('buttonLogConnection');
         buttonLogConnection.addEventListener('click', function(ev){
             console.log("Log Connection");
@@ -61,15 +50,15 @@
             ev.preventDefault();
         }, false);
 
+        hostListButtons = document.getElementById('hostListButtons');
+
+        fillHostList();
+
         console.log("Socket ID: " + signaling.id);
 
         console.log("Watch JS Startup Complete.");
     }
 
-
-
-    // Mostly from https://www.html5rocks.com/en/tutorials/webrtc/basics/#simpleRTCPeerConnectionExample
-    // handles JSON.stringify/parse
     const signaling = io();
     const constraints = {
         video: true,
@@ -108,6 +97,15 @@
     ]}]};
     const configuration = configurationA;
     
+    function fillHostList() {
+        hostListButtons.innerHTML = "";
+        tempHostList.forEach(
+            (host) => {
+                 hostListButtons.innerHTML +='<button type="button" class="list-group-item list-group-item-action">'+host+'</button>';
+            }
+        );
+       
+    };
 
     window.addEventListener('load', startup, false);
 })();
