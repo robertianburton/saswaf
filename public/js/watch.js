@@ -47,13 +47,13 @@
         buttonLogConnection.addEventListener('click', function(ev){
             console.log("Log Connection");
             console.log(pc);
+            sendToServer({'type':'requestHostList'});
             ev.preventDefault();
         }, false);
 
         hostListButtons = document.getElementById('hostListButtons');
 
         sendToServer({'type':'requestHostList'});
-        fillHostList();
 
         console.log("Socket ID: " + signaling.id);
 
@@ -99,6 +99,7 @@
     const configuration = configurationA;
     
     function sendToServer(data) {
+        console.log(data);
         signaling.emit("signalToServer",data);
     };
 

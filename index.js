@@ -22,7 +22,7 @@ const io = socket(server);
 
 const activeChatUsers = new Set();
 
-const hostList = new Set();
+var hostList = new Set();
 
 function formatDate(date, format) {
     date = date.toJSON().split(/[:/.TZ-]/);
@@ -32,13 +32,14 @@ function formatDate(date, format) {
 };
 
 function printToConsole(data) {
-    console.log(formatDate(new Date(), 'y-m-d h:i:s.u'));
-    console.log(data);
+    console.log(formatDate(new Date(), 'ymd hisu')+" "+JSON.stringify(data));
 };
 
 function sendHostList(socket) {
-    printToConsole(hostList);
-    socket.broadcast.emit("signalFromServer", {type: 'hostList', hostList: Array.from(hostList)});
+    printToConsole("Sending Host List");
+    var transmitData = {type: 'hostList', hostList: Array.from(hostList)};
+    printToConsole(transmitData);
+    io.emit("signalFromServer", transmitData);
 
 };
 
@@ -73,16 +74,19 @@ io.on("connection", function (socket) {
     });
 
     socket.on("signalToServer", (data) => {
+        printToConsole("34 Heeeee");
         printToConsole(data.type);
         if(data.type==='addHost') {
-            printToConsole("addHostToServer: " + socket.id);
+            printToConsole("67 Heeeee");
+            printToConsole("addHost: " + socket.id);
             hostList.add(data.id);
             printToConsole("hostList:");
             printToConsole(hostList);
             sendHostList(socket);
         } else if(data.type==='requestHostList') {
-            printToConsole("Heeeee");
+            printToConsole("84 Heeeee");
             sendHostList(socket);
+            /*socket.broadcast.emit("signalFromServer", {type: 'hostList', hostList: Array.from(hostList)});*/
         };
 
     });
