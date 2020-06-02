@@ -99,3 +99,8 @@ io.on("connection", function (socket) {
         sendHostList(socket);
     });
 });
+
+
+// Sources:
+// Mostly https://stackoverflow.com/questions/43978975/not-receiving-video-onicecandidate-is-not-executing
+// Mostly from https://www.html5rocks.com/en/tutorials/webrtc/basics/#simpleRTCPeerConnectionExample

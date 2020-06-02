@@ -14,6 +14,7 @@
     var stream = null;
     var pc = null;
     let polite = true;
+    const signaling = io();
 
     function startup() {
         console.log("Host JS Starting Up...");
@@ -61,6 +62,8 @@
         buttonLogConnection.addEventListener('click', function(ev){
             console.log("Log Connection");
             console.log(pc);
+            console.log(signaling.id);
+            sendAddHostToServer();
             ev.preventDefault();
         }, false);
 
@@ -69,18 +72,12 @@
 
         console.log("Socket ID: " + signaling.id);
 
-        sendAddHostToServer();
-
 
 
         console.log("Host JS Startup Complete.");
     }
 
-
-
-    // Mostly from https://www.html5rocks.com/en/tutorials/webrtc/basics/#simpleRTCPeerConnectionExample
-    // handles JSON.stringify/parse
-    const signaling = io();
+    
     const constraints = {
         video: true,
         audio: {
@@ -126,9 +123,6 @@
         /*userName = user || `User${Math.floor(Math.random() * 1000000)}`;*/
         sendToServer({'type':'addHost', 'id':signaling.id});
     };
-
-
-    // Mostly https://stackoverflow.com/questions/43978975/not-receiving-video-onicecandidate-is-not-executing
 
 
 
