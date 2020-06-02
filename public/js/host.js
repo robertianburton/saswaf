@@ -126,6 +126,7 @@
     signaling.on("connect", async (data) =>  {
         console.log("Connected. Printing data");
         console.log(data);
+        console.log(signaling.id);
     });
 
     window.addEventListener('load', startup, false);
