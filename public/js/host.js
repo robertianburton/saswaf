@@ -14,7 +14,9 @@
     var stream = null;
     var pc = null;
     let polite = true;
-    const signaling = io();
+    var signaling;
+    var friendList = new Set();
+    var friendListItems = null;
 
     function startup() {
         console.log("Host JS Starting Up...");
@@ -63,16 +65,18 @@
             console.log("Log Connection");
             console.log(pc);
             console.log(signaling.id);
-            sendAddHostToServer();
+            
             ev.preventDefault();
         }, false);
 
         userIdField = document.getElementById('userIdField');
-        userIdField.innerHTML=": "+signaling.id;
+        
+        friendListItems = document.getElementById('friendListItems');
 
-        console.log("Socket ID: " + signaling.id);
-
-
+        signaling = io();
+        userIdField.innerHTML=": Waiting...";
+        bindSignalingHandlers(signaling);
+        
 
         console.log("Host JS Startup Complete.");
     }
@@ -114,6 +118,17 @@
     ]}]};
     const configuration = configurationA;
     
+    function formatDate(date, format) {
+        date = date.toJSON().split(/[:/.TZ-]/);
+        return format.replace(/[ymdhisu]/g, function (letter) {
+            return date['ymdhisu'.indexOf(letter)];
+        });
+    };
+
+    function printToConsole(data) {
+        console.log(formatDate(new Date(), 'ymd hisu')+" "+JSON.stringify(data));
+    };
+
     function sendToServer(data) {
         signaling.emit("signalToServer",data);
     };
@@ -123,11 +138,42 @@
         sendToServer({'type':'addHost', 'id':signaling.id});
     };
 
-    signaling.on("connect", async (data) =>  {
-        console.log("Connected. Printing data");
-        console.log(data);
-        console.log(signaling.id);
-    });
+    function fillFriendList() {
+        friendListItems.innerHTML = '';
+        if(friendList.size>0) {
+            friendList.forEach(
+                (friend) => {
+                     friendListItems.innerHTML +='<button type="button" class="list-group-item list-group-item-action">'+friend+'</button>';
+                }
+            );
+        }
+    };
+
+    function bindSignalingHandlers(signalingObject) {
+        signalingObject.on("connect", async (data) =>  {
+            console.log("Socket ID: " + signaling.id);
+            userIdField = document.getElementById('userIdField');
+            userIdField.innerHTML=": "+signaling.id;
+            sendAddHostToServer();
+        });
+
+        signalingObject.on("signalToUser", async (data) =>  {
+            printToConsole("SignalToUser From " + data.fromId + " to " + data.toId + ":");
+            console.log(data);
+            if(data.type="newFriend") {
+                friendList.add(data.fromId);
+                console.log(friendList);
+                fillFriendList();
+            };
+        });
+
+        signalingObject.on("leaver", async (data) =>  {
+            console.log(data);
+            friendList.delete(data.fromId);
+            console.log("Removing " + data.fromId);
+            fillFriendList();
+        });
+    };
 
     window.addEventListener('load', startup, false);
 })();

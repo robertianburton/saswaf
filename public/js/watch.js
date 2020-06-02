@@ -8,6 +8,7 @@
     var pc = null;
     var hostListButtons = null;
     var hostList = [];
+    var currentHost = null;
 
     function startup() {
         console.log("Watch JS Starting Up...");
@@ -103,16 +104,30 @@
         signaling.emit("signalToServer",data);
     };
 
+    function sendToUser(data) {
+        console.log(data);
+        signaling.emit("signalToUser",data);
+    };
+
     function fillHostList() {
         hostListButtons.innerHTML = "";
         if(hostList.length>0) {
             hostList.forEach(
                 (host) => {
-                     hostListButtons.innerHTML +='<button type="button" class="list-group-item list-group-item-action">'+host+'</button>';
+                    hostListButtons.innerHTML +='<button type="button" class="list-group-item list-group-item-action" id="host_'+host+'">'+host+'</button>';
+                    var thisitem = document.getElementById('host_'+host);
+                    thisitem.addEventListener('click', function(ev){
+                        console.log("Clicked " + host);
+                        sendToUser({fromId: signaling.id, toId: host, type: "newFriend"});
+                        currentHost = host;
+                        ev.preventDefault();
+                    }, false);
+                    
                 }
             );
         }
     };
+
 
     signaling.on("signalFromServer", async (data) =>  {
         console.log("Received from Server. Printing data...");

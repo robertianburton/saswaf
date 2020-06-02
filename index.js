@@ -73,20 +73,22 @@ io.on("connection", function (socket) {
         printToConsole("New Screen Signal From Equal: " + socket.id);
     });
 
+    socket.on("signalToUser", (data) => {
+        io.to(data.toId).emit('signalToUser', data);
+        printToConsole("SignalToUser From " + data.fromId + " to " + data.toId + ":");
+        printToConsole(data);
+    });
+
     socket.on("signalToServer", (data) => {
-        printToConsole("34 Heeeee");
         printToConsole(data.type);
         if(data.type==='addHost') {
-            printToConsole("67 Heeeee");
             printToConsole("addHost: " + socket.id);
             hostList.add(data.id);
             printToConsole("hostList:");
             printToConsole(hostList);
             sendHostList(socket);
         } else if(data.type==='requestHostList') {
-            printToConsole("84 Heeeee");
             sendHostList(socket);
-            /*socket.broadcast.emit("signalFromServer", {type: 'hostList', hostList: Array.from(hostList)});*/
         };
 
     });
@@ -94,13 +96,15 @@ io.on("connection", function (socket) {
     socket.on("disconnecting", (reason) => {
         hostList.delete(socket.id);
         activeChatUsers.delete(socket.userId);
-        io.emit("user disconnecting", socket.userId);
-        printToConsole("User disconnecting: " + socket.id + " because " + reason);
+        /*io.emit("user disconnecting", socket.id);*/
+        var socketToRemove = socket.id;
+        socket.broadcast.emit("leaver", {fromId: socketToRemove});
+        printToConsole("User disconnecting: " + socketToRemove + " because " + reason);
         sendHostList(socket);
     });
 });
 
 
 // Sources:
-// Mostly https://stackoverflow.com/questions/43978975/not-receiving-video-onicecandidate-is-not-executing
-// Mostly from https://www.html5rocks.com/en/tutorials/webrtc/basics/#simpleRTCPeerConnectionExample
+// https://stackoverflow.com/questions/43978975/not-receiving-video-onicecandidate-is-not-executing
+// from https://www.html5rocks.com/en/tutorials/webrtc/basics/#simpleRTCPeerConnectionExample
