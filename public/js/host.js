@@ -88,7 +88,6 @@
             'noiseSuppression': false,
             'sampleRate': 44100,
             'sampleSize': 16
-            
         }
     };
     const configurationA = {
@@ -124,7 +123,10 @@
         sendToServer({'type':'addHost', 'id':signaling.id});
     };
 
-
+    signaling.on("connect", async (data) =>  {
+        console.log("Connected. Printing data");
+        console.log(data);
+    });
 
     window.addEventListener('load', startup, false);
 })();
