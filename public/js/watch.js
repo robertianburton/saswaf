@@ -9,6 +9,8 @@
     var hostListButtons = null;
     var hostList = [];
     var currentHost = null;
+    var hostIdField = null;
+    var sectionHostList = null;
 
     function startup() {
         console.log("Watch JS Starting Up...");
@@ -52,6 +54,8 @@
             ev.preventDefault();
         }, false);
 
+        sectionHostList = document.getElementById('sectionHostList');
+        hostIdField = document.getElementById('hostIdField');
         hostListButtons = document.getElementById('hostListButtons');
 
         sendToServer({'type':'requestHostList'});
@@ -117,9 +121,11 @@
                     hostListButtons.innerHTML +='<button type="button" class="list-group-item list-group-item-action" id="host_'+host+'">'+host+'</button>';
                     var thisitem = document.getElementById('host_'+host);
                     thisitem.addEventListener('click', function(ev){
+                        sectionHostList.style.display = "none";
                         console.log("Clicked " + host);
                         sendToUser({fromId: signaling.id, toId: host, type: "newFriend"});
                         currentHost = host;
+                        hostIdField.innerHTML = ': ' + currentHost;
                         ev.preventDefault();
                     }, false);
                     
