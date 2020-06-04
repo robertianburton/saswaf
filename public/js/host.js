@@ -17,6 +17,7 @@
     var signaling;
     var friendList = new Set();
     var friendListItems = null;
+    var pclist = [];
 
     function startup() {
         console.log("Host JS Starting Up...");
@@ -129,6 +130,11 @@
         console.log(formatDate(new Date(), 'ymd hisu')+" "+JSON.stringify(data));
     };
 
+    function sendToUser(data) {
+        console.log(data);
+        signaling.emit("signalToUser",data);
+    };
+
     function sendToServer(data) {
         signaling.emit("signalToServer",data);
     };
@@ -174,6 +180,113 @@
             fillFriendList();
         });
     };
+
+    function handleGetUserMediaError(e) {
+        switch(e.name) {
+            case "NotFoundError":
+                alert("Unable to open your call because no camera and/or microphone" +
+                    "were found.");
+                break;
+            case "SecurityError":
+            case "PermissionDeniedError":
+                // Do nothing; this is the same as the user canceling the call.
+                break;
+            default:
+                alert("Error opening your camera and/or microphone: " + e.message);
+                break;
+        }
+
+        /*closeVideoCall();*/
+    }
+
+    function handleNegotiationNeededEvent(friendId) {
+    pclist[friendId].createOffer().then(function(offer) {
+        return pclist[friendId].setLocalDescription(offer);
+    })
+    .then(function() {
+        sendToServer({
+            fromId: signaling.id,
+            toId: friendId,
+            type: "video-offer",
+            sdp: pclist[friendId].localDescription
+        });
+    })
+    .catch(reportError);
+    }
+
+    async function handleOnicecandidate(data) {
+        console.log("onicecandidate trigger");
+        signaling.emit("screenSignalFromScreen",{
+        toId: data.fromId,
+        candidate: data.candidate});
+    }
+
+    async function handleOnnegotiationneeded() {
+        console.log("onnegotiationneeded trigger");
+        makingOffer = false;
+        try {
+            makingOffer = true;
+            await pclist[data.fromId].setLocalDescription(await pclist[data.fromId].createOffer());
+            // send the offer to the other peer
+            signaling.emit("screenSignalFromScreen",{
+                toId: data.fromId,
+                desc: pclist[data.fromId].localDescription});
+        } catch (err) {
+            console.error(err);
+        } finally {
+            makingOffer = false;
+        }
+    }
+
+    async function start() {
+        if(nowStreaming>0) {
+            return;
+        };
+        console.log("Start");
+        nowStreaming = 1;
+        /*checkPeerConnection();*/
+        return pc.createOffer().then(function (offer) {
+            return pc.setLocalDescription(offer);
+        })
+        .then(function () {
+            signaling.emit(
+                "screenSignalFromEqual",
+                {
+                    fromId: signaling.id,
+                    desc: pc.localDescription
+                }
+            );
+        })
+        .catch(function (err){console.error(err)});
+    };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     window.addEventListener('load', startup, false);
 })();
