@@ -144,21 +144,21 @@
     };
 
     function handleGetUserMediaError(e) {
-    switch(e.name) {
-    case "NotFoundError":
-        alert("Unable to open your call because no camera and/or microphone" +
-            "were found.");
-        break;
-    case "SecurityError":
-    case "PermissionDeniedError":
-        // Do nothing; this is the same as the user canceling the call.
-        break;
-    default:
-        alert("Error opening your camera and/or microphone: " + e.message);
-        break;
-    }
+        switch(e.name) {
+        case "NotFoundError":
+            alert("Unable to open your call because no camera and/or microphone" +
+                "were found.");
+            break;
+        case "SecurityError":
+        case "PermissionDeniedError":
+            // Do nothing; this is the same as the user canceling the call.
+            break;
+        default:
+            alert("Error opening your camera and/or microphone: " + e.message);
+            break;
+        }
 
-    closeVideoCall();
+        closeVideoCall();
     }
 
     // Mostly https://stackoverflow.com/questions/43978975/not-receiving-video-onicecandidate-is-not-executing

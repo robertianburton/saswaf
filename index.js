@@ -90,7 +90,6 @@ io.on("connection", function (socket) {
         } else if(data.type==='requestHostList') {
             sendHostList(socket);
         };
-
     });
 
     socket.on("disconnecting", (reason) => {

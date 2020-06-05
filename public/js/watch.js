@@ -115,7 +115,7 @@
 
     function fillHostList() {
         hostListButtons.innerHTML = "";
-        if(hostList.length>0) {
+        if(hostList && hostList.length>0) {
             hostList.forEach(
                 (host) => {
                     hostListButtons.innerHTML +='<button type="button" class="list-group-item list-group-item-action" id="host_'+host+'">'+host+'</button>';
@@ -134,15 +134,137 @@
         }
     };
 
+    function onTrack(event) {
+      // don't set srcObject again if it is already set.
+      if (videoRemoteElem.srcObject) return;
+      videoRemoteElem.srcObject = event.streams[0];
+    };
+
+    function checkPeerConnection() {
+        if(!pc) {
+            pc = new RTCPeerConnection(configuration);
+            pc.onconnectionstatechange = onConnectionStateChange;
+            pc.ontrack = onTrack;
+            pc.onnegotiationneeded = onNegotiationNeeded;
+            pc.onicecandidate = onIceCandidate;
+        }
+    };
+
+
+    function onConnectionStateChange(event) {
+        switch(pc.connectionState) {
+            case "connected": 
+                console.log("Connection Connected!");
+            // The connection has become fully connected
+            break;
+            case "disconnected":
+            case "failed":
+            // One or more transports has terminated unexpectedly or in an error
+                console.log("Failed! Closing!");
+                shutdown();
+            break;
+            case "closed":
+            // The connection has been closed
+                console.log("Closed! Closing!");
+                shutdown();
+            break;
+        };
+        if(pc.iceConnectionState == 'disconnected') {
+            console.log('Disconnected. Closing.');
+            shutdown();
+        }
+    };
+
+        // send any ice candidates to the other peer
+    function onIceCandidate(data) {
+        console.log("onicecandidate...");
+        console.log(data);
+        signaling.emit(
+            "screenSignalFromEqual",
+            {
+                fromId: signaling.id,
+                candidate: data.candidate
+            }
+        )
+    };
+
+    // let the "negotiationneeded" event trigger offer generation
+   async function onNegotiationNeeded() {
+        console.log("onnegotiationneeded...");
+      try {
+        makingOffer = true;
+        await pc.setLocalDescription(await pc.createOffer());
+        // send the offer to the other peer
+        signaling.emit("screenSignalFromEqual",
+        {
+            fromId: signaling.id,
+            desc: pc.localDescription
+        });
+      } catch (err) {
+        console.error(err);
+      } finally {
+        makingOffer = false;
+      }
+    };
+
+    function handleGetUserMediaError(e) {
+        switch(e.name) {
+        case "NotFoundError":
+            alert("Unable to open your call because no camera and/or microphone" +
+                "were found.");
+            break;
+        case "SecurityError":
+        case "PermissionDeniedError":
+            // Do nothing; this is the same as the user canceling the call.
+            break;
+        default:
+            alert("Error opening your camera and/or microphone: " + e.message);
+            break;
+        }
+
+        closeVideoCall();
+    }
+
+    // once remote track media arrives, show it in remote video element
+    function onTrack(event) {
+      // don't set srcObject again if it is already set.
+      if (videoRemoteElem.srcObject) return;
+      videoRemoteElem.srcObject = event.streams[0];
+    };
 
     signaling.on("signalFromServer", async (data) =>  {
         console.log("Received from Server. Printing data...");
         console.log(data);
         if(data.type="hostList") {
             hostList = data.hostList;
+            hostIdField.innerHTML = '';
             fillHostList();
         };
     });
+
+    signaling.on("leaver", async (data) =>  {
+        console.log("Received from Server. Printing data...");
+        console.log(data);
+        if(data.fromId=currentHost) {
+            sectionHostList.style.display = "block";
+            hostList = data.hostList;
+            fillHostList();
+        };
+    });
+
+    function shutdown() {
+        videoLocalElem.srcObject = null;
+        videoRemoteElem.srcObject = null;
+        if(nowStreaming > 0) {
+            stream.getTracks().forEach(function(track) {
+                track.stop();
+            });
+        }
+        stream = null;
+        pc.close();
+        pc = new RTCPeerConnection(configuration);
+        nowStreaming = 0;
+    };
 
     window.addEventListener('load', startup, false);
 })();

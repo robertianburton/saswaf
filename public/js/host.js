@@ -197,7 +197,7 @@
         }
 
         /*closeVideoCall();*/
-    }
+    };
 
     function handleNegotiationNeededEvent(friendId) {
     pclist[friendId].createOffer().then(function(offer) {
@@ -212,14 +212,14 @@
         });
     })
     .catch(reportError);
-    }
+    };
 
     async function handleOnicecandidate(data) {
         console.log("onicecandidate trigger");
         signaling.emit("screenSignalFromScreen",{
         toId: data.fromId,
         candidate: data.candidate});
-    }
+    };
 
     async function handleOnnegotiationneeded() {
         console.log("onnegotiationneeded trigger");
@@ -236,7 +236,31 @@
         } finally {
             makingOffer = false;
         }
-    }
+    };
+
+    function onConnectionStateChange(event) {
+        switch(pc.connectionState) {
+            case "connected": 
+                console.log("Connection Connected!");
+            // The connection has become fully connected
+            break;
+            case "disconnected":
+            case "failed":
+            // One or more transports has terminated unexpectedly or in an error
+                console.log("Failed! Closing!");
+                shutdown();
+            break;
+            case "closed":
+            // The connection has been closed
+                console.log("Closed! Closing!");
+                shutdown();
+            break;
+        };
+        if(pc.iceConnectionState == 'disconnected') {
+            console.log('Disconnected. Closing.');
+            shutdown();
+        }
+    };
 
     async function start() {
         if(nowStreaming>0) {
@@ -244,16 +268,16 @@
         };
         console.log("Start");
         nowStreaming = 1;
-        /*checkPeerConnection();*/
+        checkPeerConnection();
         return pc.createOffer().then(function (offer) {
             return pc.setLocalDescription(offer);
         })
-        .then(function () {
+        .then(function () {    
             signaling.emit(
                 "screenSignalFromEqual",
                 {
                     fromId: signaling.id,
-                    desc: pc.localDescription
+                    desc: pclist.localDescription /* uhhhh */
                 }
             );
         })
