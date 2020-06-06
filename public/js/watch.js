@@ -50,7 +50,6 @@
         buttonLogConnection.addEventListener('click', function(ev){
             console.log("Log Connection");
             console.log(pc);
-            sendToServer({'type':'requestHostList'});
             ev.preventDefault();
         }, false);
 
@@ -103,16 +102,24 @@
     ]}]};
     const configuration = configurationA;
     
+    function formatDate(date, format) {
+        date = date.toJSON().split(/[:/.TZ-]/);
+        return format.replace(/[ymdhisu]/g, function (letter) {
+            return date['ymdhisu'.indexOf(letter)];
+        });
+    };
+
     function printToConsole(data) {
         console.log(formatDate(new Date(), 'ymd hisu')+" "+JSON.stringify(data));
     };
-    
+
     function sendToServer(data) {
         console.log(data);
         signaling.emit("signalToServer",data);
     };
 
     function sendToUser(data) {
+        console.log("Sending: ");
         console.log(data);
         signaling.emit("signalToUser",data);
     };
@@ -149,8 +156,8 @@
             pc = new RTCPeerConnection(configuration);
             pc.onconnectionstatechange = onConnectionStateChange;
             pc.ontrack = onTrack;
-            pc.onnegotiationneeded = onNegotiationNeeded;
-            pc.onicecandidate = onIceCandidate;
+            pc.onnegotiationneeded = handleNegotiationNeededEvent;
+            pc.onicecandidate = handleICECandidateEvent;
         }
     };
 
@@ -193,22 +200,22 @@
     };
 
     // let the "negotiationneeded" event trigger offer generation
-   async function onNegotiationNeeded() {
-        console.log("onnegotiationneeded...");
-      try {
-        makingOffer = true;
-        await pc.setLocalDescription(await pc.createOffer());
-        // send the offer to the other peer
-        signaling.emit("screenSignalFromEqual",
-        {
-            fromId: signaling.id,
-            desc: pc.localDescription
-        });
-      } catch (err) {
-        console.error(err);
-      } finally {
-        makingOffer = false;
-      }
+    async function handleNegotiationNeededEvent() {
+        console.log("Peer Connection");
+        console.log(pc);
+        pc.createOffer().then(function(offer) {
+            return pc.setLocalDescription(offer);
+        })
+        .then(function() {
+            sendToUser({
+                fromId: signaling.id,
+                toId: currentHost,
+                type: "video-offer",
+                sdp: pc.localDescription
+
+            })
+        })
+        .catch(reportError);
     };
 
     function handleGetUserMediaError(e) {
@@ -231,9 +238,15 @@
 
     // once remote track media arrives, show it in remote video element
     function onTrack(event) {
+        console.log("Getting tracks!");
       // don't set srcObject again if it is already set.
       if (videoRemoteElem.srcObject) return;
       videoRemoteElem.srcObject = event.streams[0];
+    };
+
+    function reportError(e) {
+        console.log("Report Error");
+        console.error(e);
     };
 
     signaling.on("signalFromServer", async (data) =>  {
@@ -256,8 +269,53 @@
         };
     });
 
+    signaling.on("signalToUser", async (data) =>  {
+        printToConsole("SignalToUser From " + data.fromId + " to " + data.toId + ":");
+        console.log(data);
+        if(data.type==="video-offer") {
+            checkPeerConnection();
+            var desc = new RTCSessionDescription(data.sdp);
+            pc.setRemoteDescription(desc)
+            .then(function() {
+                return pc.createAnswer();
+            })
+            .then(function(answer) {
+                return pc.setLocalDescription(answer);
+            })
+            .then(function() {
+                var msg = {
+                    fromId: signaling.id,
+                    toId: currentHost,
+                    type: "video-answer",
+                    sdp: pc.localDescription
+                };
+                sendToUser(msg);
+            })
+            .catch(handleGetUserMediaError);
+        } else if(data.type==="new-ice-candidate") {
+            handleNewICECandidate(data);
+        };
+    });
+
+    function handleICECandidateEvent(data) {
+        if (data.candidate) {
+            sendToUser({
+                type: "new-ice-candidate",
+                toId: data.fromId,
+                fromId: signaling.id,
+                candidate: data.candidate
+            });
+        };
+    };
+
+    async function handleNewICECandidate(data) {
+        var candidate = new RTCIceCandidate(data.candidate);
+
+        await pc.addIceCandidate(candidate)
+        .catch(reportError);
+    }
+
     function shutdown() {
-        videoLocalElem.srcObject = null;
         videoRemoteElem.srcObject = null;
         if(nowStreaming > 0) {
             stream.getTracks().forEach(function(track) {

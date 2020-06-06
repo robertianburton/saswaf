@@ -80,7 +80,8 @@ io.on("connection", function (socket) {
     });
 
     socket.on("signalToServer", (data) => {
-        printToConsole(data.type);
+    	printToConsole("SignalToServer From " + data.fromId + ":");
+        printToConsole(data);
         if(data.type==='addHost') {
             printToConsole("addHost: " + socket.id);
             hostList.add(data.id);
