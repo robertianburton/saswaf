@@ -103,6 +103,10 @@
     ]}]};
     const configuration = configurationA;
     
+    function printToConsole(data) {
+        console.log(formatDate(new Date(), 'ymd hisu')+" "+JSON.stringify(data));
+    };
+    
     function sendToServer(data) {
         console.log(data);
         signaling.emit("signalToServer",data);
