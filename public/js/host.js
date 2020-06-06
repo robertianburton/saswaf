@@ -5,7 +5,6 @@
     var buttonVideoSizeResponsive = null;
     var buttonLogConnection = null;
     var userIdField = null;
-    var videoRemoteElem = null;
     var videoLocalElem = null;
     var screenHostId = null;
     let makingOffer = false;
@@ -22,35 +21,34 @@
     function startup() {
         console.log("Host JS Starting Up...");
 
-        videoRemoteElem = document.getElementById('videoRemoteElem');
         videoLocalElem = document.getElementById('videoLocalElem');
 
         buttonVideoSizeSource = document.getElementById('buttonVideoSizeSource');
         buttonVideoSizeSource.addEventListener('click', function(ev){
-            videoRemoteElem.style.width = "auto";
-            videoRemoteElem.scrollIntoView();
+            videoLocalElem.style.width = "auto";
+            videoLocalElem.scrollIntoView();
             ev.preventDefault();
         }, false);
 
         buttonVideoSizeResponsive = document.getElementById('buttonVideoSizeResponsive');
         buttonVideoSizeResponsive.addEventListener('click', function(ev){
-            videoRemoteElem.style.width = "100%";
+            videoLocalElem.style.width = "100%";
 
             ev.preventDefault();
         }, false);
 
         buttonVideoSizePage = document.getElementById('buttonVideoSizePage');
         buttonVideoSizePage.addEventListener('click', function(ev){
-            videoRemoteElem.style.width = window.innerWidth;
+            videoLocalElem.style.width = window.innerWidth;
 
             var docH = $( document ).height();
             var vidH = $('#videoElem').height();
-            var videoScale = ($('#videoElem').width() / $('#videoRemoteElem').height());
+            var videoScale = ($('#videoElem').width() / $('#videoLocalElem').height());
             var topH = docH-vidH;
             var workableH = Math.floor((window.innerHeight-topH-0)*videoScale);
 
-            videoRemoteElem.style.width = workableH + "px";
-            videoRemoteElem.scrollIntoView();
+            videoLocalElem.style.width = workableH + "px";
+            videoLocalElem.scrollIntoView();
             ev.preventDefault();
         }, false);
 
@@ -74,9 +72,7 @@
         
         friendListItems = document.getElementById('friendListItems');
 
-        signaling = io();
-        userIdField.innerHTML=": Waiting...";
-        bindSignalingHandlers(signaling);
+        
         
 
         console.log("Host JS Startup Complete.");
@@ -262,7 +258,7 @@
         }
     };
 
-    async function start() {
+    async function oldStart() {
         if(nowStreaming>0) {
             return;
         };
@@ -282,6 +278,25 @@
             );
         })
         .catch(function (err){console.error(err)});
+    };
+
+    async function start() {
+        signaling = io();
+        userIdField.innerHTML=": Waiting...";
+        bindSignalingHandlers(signaling);
+        nowStreaming = 1;
+        if(nowStreaming===1) {
+            nowStreaming = 2;
+            /*stream = await navigator.mediaDevices.getUserMedia(constraints);*/
+            await navigator.mediaDevices.getDisplayMedia(constraints).then(function(getDisplayMediaResult) {
+                stream = getDisplayMediaResult;
+            }).catch(handleGetUserMediaError);
+            /*console.log("Capabilities:");*/
+            /*console.log(stream.getVideoTracks()[0].getCapabilities());*/
+            /*stream.getTracks().forEach((track) => pc.addTrack(track, stream));*/
+            videoLocalElem.srcObject = stream;
+            nowStreaming = 3;
+        };
     };
 
 
