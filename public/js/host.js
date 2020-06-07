@@ -276,6 +276,7 @@
 
     async function handleNewICECandidate(data) {
         printToConsole("handleNewICECandidate");
+        console.log(data);
         var candidate = new RTCIceCandidate(data.candidate);
 
         await pclist[data.fromId].addIceCandidate(candidate)
