@@ -162,25 +162,56 @@
         signalingObject.on("signalToUser", async (data) =>  {
             printToConsole("SignalToUser From " + data.fromId + " to " + data.toId + ":");
             console.log(data);
-            console.log("Type");
-            console.log(data.type);
             if(data.type==="newFriend") {
                 friendList.add(data.fromId);
                 console.log(friendList);
                 fillFriendList();
                 if(!pclist[data.fromId]) {
                     pclist[data.fromId] = new RTCPeerConnection(configuration);
-                    pclist[data.fromId].onnegotiationneeded = handleNegotiationNeededEvent(data.fromId);
+                    /*pclist[data.fromId].onnegotiationneeded = handleNegotiationNeededEvent;*/
+
+                    pclist[data.fromId].onnegotiationneeded = function () {
+                        printToConsole("handleNegotiationNeededEvent");
+                        console.log(data.fromId);
+                        pclist[data.fromId].createOffer().then(function(offer) {
+                            return pclist[data.fromId].setLocalDescription(offer);
+                        })
+                        .then(function() {
+                            sendToUser({
+                                fromId: signaling.id,
+                                toId: data.fromId,
+                                type: "video-offer",
+                                sdp: pclist[data.fromId].localDescription
+                            });
+                        })
+                        .catch(reportError);
+                    };
+
+
+
                     pclist[data.fromId].onicecandidate = handleICECandidateEvent;
                     /*pclist[data.fromId].oniceconnectionstatechange = onConnectionStateChange;*/
+                    handleNegotiationNeededEvent(data.fromId);
                 }
             }
             else if(data.type==="video-answer") {
                 var desc = new RTCSessionDescription(data.sdp);
                 await pclist[data.fromId].setRemoteDescription(desc).catch(reportError);
-                console.log("In video-answer, printing pclist entry");
-                console.log(pclist[data.fromId]);
-                stream.getTracks().forEach((track) => pclist[data.fromId].addTrack(track, stream));
+                /*console.log("In video-answer, printing pclist entry");
+                console.log(pclist[data.fromId]);*/
+
+                if(!pclist[data.fromId].nowStreaming) {
+                    console.log("HAPPENING")
+                    pclist[data.fromId].nowStreaming = 2;
+                    stream.getTracks().forEach((track) => pclist[data.fromId].addTrack(track, stream));
+                    pclist[data.fromId].nowStreaming = 3;
+                };
+                /*
+                try{
+                    stream.getTracks().forEach((track) => pclist[data.fromId].addTrack(track));
+                } catch (err) {
+                    console.error(err)
+                };*/
             }
             else if(data.type==="new-ice-candidate") {
                 handleNewICECandidate(data);
@@ -214,6 +245,8 @@
     };
 
     function handleNegotiationNeededEvent(friendId) {
+        printToConsole("handleNegotiationNeededEvent");
+        console.log(friendId);
         pclist[friendId].createOffer().then(function(offer) {
             return pclist[friendId].setLocalDescription(offer);
         })
@@ -228,7 +261,38 @@
         .catch(reportError);
     };
 
+    /*handleNegotiationNeededEvent = async (friendId) => {
+        printToConsole("handleNegotiationNeededEvent");
+        try {
+            await pclist[friendId].setLocalDescription(await pclist[friendId].createOffer());
+            sendToUser({
+                fromId: signaling.id,
+                toId: friendId,
+                type: "video-offer",
+                sdp: pclist[friendId].localDescription
+            });
+        } catch (err) {
+            console.error(err);
+        }
+    };
+*/
+    /*async function handleNegotiationNeededEvent(data) {
+        printToConsole("handleNegotiationNeededEvent");
+        try {
+            await pclist[data.fromId].setLocalDescription(await pclist[data.fromId].createOffer());
+            sendToUser({
+                fromId: signaling.id,
+                toId: data.fromId,
+                type: "video-offer",
+                sdp: pclist[data.fromId].localDescription
+            });
+        } catch (err) {
+            console.error(err);
+        }
+    };*/
+
     function handleICECandidateEvent(data) {
+        printToConsole("handleICECandidateEvent");
         if (data.candidate) {
             sendToUser({
                 type: "new-ice-candidate",
@@ -240,45 +304,16 @@
     };
 
     async function handleNewICECandidate(data) {
+        printToConsole("handleNewICECandidate");
         var candidate = new RTCIceCandidate(data.candidate);
 
         await pclist[data.fromId].addIceCandidate(candidate)
         .catch(reportError);
     };
-    
+
     function reportError(e) {
         console.log("Report Error");
         console.error(e);
-    };
-
-    async function handleOnnegotiationneeded(friendId) {
-        console.log("onnegotiationneeded trigger");
-        pclist[friendId].createOffer().then(function(offer) {
-            return pclist[friendId].setLocalDescription(offer);
-        })
-        .then(function() {
-            sendToUser({
-                fromId: signaling.id,
-                toId: friendId,
-                type: "video-offer",
-                sdp: pclist[friendId].localDescription
-            });
-        })
-        .catch(reportError);
-
-        /*makingOffer = false;
-        try {
-            makingOffer = true;
-            await pclist[data.fromId].setLocalDescription(await pclist[data.fromId].createOffer());
-            // send the offer to the other peer
-            signaling.emit("screenSignalFromScreen",{
-                toId: data.fromId,
-                desc: pclist[data.fromId].localDescription});
-        } catch (err) {
-            console.error(err);
-        } finally {
-            makingOffer = false;
-        }*/
     };
 
     function onConnectionStateChange(event) {
@@ -303,28 +338,6 @@
             console.log('Disconnected. Closing.');
             shutdown();
         }
-    };
-
-    async function oldStart() {
-        if(nowStreaming>0) {
-            return;
-        };
-        console.log("Start");
-        nowStreaming = 1;
-        checkPeerConnection();
-        return pc.createOffer().then(function (offer) {
-            return pc.setLocalDescription(offer);
-        })
-        .then(function () {    
-            signaling.emit(
-                "screenSignalFromEqual",
-                {
-                    fromId: signaling.id,
-                    desc: pclist.localDescription /* uhhhh */
-                }
-            );
-        })
-        .catch(function (err){console.error(err)});
     };
 
     async function start() {

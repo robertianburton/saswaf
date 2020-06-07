@@ -17,6 +17,7 @@
         console.log("Watch JS Starting Up...");
 
         videoRemoteElem = document.getElementById('videoRemoteElem');
+        videoRemoteElem.srcObject = null;
 
         buttonVideoSizeSource = document.getElementById('buttonVideoSizeSource');
         buttonVideoSizeSource.addEventListener('click', function(ev){
@@ -58,6 +59,7 @@
         hostIdField = document.getElementById('hostIdField');
         userIdField = document.getElementById('userIdField');
         hostListButtons = document.getElementById('hostListButtons');
+
 
         sendToServer({'type':'requestHostList'});
 
@@ -148,12 +150,6 @@
         userIdField.innerHTML = ': ' + signaling.id;
     };
 
-    function onTrack(event) {
-      // don't set srcObject again if it is already set.
-      if (videoRemoteElem.srcObject) return;
-      videoRemoteElem.srcObject = event.streams[0];
-    };
-
     function checkPeerConnection() {
         if(!pc) {
             pc = new RTCPeerConnection(configuration);
@@ -189,24 +185,7 @@
         }
     };
 
-    // let the "negotiationneeded" event trigger offer generation
-    async function handleNegotiationNeededEvent() {
-        console.log("Peer Connection");
-        console.log(pc);
-        pc.createOffer().then(function(offer) {
-            return pc.setLocalDescription(offer);
-        })
-        .then(function() {
-            sendToUser({
-                fromId: signaling.id,
-                toId: currentHost,
-                type: "video-offer",
-                sdp: pc.localDescription
 
-            })
-        })
-        .catch(reportError);
-    };
 
     function handleGetUserMediaError(e) {
         switch(e.name) {
@@ -229,9 +208,12 @@
     // once remote track media arrives, show it in remote video element
     function onTrack(event) {
         console.log("Getting tracks!");
-      // don't set srcObject again if it is already set.
-      if (videoRemoteElem.srcObject) return;
-      videoRemoteElem.srcObject = event.streams[0];
+        // don't set srcObject again if it is already set.
+        if (videoRemoteElem.srcObject) return;
+
+        console.log("SET THE TRACKS!!!!");
+        console.log(event);
+        videoRemoteElem.srcObject = event.streams[0];
     };
 
     function reportError(e) {
@@ -292,7 +274,7 @@
         if (data.candidate) {
             sendToUser({
                 type: "new-ice-candidate",
-                toId: data.fromId,
+                toId: currentHost,
                 fromId: signaling.id,
                 candidate: data.candidate
             });
@@ -306,6 +288,24 @@
         await pc.addIceCandidate(candidate)
         .catch(reportError);
     }
+
+    // let the "negotiationneeded" event trigger offer generation
+    async function handleNegotiationNeededEvent() {
+        console.log("handleNegotiationNeededEvent");
+        pc.createOffer().then(function(offer) {
+            return pc.setLocalDescription(offer);
+        })
+        .then(function() {
+            sendToUser({
+                fromId: signaling.id,
+                toId: currentHost,
+                type: "video-offer",
+                sdp: pc.localDescription
+
+            })
+        })
+        .catch(reportError);
+    };
 
     function shutdown() {
         videoRemoteElem.srcObject = null;

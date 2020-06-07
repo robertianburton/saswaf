@@ -20,6 +20,8 @@
         videoRemoteElem = document.getElementById('videoRemoteElem');
         videoLocalElem = document.getElementById('videoLocalElem');
 
+        videoRemoteElem.srcObject = null;
+
         buttonVideoSizeSource = document.getElementById('buttonVideoSizeSource');
         buttonVideoSizeSource.addEventListener('click', function(ev){
             videoRemoteElem.style.width = "auto";
