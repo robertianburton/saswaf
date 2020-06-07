@@ -281,11 +281,13 @@
 
     async function handleNewICECandidate(data) {
         console.log("handleNewICECandidateEvent");
-        var candidate = new RTCIceCandidate(data.candidate);
 
-        await pc.addIceCandidate(candidate)
-        .catch(reportError);
-    }
+        if(data.candidate) {
+            var candidate = new RTCIceCandidate(data.candidate);
+            await pc.addIceCandidate(candidate)
+            .catch(reportError);
+        }
+    };
 
     // let the "negotiationneeded" event trigger offer generation
     async function handleNegotiationNeededEvent() {
