@@ -311,14 +311,15 @@
 
     function shutdown() {
         videoRemoteElem.srcObject = null;
-        if(nowStreaming && nowStreaming > 0) {
+        if(nowStreaming && nowStreaming > 0 && stream) {
             stream.getTracks().forEach(function(track) {
                 track.stop();
             });
         };
         stream = null;
-        pc.close();
-        pc = new RTCPeerConnection(configuration);
+        if(pc) {
+            pc.close();
+        };
         nowStreaming = 0;
     };
 
