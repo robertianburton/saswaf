@@ -269,7 +269,7 @@
                 type: "new-ice-candidate",
                 toId: data.fromId,
                 fromId: signaling.id,
-                candidate: data.candidate
+                candidate: data.candidate.candidate
             });
         };
     };
