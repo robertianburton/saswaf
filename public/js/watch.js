@@ -10,6 +10,7 @@
     var hostList = [];
     var currentHost = null;
     var hostIdField = null;
+    var userIdField = null;
     var sectionHostList = null;
 
     function startup() {
@@ -55,6 +56,7 @@
 
         sectionHostList = document.getElementById('sectionHostList');
         hostIdField = document.getElementById('hostIdField');
+        userIdField = document.getElementById('userIdField');
         hostListButtons = document.getElementById('hostListButtons');
 
         sendToServer({'type':'requestHostList'});
@@ -142,7 +144,8 @@
                     
                 }
             );
-        }
+        };
+        userIdField.innerHTML = ': ' + signaling.id;
     };
 
     function onTrack(event) {
@@ -184,19 +187,6 @@
             console.log('Disconnected. Closing.');
             shutdown();
         }
-    };
-
-        // send any ice candidates to the other peer
-    function onIceCandidate(data) {
-        console.log("onicecandidate...");
-        console.log(data);
-        signaling.emit(
-            "screenSignalFromEqual",
-            {
-                fromId: signaling.id,
-                candidate: data.candidate
-            }
-        )
     };
 
     // let the "negotiationneeded" event trigger offer generation
@@ -298,6 +288,7 @@
     });
 
     function handleICECandidateEvent(data) {
+        console.log("handleICECandidateEvent");
         if (data.candidate) {
             sendToUser({
                 type: "new-ice-candidate",
@@ -309,6 +300,7 @@
     };
 
     async function handleNewICECandidate(data) {
+        console.log("handleNewICECandidateEvent");
         var candidate = new RTCIceCandidate(data.candidate);
 
         await pc.addIceCandidate(candidate)

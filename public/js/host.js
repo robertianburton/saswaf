@@ -245,14 +245,7 @@
         await pclist[data.fromId].addIceCandidate(candidate)
         .catch(reportError);
     };
-
-    async function handleOnicecandidate(data) {
-        console.log("onicecandidate trigger");
-        signaling.emit("screenSignalFromScreen",{
-        toId: data.fromId,
-        candidate: data.candidate});
-    };
-
+    
     function reportError(e) {
         console.log("Report Error");
         console.error(e);
