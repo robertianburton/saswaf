@@ -263,6 +263,7 @@
 
     function handleICECandidateEvent(data) {
         printToConsole("handleICECandidateEvent");
+        console.log(data);
         if (data.candidate) {
             sendToUser({
                 type: "new-ice-candidate",
