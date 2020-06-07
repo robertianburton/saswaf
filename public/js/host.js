@@ -264,14 +264,14 @@
     function handleICECandidateEvent(data) {
         printToConsole("handleICECandidateEvent");
         console.log(data);
-        if (data.candidate) {
+        /*if (data.candidate) {*/
             sendToUser({
                 type: "new-ice-candidate",
                 toId: data.fromId,
                 fromId: signaling.id,
                 candidate: data.candidate
             });
-        };
+        /*};*/
     };
 
     async function handleNewICECandidate(data) {
