@@ -12,6 +12,7 @@
     var hostIdField = null;
     var userIdField = null;
     var sectionHostList = null;
+    var nowStreaming = 0;
 
     function startup() {
         console.log("Watch JS Starting Up...");
@@ -212,6 +213,7 @@
         console.log("SET THE TRACKS!!!!");
         console.log(event);
         videoRemoteElem.srcObject = event.streams[0];
+        nowStreaming = 1;
     };
 
     function reportError(e) {
@@ -242,7 +244,7 @@
     signaling.on("signalToUser", async (data) =>  {
         printToConsole("SignalToUser From " + data.fromId + " to " + data.toId + ":");
         console.log(data);
-        if(data.type==="video-offer") {
+        if(data.type==="video-offer" && data.fromId===currentHost) {
             checkPeerConnection();
             var desc = new RTCSessionDescription(data.sdp);
             pc.setRemoteDescription(desc)
@@ -262,7 +264,7 @@
                 sendToUser(msg);
             })
             .catch(handleGetUserMediaError);
-        } else if(data.type==="new-ice-candidate") {
+        } else if(data.type==="new-ice-candidate" && data.fromId===currentHost) {
             handleNewICECandidate(data);
         };
     });
@@ -309,11 +311,11 @@
 
     function shutdown() {
         videoRemoteElem.srcObject = null;
-        if(nowStreaming > 0) {
+        if(nowStreaming && nowStreaming > 0) {
             stream.getTracks().forEach(function(track) {
                 track.stop();
             });
-        }
+        };
         stream = null;
         pc.close();
         pc = new RTCPeerConnection(configuration);
