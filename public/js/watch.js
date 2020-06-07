@@ -185,8 +185,6 @@
         }
     };
 
-
-
     function handleGetUserMediaError(e) {
         switch(e.name) {
         case "NotFoundError":

@@ -261,36 +261,6 @@
         .catch(reportError);
     };
 
-    /*handleNegotiationNeededEvent = async (friendId) => {
-        printToConsole("handleNegotiationNeededEvent");
-        try {
-            await pclist[friendId].setLocalDescription(await pclist[friendId].createOffer());
-            sendToUser({
-                fromId: signaling.id,
-                toId: friendId,
-                type: "video-offer",
-                sdp: pclist[friendId].localDescription
-            });
-        } catch (err) {
-            console.error(err);
-        }
-    };
-*/
-    /*async function handleNegotiationNeededEvent(data) {
-        printToConsole("handleNegotiationNeededEvent");
-        try {
-            await pclist[data.fromId].setLocalDescription(await pclist[data.fromId].createOffer());
-            sendToUser({
-                fromId: signaling.id,
-                toId: data.fromId,
-                type: "video-offer",
-                sdp: pclist[data.fromId].localDescription
-            });
-        } catch (err) {
-            console.error(err);
-        }
-    };*/
-
     function handleICECandidateEvent(data) {
         printToConsole("handleICECandidateEvent");
         if (data.candidate) {
