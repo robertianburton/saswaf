@@ -78,7 +78,7 @@ io.on("connection", function (socket) {
         	io.to(data.toId).emit('signalToUser', data);
     	} else {
     		socket.broadcast.emit('signalToUser', data);
-    	}
+    	};
         printToConsole("SignalToUser From " + data.fromId + " to " + data.toId + ":");
         printToConsole(data);
     });
