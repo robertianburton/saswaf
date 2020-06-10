@@ -80,7 +80,17 @@
 
     
     const constraints = {
-        video: true,
+        video: {
+            width: {
+                max: 1280
+            },
+            height: {
+                max: 720
+            },
+            frameRate: {
+                max: 30
+            }
+        },
         audio: {
             'channelCount': {'ideal': 2},
             'echoCancellation': false,
