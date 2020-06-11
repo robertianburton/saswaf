@@ -230,6 +230,12 @@
 
         signalingObject.on("leaver", async (data) =>  {
             console.log(data);
+            
+            if(pclist[data.fromId]) {
+                const senders = pclist[data.fromId].getSenders();
+                senders.forEach((sender) => pclist[data.fromId].removeTrack(sender));
+                pclist[data.fromId].close();
+            };
             friendList.delete(data.fromId);
             console.log("Removing " + data.fromId);
             fillFriendList();
