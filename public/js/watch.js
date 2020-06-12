@@ -13,6 +13,7 @@
     var userIdField = null;
     var sectionHostList = null;
     var nowStreaming = 0;
+    var audioOutputSelect = null;
 
     function startup() {
         console.log("Watch JS Starting Up...");
@@ -39,8 +40,8 @@
             videoRemoteElem.style.width = window.innerWidth;
 
             var docH = $( document ).height();
-            var vidH = $('#videoElem').height();
-            var videoScale = ($('#videoElem').width() / $('#videoRemoteElem').height());
+            var vidH = $('#videoRemoteElem').height();
+            var videoScale = ($('#videoRemoteElem').width() / $('#videoRemoteElem').height());
             var topH = docH-vidH;
             var workableH = Math.floor((window.innerHeight-topH-0)*videoScale);
 
@@ -60,9 +61,13 @@
         hostIdField = document.getElementById('hostIdField');
         userIdField = document.getElementById('userIdField');
         hostListButtons = document.getElementById('hostListButtons');
+        audioOutputSelect = document.getElementById('audioOutput');
 
+        audioOutputSelect.onchange = changeAudioDestination;
 
         sendToServer({'type':'requestHostList'});
+
+        gotDevices();
 
         console.log("Socket ID: " + signaling.id);
 
@@ -322,6 +327,105 @@
         };
         nowStreaming = 0;
     };
+
+
+
+
+
+
+
+    async function gotDevices() {
+      // Handles being called several times to update labels. Preserve values.
+      var deviceInfos = await navigator.mediaDevices.enumerateDevices();
+      console.log(deviceInfos);
+      var selectors = [audioOutputSelect];
+      const values = selectors.map(select => select.value);
+      selectors.forEach(select => {
+        while (select.firstChild) {
+          select.removeChild(select.firstChild);
+        }
+      });
+      for (let i = 0; i !== deviceInfos.length; ++i) {
+        const deviceInfo = deviceInfos[i];
+        const option = document.createElement('option');
+        option.value = deviceInfo.deviceId;
+        if (deviceInfo.kind === 'audiooutput') {
+          option.text = deviceInfo.label || `speaker ${audioOutputSelect.length + 1}`;
+          audioOutputSelect.appendChild(option);
+        } else {
+          console.log('Some other kind of source/device: ', deviceInfo);
+        }
+      }
+      selectors.forEach((select, selectorIndex) => {
+        if (Array.prototype.slice.call(select.childNodes).some(n => n.value === values[selectorIndex])) {
+          select.value = values[selectorIndex];
+        }
+      });
+    }
+
+    // Attach audio output device to video element using device/sink ID.
+    function attachSinkId(element, sinkId) {
+      if (typeof element.sinkId !== 'undefined') {
+        element.setSinkId(sinkId)
+            .then(() => {
+              console.log(`Success, audio output device attached: ${sinkId}`);
+            })
+            .catch(error => {
+              let errorMessage = error;
+              if (error.name === 'SecurityError') {
+                errorMessage = `You need to use HTTPS for selecting audio output device: ${error}`;
+              }
+              console.error(errorMessage);
+              // Jump back to first output device in the list as it's the default.
+              audioOutputSelect.selectedIndex = 0;
+            });
+      } else {
+        console.warn('Browser does not support output device selection.');
+      }
+    }
+
+    function changeAudioDestination() {
+      const audioDestination = audioOutputSelect.value;
+      attachSinkId(videoRemoteElem, audioDestination);
+    }
+
+
+
+
+    var modifyGain = (stream, gainValue) => {
+      var ctx = new AudioContext();
+      var src = ctx.createMediaStreamSource(stream);
+      var dst = ctx.createMediaStreamDestination();
+      var gainNode = ctx.createGain();
+      gainNode.gain.value = gainValue;
+      [src, gainNode, dst].reduce((a, b) => a && a.connect(b));
+      return dst.stream;
+    };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     window.addEventListener('load', startup, false);
 })();

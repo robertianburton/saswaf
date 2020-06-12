@@ -111,4 +111,6 @@ io.on("connection", function (socket) {
 
 // Sources:
 // https://stackoverflow.com/questions/43978975/not-receiving-video-onicecandidate-is-not-executing
-// from https://www.html5rocks.com/en/tutorials/webrtc/basics/#simpleRTCPeerConnectionExample
+// https://www.html5rocks.com/en/tutorials/webrtc/basics/#simpleRTCPeerConnectionExample
+// Audio selector: https://github.com/webrtc/samples/blob/gh-pages/src/content/devices/input-output/js/main.js
+// Audio gain: https://stackoverflow.com/questions/38873061/how-to-increase-mic-gain-in-webrtc
