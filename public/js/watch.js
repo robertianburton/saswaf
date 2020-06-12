@@ -14,6 +14,7 @@
     var sectionHostList = null;
     var nowStreaming = 0;
     var audioOutputSelect = null;
+    var audioPerm = 0;
 
     function startup() {
         console.log("Watch JS Starting Up...");
@@ -55,7 +56,13 @@
             console.log("Log Connection");
             gotDevices();
             console.log(pc);
-            console.log(stream);
+            ev.preventDefault();
+        }, false);
+
+        buttonAudioOutputs = document.getElementById('buttonAudioOutputs');
+        buttonAudioOutputs.addEventListener('click', function(ev){
+            console.log("Audio Outputs");
+            gotDevices();
             ev.preventDefault();
         }, false);
 
@@ -68,8 +75,6 @@
         audioOutputSelect.onchange = changeAudioDestination;
 
         sendToServer({'type':'requestHostList'});
-
-        gotDevices();
 
         console.log("Socket ID: " + signaling.id);
 
@@ -357,8 +362,11 @@
 
     async function gotDevices() {
       // Handles being called several times to update labels. Preserve values.
-      alert("Click anything on the next prompt. This allows the Audio Output selector to work. The display capture is not saved or used.");
-      await navigator.mediaDevices.getUserMedia({audio: true}); 
+      if(audioPerm===0) {
+          alert("In order to display your audio output devices, the site may ask for microphone permissions. The microphone is not accessed, used, recorded, or saved in any way.");
+          await navigator.mediaDevices.getUserMedia({audio: true});
+          audioPerm = 1;
+      };
       var deviceInfos = await navigator.mediaDevices.enumerateDevices();
       console.log(deviceInfos);
       var selectors = [audioOutputSelect];
