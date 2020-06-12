@@ -358,7 +358,7 @@
     async function gotDevices() {
       // Handles being called several times to update labels. Preserve values.
       alert("Click anything on the next prompt. This allows the Audio Output selector to work. The display capture is not saved or used.");
-      await navigator.mediaDevices.getDisplayMedia({video: true}); 
+      await navigator.mediaDevices.getUserMedia({audio: true}); 
       var deviceInfos = await navigator.mediaDevices.enumerateDevices();
       console.log(deviceInfos);
       var selectors = [audioOutputSelect];
