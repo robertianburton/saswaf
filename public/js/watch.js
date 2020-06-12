@@ -53,7 +53,9 @@
         buttonLogConnection = document.getElementById('buttonLogConnection');
         buttonLogConnection.addEventListener('click', function(ev){
             console.log("Log Connection");
+            gotDevices();
             console.log(pc);
+            console.log(stream);
             ev.preventDefault();
         }, false);
 
@@ -217,7 +219,26 @@
 
         console.log("SET THE TRACKS!!!!");
         console.log(event);
-        videoRemoteElem.srcObject = event.streams[0];
+        /*videoRemoteElem.srcObject = event.streams[0];*/
+
+        //Fancy Audio Attempt
+        stream = event.streams[0];
+        videoRemoteElem.srcObject = stream;
+
+
+        /*var audioCtx = new AudioContext();
+        var source = audioCtx.createMediaStreamSource(stream);
+        var gainNode = audioCtx.createGain();
+        gainNode.gain.value = 0.1;
+        source.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        gainNode.gain.setValueAtTime(0.1,audioCtx.currentTime);*/
+
+        /*var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        var gainNode = audioCtx.createGain();
+        gainNode.gain.value = 0.1;
+        gainNode.connect(audioCtx.destination);*/
+
         nowStreaming = 1;
     };
 
