@@ -11,10 +11,9 @@ const app = express()
     .get('/soundcheck', (req, res) => res.render('pages/soundcheck'))
     .get('/chat', (req, res) => res.render('pages/chat'))
     .get('/equal', (req, res) => res.render('pages/equal'))
-    .get('/screen', (req, res) => res.render('pages/screen'))
-    .get('/audience', (req, res) => res.render('pages/audience'))
     .get('/host', (req, res) => res.render('pages/host'))
-    .get('/watch', (req, res) => res.render('pages/watch'));
+    .get('/watch', (req, res) => res.render('pages/watch'))
+    .get('/stereo', (req, res) => res.render('pages/stereo'));
 
 const server = app.listen(PORT, () => printToConsole(`Listening on ${ PORT }`));
 
