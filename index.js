@@ -113,3 +113,5 @@ io.on("connection", function (socket) {
 // https://www.html5rocks.com/en/tutorials/webrtc/basics/#simpleRTCPeerConnectionExample
 // Audio selector: https://github.com/webrtc/samples/blob/gh-pages/src/content/devices/input-output/js/main.js
 // Audio gain: https://stackoverflow.com/questions/38873061/how-to-increase-mic-gain-in-webrtc
+
+// 2020-06-13 Host & Watch was tested with friends and worked great!
