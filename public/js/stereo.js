@@ -65,6 +65,13 @@
             ev.preventDefault();
         }, false);
 
+        buttonAudioOutputs = document.getElementById('buttonAudioOutputs');
+        buttonAudioOutputs.addEventListener('click', function(ev){
+            console.log("Audio Outputs");
+            gotDevices();
+            ev.preventDefault();
+        }, false);
+
         console.log("Socket ID: " + signaling.id);
 
         console.log("Equal JS Startup Complete.");
@@ -76,7 +83,7 @@
     // handles JSON.stringify/parse
     const signaling = io();
     const constraints = {
-        video: true,
+        /*video: true,*/
         audio: {
             'channelCount': {'ideal': 2},
             'echoCancellation': false,
@@ -160,7 +167,6 @@
             break;
         }
 
-        closeVideoCall();
     }
 
     // Mostly https://stackoverflow.com/questions/43978975/not-receiving-video-onicecandidate-is-not-executing
@@ -281,11 +287,11 @@
             if(nowStreaming===1) {
                 nowStreaming = 2;
                 /*stream = await navigator.mediaDevices.getUserMedia(constraints);*/
-                await navigator.mediaDevices.getDisplayMedia(constraints).then(function(getDisplayMediaResult) {
-                    stream = getDisplayMediaResult;
+                await navigator.mediaDevices.getUserMedia(constraints).then(function(getUserMediaResult) {
+                    stream = getUserMediaResult;
                 }).catch(handleGetUserMediaError);
-                /*console.log("Capabilities:");*/
-                /*console.log(stream.getVideoTracks()[0].getCapabilities());*/
+                console.log("Capabilities:");
+                console.log(stream.getAudioTracks()[0].getCapabilities());
                 stream.getTracks().forEach((track) => pc.addTrack(track, stream));
                 videoLocalElem.srcObject = stream;
                 nowStreaming = 3;

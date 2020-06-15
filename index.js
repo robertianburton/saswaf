@@ -95,7 +95,7 @@ io.on("connection", function (socket) {
             sendHostList(socket);
         };
     });
-
+    
     socket.on("disconnecting", (reason) => {
         hostList.delete(socket.id);
         activeChatUsers.delete(socket.userId);

@@ -24,12 +24,18 @@
 			<br>
 			<p>Remote Video Element</p>
 			<div class="d-flex justify-content-center">
-				<video id="videoRemoteElem" autoplay></video>
+				<audio id="videoRemoteElem" autoplay controls></video>
 			</div>
 			<p>Local Video Element</p>
 			<div class="d-flex justify-content-center">
-				<video id="videoLocalElem" autoplay></video>
+				<audio id="videoLocalElem" autoplay controls></video>
 			</div>
+			<div class="select">
+		        <label for="audioInput">Audio input source: </label><select id="audioInput"></select>
+		    </div>
+		    <div class="select">
+		        <label for="audioOutput">Audio output destination: </label><select id="audioOutput"></select>
+		    </div>
 
 		</main>
 		<% include ../partials/footer.ejs %>
