@@ -83,9 +83,9 @@
     // handles JSON.stringify/parse
     const signaling = io();
     const constraints = {
-        /*video: true,*/
+        video: false,
         audio: {
-            'channelCount': {'ideal': 2},
+            'channelCount': {'exact': 2},
             'echoCancellation': false,
             'autoGainControl': false,
             'googAutoGainControl': false,
@@ -125,7 +125,7 @@
         console.log("onicecandidate...");
         console.log(data);
         signaling.emit(
-            "screenSignalFromEqual",
+            "screenSignalFromStereo",
             {
                 fromId: signaling.id,
                 candidate: data.candidate
@@ -138,9 +138,16 @@
         console.log("onnegotiationneeded...");
       try {
         makingOffer = true;
-        await pc.setLocalDescription(await pc.createOffer());
+        var offer = await pc.createOffer();
+/*        offer.sdp = offer.sdp
+            + "m=audio 54312 RTP/AVP 101\r\n"
+            + "a=mid:audio\r\n"
+            + "a=rtpmap:101 opus/48000/2\r\n"
+            + "a=fmtp:101 stereo=1; sprop-stereo=1\r\n"
+            + "a=fingerprint:SHA-1 4A:AD:B9:B1:3F:82:18:3B:54:02:12:DF:3E:5D:49:6B:19:E5:7C:AB\r\n";*/
+        await pc.setLocalDescription(offer);
         // send the offer to the other peer
-        signaling.emit("screenSignalFromEqual",
+        signaling.emit("screenSignalFromStereo",
         {
             fromId: signaling.id,
             desc: pc.localDescription
@@ -178,11 +185,20 @@
         nowStreaming = 1;
         checkPeerConnection();
         return pc.createOffer().then(function (offer) {
+            console.log("MAKING OFFER");
+            console.log(offer);
+            /*offer.sdp = offer.sdp
+            + "m=audio 54312 RTP/AVP 101\r\n"
+            + "a=mid:audio\r\n"
+            + "a=rtpmap:101 opus/48000/2\r\n"
+            + "a=fmtp:101 stereo=1; sprop-stereo=1\r\n"
+            + "a=fingerprint: SHA-1 4A:AD:B9:B1:3F:82:18:3B:54:02:12:DF:3E:5D:49:6B:19:E5:7C:AB\r\n";*/
+            console.log(offer);
             return pc.setLocalDescription(offer);
         })
         .then(function () {
             signaling.emit(
-                "screenSignalFromEqual",
+                "screenSignalFromStereo",
                 {
                     fromId: signaling.id,
                     desc: pc.localDescription
@@ -258,7 +274,7 @@
         })))
     };
 
-    signaling.on("screenSignalFromEqual", async (data) =>  {
+    signaling.on("screenSignalFromStereo", async (data) =>  {
         checkPeerConnection();
         console.log("Received from Equal. Printing data...");
         console.log(data);
@@ -275,7 +291,7 @@
               await pc.setRemoteDescription(data.desc);
               if (data.desc.type =="offer") {
                 await pc.setLocalDescription();
-                signaling.emit("screenSignalFromEqual",{
+                signaling.emit("screenSignalFromStereo",{
                     fromId: signaling.id,
                     desc: pc.localDescription});
               }

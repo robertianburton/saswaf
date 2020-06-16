@@ -314,7 +314,6 @@
 
     async function handleNewICECandidate(data) {
         console.log("handleNewICECandidateEvent");
-
         if(data.candidate) {
             var candidate = new RTCIceCandidate(data.candidate);
             await pc.addIceCandidate(candidate)
@@ -334,7 +333,6 @@
                 toId: currentHost,
                 type: "video-offer",
                 sdp: pc.localDescription
-
             })
         })
         .catch(reportError);
@@ -359,7 +357,7 @@
 
 
 
-
+    //Auto output devices list grab
     async function gotDevices() {
       // Handles being called several times to update labels. Preserve values.
       if(audioPerm===0) {
@@ -392,7 +390,7 @@
           select.value = values[selectorIndex];
         }
       });
-    }
+    };
 
     // Attach audio output device to video element using device/sink ID.
     function attachSinkId(element, sinkId) {
@@ -413,27 +411,12 @@
       } else {
         console.warn('Browser does not support output device selection.');
       }
-    }
+    };
 
     function changeAudioDestination() {
       const audioDestination = audioOutputSelect.value;
       attachSinkId(videoRemoteElem, audioDestination);
-    }
-
-
-
-
-    var modifyGain = (stream, gainValue) => {
-      var ctx = new AudioContext();
-      var src = ctx.createMediaStreamSource(stream);
-      var dst = ctx.createMediaStreamDestination();
-      var gainNode = ctx.createGain();
-      gainNode.gain.value = gainValue;
-      [src, gainNode, dst].reduce((a, b) => a && a.connect(b));
-      return dst.stream;
     };
-
-
 
 
 

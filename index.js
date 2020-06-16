@@ -72,6 +72,11 @@ io.on("connection", function (socket) {
         printToConsole("New Screen Signal From Equal: " + socket.id);
     });
 
+    socket.on("screenSignalFromStereo", (data) => {
+        socket.broadcast.emit("screenSignalFromStereo", data);
+        printToConsole("New Signal From Stereo: " + socket.id);
+    });
+
     socket.on("signalToUser", (data) => {
     	if(data.toId) {
         	io.to(data.toId).emit('signalToUser', data);
@@ -95,7 +100,7 @@ io.on("connection", function (socket) {
             sendHostList(socket);
         };
     });
-    
+
     socket.on("disconnecting", (reason) => {
         hostList.delete(socket.id);
         activeChatUsers.delete(socket.userId);
