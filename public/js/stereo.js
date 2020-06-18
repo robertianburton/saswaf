@@ -15,7 +15,7 @@
     let polite = true;
 
     function startup() {
-        console.log("Audience JS Starting Up...");
+        console.log("Stereo JS Starting Up...");
 
         videoRemoteElem = document.getElementById('videoRemoteElem');
         videoLocalElem = document.getElementById('videoLocalElem');
@@ -74,13 +74,9 @@
 
         console.log("Socket ID: " + signaling.id);
 
-        console.log("Equal JS Startup Complete.");
+        console.log("Stereo JS Startup Complete.");
     }
 
-
-
-    // Mostly from https://www.html5rocks.com/en/tutorials/webrtc/basics/#simpleRTCPeerConnectionExample
-    // handles JSON.stringify/parse
     const signaling = io();
     const constraints = {
         video: false,
@@ -139,12 +135,6 @@
       try {
         makingOffer = true;
         var offer = await pc.createOffer();
-/*        offer.sdp = offer.sdp
-            + "m=audio 54312 RTP/AVP 101\r\n"
-            + "a=mid:audio\r\n"
-            + "a=rtpmap:101 opus/48000/2\r\n"
-            + "a=fmtp:101 stereo=1; sprop-stereo=1\r\n"
-            + "a=fingerprint:SHA-1 4A:AD:B9:B1:3F:82:18:3B:54:02:12:DF:3E:5D:49:6B:19:E5:7C:AB\r\n";*/
         await pc.setLocalDescription(offer);
         // send the offer to the other peer
         signaling.emit("screenSignalFromStereo",
@@ -173,10 +163,8 @@
             alert("Error opening your camera and/or microphone: " + e.message);
             break;
         }
+    };
 
-    }
-
-    // Mostly https://stackoverflow.com/questions/43978975/not-receiving-video-onicecandidate-is-not-executing
     async function start() {
         if(nowStreaming>0) {
             return;
@@ -187,12 +175,6 @@
         return pc.createOffer().then(function (offer) {
             console.log("MAKING OFFER");
             console.log(offer);
-            /*offer.sdp = offer.sdp
-            + "m=audio 54312 RTP/AVP 101\r\n"
-            + "a=mid:audio\r\n"
-            + "a=rtpmap:101 opus/48000/2\r\n"
-            + "a=fmtp:101 stereo=1; sprop-stereo=1\r\n"
-            + "a=fingerprint: SHA-1 4A:AD:B9:B1:3F:82:18:3B:54:02:12:DF:3E:5D:49:6B:19:E5:7C:AB\r\n";*/
             console.log(offer);
             return pc.setLocalDescription(offer);
         })
@@ -237,7 +219,7 @@
             console.log('Disconnected. Closing.');
             shutdown();
         }
-    }   
+    };
 
     function checkPeerConnection() {
         if(!pc) {
@@ -276,7 +258,7 @@
 
     signaling.on("screenSignalFromStereo", async (data) =>  {
         checkPeerConnection();
-        console.log("Received from Equal. Printing data...");
+        console.log("Received from Stereo. Printing data...");
         console.log(data);
         try {
             if (data.desc) {
