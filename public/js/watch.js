@@ -212,9 +212,7 @@
             alert("Error opening your camera and/or microphone: " + e.message);
             break;
         }
-
-        closeVideoCall();
-    }
+    };
 
     // once remote track media arrives, show it in remote video element
     function onTrack(event) {
@@ -401,14 +399,6 @@
       const audioDestination = audioOutputSelect.value;
       attachSinkId(videoRemoteElem, audioDestination);
     };
-
-
-
-
-
-
-
-
 
 
 
