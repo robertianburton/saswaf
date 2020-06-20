@@ -75,7 +75,7 @@
         console.log("Socket ID: " + signaling.id);
 
         console.log("Stereo JS Startup Complete.");
-    }
+    };
 
     const signaling = io();
     const constraints = {
@@ -146,7 +146,7 @@
         console.error(err);
       } finally {
         makingOffer = false;
-      }
+      };
     };
 
     function handleGetUserMediaError(e) {
@@ -218,7 +218,7 @@
         if(pc.iceConnectionState == 'disconnected') {
             console.log('Disconnected. Closing.');
             shutdown();
-        }
+        };
     };
 
     function checkPeerConnection() {
@@ -238,7 +238,7 @@
             stream.getTracks().forEach(function(track) {
                 track.stop();
             });
-        }
+        };
         stream = null;
         pc.close();
         pc = new RTCPeerConnection(configuration);
@@ -253,7 +253,7 @@
             var txt = await device.getCapabilities();
             console.log(device);
             console.log(txt);
-        })))
+        })));
     };
 
     signaling.on("screenSignalFromStereo", async (data) =>  {
