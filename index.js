@@ -120,3 +120,4 @@ io.on("connection", function (socket) {
 // Audio gain: https://stackoverflow.com/questions/38873061/how-to-increase-mic-gain-in-webrtc
 
 // 2020-06-13 Host & Watch was tested with friends and worked great!
+// 2020-06-20 Another good test. Some choppiness in non-critical screen elements can occur.
