@@ -69,8 +69,10 @@
 
         buttonLogConnection = document.getElementById('buttonLogConnection');
         buttonLogConnection.addEventListener('click', function(ev) {
+
             console.log("Log Connection");
             console.log(pc);
+            console.log(stream.getAudioTracks().map(item => item.getCapabilities()));
             ev.preventDefault();
         }, false);
 
@@ -93,7 +95,7 @@
     var constraints = {
         video: false,
         audio: {
-            'channelCount': { 'exact': 2 },
+            'channelCount': { 'min': 2 },
             'echoCancellation': false,
             'autoGainControl': false,
             'googAutoGainControl': false,
@@ -149,7 +151,10 @@
         try {
             makingOffer = true;
             var offer = await pc.createOffer();
-            await pc.setLocalDescription(offer);
+            var processedOffer = processOfferForStereo(offer);
+            console.log("PROCESSED OFFER NN");
+            console.log(processedOffer);
+            await pc.setLocalDescription(processedOffer);
             // send the offer to the other peer
             signaling.emit("screenSignalFromStereo", {
                 fromId: signaling.id,
@@ -188,8 +193,11 @@
         return pc.createOffer().then(function(offer) {
                 console.log("MAKING OFFER");
                 console.log(offer);
-                console.log(offer);
-                return pc.setLocalDescription(offer);
+
+                var processedOffer = processOfferForStereo(offer);
+                console.log("PROCESSED OFFER START");
+                console.log(processedOffer);
+                return pc.setLocalDescription(processedOffer);
             })
             .then(function() {
                 signaling.emit(
@@ -206,7 +214,10 @@
     function onTrack(event) {
         // don't set srcObject again if it is already set.
         /*if (videoRemoteElem.srcObject) return;*/
-        videoRemoteElem.srcObject = event.streams[0];
+        console.log("Adding Streams:");
+        console.log(event);
+        stream = event.streams[0];
+        videoRemoteElem.srcObject = stream;
     };
 
     function onConnectionStateChange(event) {
@@ -284,7 +295,9 @@
                 };
                 await pc.setRemoteDescription(data.desc);
                 if (data.desc.type == "offer") {
-                    await pc.setLocalDescription();
+                    var answer = await pc.createAnswer();
+                    answer = processOfferForStereo(answer);
+                    await pc.setLocalDescription(answer);
                     signaling.emit("screenSignalFromStereo", {
                         fromId: signaling.id,
                         desc: pc.localDescription
@@ -293,8 +306,8 @@
             } else if (data.candidate) {
                 await pc.addIceCandidate(data.candidate);
             };
-            console.log("Peer Connection...");
-            console.log(pc);
+            /*console.log("Peer Connection...");
+            console.log(pc);*/
             if (nowStreaming === 1) {
                 nowStreaming = 2;
                 /*stream = await navigator.mediaDevices.getUserMedia(constraints);*/
@@ -317,7 +330,7 @@
         constraints = {
             video: false,
             audio: {
-                'channelCount': { 'exact': 2 },
+                'channelCount': { 'min': 2 },
                 'echoCancellation': false,
                 'autoGainControl': false,
                 'googAutoGainControl': false,
@@ -439,7 +452,10 @@
         videoLocalElem.srcObject = stream;
     };
 
-
+    function processOfferForStereo(offer) {
+        offer.sdp = offer.sdp.replace('useinbandfec=1', 'stereo=1; sprop-stereo=1; maxaveragebitrate=510000; cbr=1');
+        return offer;
+    };
 
 
 
