@@ -265,7 +265,10 @@
                 return pc.createAnswer();
             })
             .then(function(answer) {
-                return pc.setLocalDescription(answer);
+                var processedAnswer = processOfferForStereo(answer);
+                            console.log("PROCESSED ANSWER SIGNAL");
+                            console.log(processedAnswer);
+                return pc.setLocalDescription(processedAnswer);
             })
             .then(function() {
                 var msg = {
@@ -307,6 +310,9 @@
     async function handleNegotiationNeededEvent() {
         console.log("handleNegotiationNeededEvent");
         pc.createOffer().then(function(offer) {
+            var processedOffer = processOfferForStereo(offer);
+            console.log("PROCESSED OFFER NN");
+            console.log(processedOffer);
             return pc.setLocalDescription(offer);
         })
         .then(function() {
@@ -403,7 +409,10 @@
 
 
 
-
+    function processOfferForStereo(offer) {
+        offer.sdp = offer.sdp.replace('useinbandfec=1', 'stereo=1; sprop-stereo=1; maxaveragebitrate=192000; cbr=1');
+        return offer;
+    };
 
 
 

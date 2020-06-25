@@ -184,7 +184,10 @@
                         printToConsole("handleNegotiationNeededEvent");
                         console.log(data.fromId);
                         pclist[data.fromId].createOffer().then(function(offer) {
-                            return pclist[data.fromId].setLocalDescription(offer);
+                            var processedOffer = processOfferForStereo(offer);
+                            console.log("PROCESSED OFFER NN");
+                            console.log(processedOffer);
+                            return pclist[data.fromId].setLocalDescription(processedOffer);
                         })
                         .then(function() {
                             sendToUser({
@@ -264,7 +267,10 @@
         printToConsole("handleNegotiationNeededEvent");
         console.log(friendId);
         pclist[friendId].createOffer().then(function(offer) {
-            return pclist[friendId].setLocalDescription(offer);
+            var processedOffer = processOfferForStereo(offer);
+            console.log("PROCESSED OFFER NN");
+            console.log(processedOffer);
+            return pclist[friendId].setLocalDescription(processedOffer);
         })
         .then(function() {
             sendToUser({
@@ -349,7 +355,10 @@
 
 
 
-
+    function processOfferForStereo(offer) {
+        offer.sdp = offer.sdp.replace('useinbandfec=1', 'stereo=1; sprop-stereo=1; maxaveragebitrate=192000; cbr=1');
+        return offer;
+    };
 
 
 
