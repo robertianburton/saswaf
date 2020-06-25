@@ -456,7 +456,7 @@
 
 
     function processOfferForStereo(offer) {
-        offer.sdp = offer.sdp.replace('useinbandfec=1', 'stereo=1; sprop-stereo=1; maxaveragebitrate=510000; cbr=1');
+        offer.sdp = offer.sdp.replace('useinbandfec=1', 'stereo=1; sprop-stereo=1; maxaveragebitrate=196608; cbr=1');
         return offer;
     };
 
