@@ -175,6 +175,7 @@
 
 
     function onConnectionStateChange(event) {
+        console.log("Connection State Change...");
         switch(pc.connectionState) {
             case "connected": 
                 console.log("Connection Connected!");
@@ -240,6 +241,7 @@
         if(data.type="hostList") {
             hostList = data.hostList;
             hostIdField.innerHTML = '';
+            console.log("Cleared hostIdField");
             fillHostList();
         };
     });
@@ -249,6 +251,7 @@
         console.log(data);
         if(data.fromId=currentHost) {
             sectionHostList.style.display = "block";
+            console.log("254 Showing Host List");
             hostList = data.hostList;
             fillHostList();
         };
