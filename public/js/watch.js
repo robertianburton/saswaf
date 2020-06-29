@@ -238,7 +238,7 @@
     signaling.on("signalFromServer", async (data) =>  {
         console.log("Received from Server. Printing data...");
         console.log(data);
-        if(data.type="hostList") {
+        if(data.type="hostList" && !currentHost) {
             hostList = data.hostList;
             hostIdField.innerHTML = '';
             console.log("Cleared hostIdField");
