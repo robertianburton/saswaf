@@ -250,6 +250,8 @@
         console.log("Received from Server. Printing data...");
         console.log(data);
         if(data.fromId=currentHost) {
+            currentHost = null;
+            shutdown();
             sectionHostList.style.display = "block";
             console.log("254 Showing Host List");
             hostList = data.hostList;
@@ -340,6 +342,7 @@
         if(pc) {
             pc.close();
         };
+        pc = null;
         nowStreaming = 0;
     };
 
