@@ -249,7 +249,7 @@
     signaling.on("leaver", async (data) =>  {
         console.log("Received from Server. Printing data...");
         console.log(data);
-        if(data.fromId=currentHost) {
+        if(data.fromId === currentHost) {
             currentHost = null;
             shutdown();
             sectionHostList.style.display = "block";
