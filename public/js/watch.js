@@ -56,6 +56,10 @@
             console.log("Log Connection");
             gotDevices();
             console.log(pc);
+            getCredential();
+
+
+
             ev.preventDefault();
         }, false);
 
@@ -420,6 +424,17 @@
         return offer;
     };
 
+
+
+    async function getCredential() {
+
+            var fetchUrl = "/cred?userId=" + signaling.id;
+            fetch(fetchUrl).then(function(response) {
+                response.text().then(function(text) {
+                    console.log(text);
+                })
+            });
+    };
 
 
 
