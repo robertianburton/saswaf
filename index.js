@@ -13,7 +13,8 @@ const app = express()
     .get('/equal', (req, res) => res.render('pages/equal'))
     .get('/host', (req, res) => res.render('pages/host'))
     .get('/watch', (req, res) => res.render('pages/watch'))
-    .get('/stereo', (req, res) => res.render('pages/stereo'));
+    .get('/stereo', (req, res) => res.render('pages/stereo'))
+    .get('/cred', (req, res) => res.send('Received a GET HTTP method'));
 
 const server = app.listen(PORT, () => printToConsole(`Listening on ${ PORT }`));
 
@@ -118,6 +119,7 @@ io.on("connection", function (socket) {
 // https://www.html5rocks.com/en/tutorials/webrtc/basics/#simpleRTCPeerConnectionExample
 // Audio selector: https://github.com/webrtc/samples/blob/gh-pages/src/content/devices/input-output/js/main.js
 // Audio gain: https://stackoverflow.com/questions/38873061/how-to-increase-mic-gain-in-webrtc
+// Turn server credential get setup: https://www.robinwieruch.de/node-express-server-rest-api
 
 // 2020-06-13 Host & Watch was tested with friends and worked great!
 // 2020-06-20 Another good test. Some choppiness in non-critical screen elements can occur.
