@@ -14,7 +14,7 @@ const app = express()
     .get('/host', (req, res) => res.render('pages/host'))
     .get('/watch', (req, res) => res.render('pages/watch'))
     .get('/stereo', (req, res) => res.render('pages/stereo'))
-    .get('/cred', (req, res) => res.send('Received a GET HTTP method'));
+    .get('/cred', (req, res) => handleCred(req,res));
 
 const server = app.listen(PORT, () => printToConsole(`Listening on ${ PORT }`));
 
@@ -42,6 +42,14 @@ function sendHostList(socket) {
     io.emit("signalFromServer", transmitData);
 
 };
+
+function handleCred(req,res) {
+	var userId = req.query.userId;
+	res.send('Received a GET HTTP method from ' + userId);
+
+
+};
+
 
 io.on("connection", function (socket) {
     printToConsole("Made socket connection: " + socket.id);
