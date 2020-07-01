@@ -54,12 +54,8 @@
         buttonLogConnection = document.getElementById('buttonLogConnection');
         buttonLogConnection.addEventListener('click', function(ev){
             console.log("Log Connection");
-            gotDevices();
             console.log(pc);
             getCredential();
-
-
-
             ev.preventDefault();
         }, false);
 

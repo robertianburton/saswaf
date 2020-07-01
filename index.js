@@ -3,7 +3,6 @@ const path = require('path');
 const socket = require("socket.io");
 const PORT = process.env.PORT || 5000;
 const crypto = require('crypto');
-require('dotenv').config();
 
 const app = express()
     .use(express.static(path.join(__dirname, 'public')))
@@ -48,8 +47,7 @@ function sendHostList(socket) {
 function getTurnCredentials(req,res) {
 	var userId = req.query.userId;
 	var secret = process.env.TURN_KEY;
-	printToConsole(process.env.TURN_KEY);
-	var unixTimeStamp = parseInt(Date.now()/1000) + 24*3600,   // this credential would be valid for the next 24 hours
+	var unixTimeStamp = parseInt(Date.now()/1000) + 8*3600,   // this credential would be valid for the next 8 hours
         username = [unixTimeStamp, userId].join(':'),
         password,
         hmac = crypto.createHmac('sha1', secret);
