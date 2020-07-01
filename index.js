@@ -2,6 +2,8 @@ const express = require('express');
 const path = require('path');
 const socket = require("socket.io");
 const PORT = process.env.PORT || 5000;
+const crypto = require('crypto');
+require('dotenv').config();
 
 const app = express()
     .use(express.static(path.join(__dirname, 'public')))
@@ -14,7 +16,7 @@ const app = express()
     .get('/host', (req, res) => res.render('pages/host'))
     .get('/watch', (req, res) => res.render('pages/watch'))
     .get('/stereo', (req, res) => res.render('pages/stereo'))
-    .get('/cred', (req, res) => handleCred(req,res));
+    .get('/cred', (req, res) => getTurnCredentials(req,res));
 
 const server = app.listen(PORT, () => printToConsole(`Listening on ${ PORT }`));
 
@@ -43,9 +45,24 @@ function sendHostList(socket) {
 
 };
 
-function handleCred(req,res) {
+function getTurnCredentials(req,res) {
 	var userId = req.query.userId;
-	res.send('Received a GET HTTP method from ' + userId);
+	var secret = process.env.TURN_KEY;
+	printToConsole(process.env.TURN_KEY);
+	var unixTimeStamp = parseInt(Date.now()/1000) + 24*3600,   // this credential would be valid for the next 24 hours
+        username = [unixTimeStamp, userId].join(':'),
+        password,
+        hmac = crypto.createHmac('sha1', secret);
+    hmac.setEncoding('base64');
+    hmac.write(username);
+    hmac.end();
+    password = hmac.read();
+    var result = {
+        username: username,
+        password: password
+    };
+    var resultAsString = JSON.stringify(result)
+	res.send(resultAsString);
 
 
 };
@@ -128,6 +145,7 @@ io.on("connection", function (socket) {
 // Audio selector: https://github.com/webrtc/samples/blob/gh-pages/src/content/devices/input-output/js/main.js
 // Audio gain: https://stackoverflow.com/questions/38873061/how-to-increase-mic-gain-in-webrtc
 // Turn server credential get setup: https://www.robinwieruch.de/node-express-server-rest-api
+// Turn credential generation: https://stackoverflow.com/questions/35766382/coturn-how-to-use-turn-rest-api
 
 // 2020-06-13 Host & Watch was tested with friends and worked great!
 // 2020-06-20 Another good test. Some choppiness in non-critical screen elements can occur.
