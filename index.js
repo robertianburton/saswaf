@@ -14,8 +14,8 @@ const app = express()
     .get('/equal', (req, res) => res.render('pages/equal'))
     .get('/host', (req, res) => res.render('pages/host'))
     .get('/watch', (req, res) => res.render('pages/watch'))
-    .get('/stereo', (req, res) => res.render('pages/stereo'))
-    .get('/cred', (req, res) => getTurnCredentials(req,res));
+    .get('/stereo', (req, res) => res.render('pages/stereo'));
+    /*.get('/cred', (req, res) => getTurnCredentials(req,res));*/
 
 const server = app.listen(PORT, () => printToConsole(`Listening on ${ PORT }`));
 
@@ -44,8 +44,8 @@ function sendHostList(socket) {
 
 };
 
-function getTurnCredentials(req,res) {
-	var userId = req.query.userId;
+function sendTurnCredentials(socket) {
+	var userId = socket.id;
 	var secret = process.env.TURN_KEY;
 	var unixTimeStamp = parseInt(Date.now()/1000) + 8*3600,   // this credential would be valid for the next 8 hours
         username = [unixTimeStamp, userId].join(':'),
@@ -60,9 +60,9 @@ function getTurnCredentials(req,res) {
         password: password
     };
     var resultAsString = JSON.stringify(result)
-	res.send(resultAsString);
-
-
+	/*res.send(resultAsString);*/
+	var transmitData = {type: 'turnCredentials', turnCredentials: result};
+	io.emit("signalFromServer", transmitData);
 };
 
 
@@ -112,7 +112,7 @@ io.on("connection", function (socket) {
     });
 
     socket.on("signalToServer", (data) => {
-    	printToConsole("SignalToServer From " + data.fromId + ":");
+    	printToConsole("SignalToServer From " + socket.id + ":");
         printToConsole(data);
         if(data.type==='addHost') {
             printToConsole("addHost: " + socket.id);
@@ -122,6 +122,8 @@ io.on("connection", function (socket) {
             sendHostList(socket);
         } else if(data.type==='requestHostList') {
             sendHostList(socket);
+        } else if(data.type==='getTurnCredentials') {
+        	sendTurnCredentials(socket);
         };
     });
 

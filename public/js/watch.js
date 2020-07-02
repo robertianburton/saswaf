@@ -23,28 +23,28 @@
         videoRemoteElem.srcObject = null;
 
         buttonVideoSizeSource = document.getElementById('buttonVideoSizeSource');
-        buttonVideoSizeSource.addEventListener('click', function(ev){
+        buttonVideoSizeSource.addEventListener('click', function(ev) {
             videoRemoteElem.style.width = "auto";
             videoRemoteElem.scrollIntoView();
             ev.preventDefault();
         }, false);
 
         buttonVideoSizeResponsive = document.getElementById('buttonVideoSizeResponsive');
-        buttonVideoSizeResponsive.addEventListener('click', function(ev){
+        buttonVideoSizeResponsive.addEventListener('click', function(ev) {
             videoRemoteElem.style.width = "100%";
 
             ev.preventDefault();
         }, false);
 
         buttonVideoSizePage = document.getElementById('buttonVideoSizePage');
-        buttonVideoSizePage.addEventListener('click', function(ev){
+        buttonVideoSizePage.addEventListener('click', function(ev) {
             videoRemoteElem.style.width = window.innerWidth;
 
-            var docH = $( document ).height();
+            var docH = $(document).height();
             var vidH = $('#videoRemoteElem').height();
             var videoScale = ($('#videoRemoteElem').width() / $('#videoRemoteElem').height());
-            var topH = docH-vidH;
-            var workableH = Math.floor((window.innerHeight-topH-0)*videoScale);
+            var topH = docH - vidH;
+            var workableH = Math.floor((window.innerHeight - topH - 0) * videoScale);
 
             videoRemoteElem.style.width = workableH + "px";
             videoRemoteElem.scrollIntoView();
@@ -52,15 +52,14 @@
         }, false);
 
         buttonLogConnection = document.getElementById('buttonLogConnection');
-        buttonLogConnection.addEventListener('click', function(ev){
+        buttonLogConnection.addEventListener('click', function(ev) {
             console.log("Log Connection");
             console.log(pc);
-            getCredential();
             ev.preventDefault();
         }, false);
 
         buttonAudioOutputs = document.getElementById('buttonAudioOutputs');
-        buttonAudioOutputs.addEventListener('click', function(ev){
+        buttonAudioOutputs.addEventListener('click', function(ev) {
             console.log("Audio Outputs");
             gotDevices();
             ev.preventDefault();
@@ -74,7 +73,9 @@
 
         audioOutputSelect.onchange = changeAudioDestination;
 
-        sendToServer({'type':'requestHostList'});
+        sendToServer({ 'type': 'getTurnCredentials' });
+
+        sendToServer({ 'type': 'requestHostList' });
 
         console.log("Socket ID: " + signaling.id);
 
@@ -85,19 +86,18 @@
     const constraints = {
         video: true,
         audio: {
-            'channelCount': {'ideal': 2},
+            'channelCount': { 'ideal': 2 },
             'echoCancellation': false,
             'autoGainControl': false,
             'googAutoGainControl': false,
             'noiseSuppression': false,
             'sampleRate': 44100,
             'sampleSize': 16
-            
+
         }
     };
     const configurationA = {
-        iceServers: [
-            {
+        iceServers: [{
                 urls: ['stun:stun.robertianburton.com:3478']
             },
             {
@@ -109,54 +109,58 @@
                     "turn:turn.robertianburton.com:3478?transport=tcp"
                 ]
             }
-    ]};
+        ]
+    };
     const configurationB = {
-        iceServers: [{urls: [
-        'stun:stun.l.google.com:19302',
-        'stun:stun1.l.google.com:19302',
-        'stun:stun2.l.google.com:19302',
-        'stun:stun.l.google.com:19302?transport=udp',
-    ]}]};
-    const configuration = configurationA;
-    
+        iceServers: [{
+            urls: [
+                'stun:stun.l.google.com:19302',
+                'stun:stun1.l.google.com:19302',
+                'stun:stun2.l.google.com:19302',
+                'stun:stun.l.google.com:19302?transport=udp',
+            ]
+        }]
+    };
+    var configuration = configurationA;
+
     function formatDate(date, format) {
         date = date.toJSON().split(/[:/.TZ-]/);
-        return format.replace(/[ymdhisu]/g, function (letter) {
+        return format.replace(/[ymdhisu]/g, function(letter) {
             return date['ymdhisu'.indexOf(letter)];
         });
     };
 
     function printToConsole(data) {
-        console.log(formatDate(new Date(), 'ymd hisu')+" "+JSON.stringify(data));
+        console.log(formatDate(new Date(), 'ymd hisu') + " " + JSON.stringify(data));
     };
 
     function sendToServer(data) {
         console.log(data);
-        signaling.emit("signalToServer",data);
+        signaling.emit("signalToServer", data);
     };
 
     function sendToUser(data) {
         console.log("Sending: ");
         console.log(data);
-        signaling.emit("signalToUser",data);
+        signaling.emit("signalToUser", data);
     };
 
     function fillHostList() {
         hostListButtons.innerHTML = "";
-        if(hostList && hostList.length>0) {
+        if (hostList && hostList.length > 0) {
             hostList.forEach(
                 (host) => {
-                    hostListButtons.innerHTML +='<button type="button" class="list-group-item list-group-item-action" id="host_'+host+'">'+host+'</button>';
-                    var thisitem = document.getElementById('host_'+host);
-                    thisitem.addEventListener('click', function(ev){
+                    hostListButtons.innerHTML += '<button type="button" class="list-group-item list-group-item-action" id="host_' + host + '">' + host + '</button>';
+                    var thisitem = document.getElementById('host_' + host);
+                    thisitem.addEventListener('click', function(ev) {
                         sectionHostList.style.display = "none";
                         console.log("Clicked " + host);
-                        sendToUser({fromId: signaling.id, toId: host, type: "newFriend"});
+                        sendToUser({ fromId: signaling.id, toId: host, type: "newFriend" });
                         currentHost = host;
                         hostIdField.innerHTML = ': ' + currentHost;
                         ev.preventDefault();
                     }, false);
-                    
+
                 }
             );
         };
@@ -164,7 +168,7 @@
     };
 
     function checkPeerConnection() {
-        if(!pc) {
+        if (!pc) {
             pc = new RTCPeerConnection(configuration);
             pc.onconnectionstatechange = onConnectionStateChange;
             pc.ontrack = onTrack;
@@ -176,42 +180,42 @@
 
     function onConnectionStateChange(event) {
         console.log("Connection State Change...");
-        switch(pc.connectionState) {
-            case "connected": 
+        switch (pc.connectionState) {
+            case "connected":
                 console.log("Connection Connected!");
-            // The connection has become fully connected
-            break;
+                // The connection has become fully connected
+                break;
             case "disconnected":
             case "failed":
-            // One or more transports has terminated unexpectedly or in an error
+                // One or more transports has terminated unexpectedly or in an error
                 console.log("Failed! Closing!");
                 shutdown();
-            break;
+                break;
             case "closed":
-            // The connection has been closed
+                // The connection has been closed
                 console.log("Closed! Closing!");
                 shutdown();
-            break;
+                break;
         };
-        if(pc.iceConnectionState == 'disconnected') {
+        if (pc.iceConnectionState == 'disconnected') {
             console.log('Disconnected. Closing.');
             shutdown();
         }
     };
 
     function handleGetUserMediaError(e) {
-        switch(e.name) {
-        case "NotFoundError":
-            alert("Unable to open your call because no camera and/or microphone" +
-                "were found.");
-            break;
-        case "SecurityError":
-        case "PermissionDeniedError":
-            // Do nothing; this is the same as the user canceling the call.
-            break;
-        default:
-            alert("Error opening your camera and/or microphone: " + e.message);
-            break;
+        switch (e.name) {
+            case "NotFoundError":
+                alert("Unable to open your call because no camera and/or microphone" +
+                    "were found.");
+                break;
+            case "SecurityError":
+            case "PermissionDeniedError":
+                // Do nothing; this is the same as the user canceling the call.
+                break;
+            default:
+                alert("Error opening your camera and/or microphone: " + e.message);
+                break;
         }
     };
 
@@ -235,21 +239,24 @@
         console.error(e);
     };
 
-    signaling.on("signalFromServer", async (data) =>  {
+    signaling.on("signalFromServer", async (data) => {
         console.log("Received from Server. Printing data...");
         console.log(data);
-        if(data.type="hostList" && currentHost == null) {
+        if (data.type === "hostList" && currentHost == null) {
             hostList = data.hostList;
             hostIdField.innerHTML = '';
             console.log("Cleared hostIdField");
             fillHostList();
+        } else if (data.type === "turnCredentials") {
+            console.log("Handling Turn Credentials");
+            setConfiguration(data.turnCredentials);
         };
     });
 
-    signaling.on("leaver", async (data) =>  {
+    signaling.on("leaver", async (data) => {
         console.log("Received from Server. Printing data...");
         console.log(data);
-        if(data.fromId === currentHost) {
+        if (data.fromId === currentHost) {
             currentHost = null;
             shutdown();
             sectionHostList.style.display = "block";
@@ -259,33 +266,33 @@
         };
     });
 
-    signaling.on("signalToUser", async (data) =>  {
+    signaling.on("signalToUser", async (data) => {
         printToConsole("SignalToUser From " + data.fromId + " to " + data.toId + ":");
         console.log(data);
-        if(data.type==="video-offer" && data.fromId===currentHost) {
+        if (data.type === "video-offer" && data.fromId === currentHost) {
             checkPeerConnection();
             var desc = new RTCSessionDescription(data.sdp);
             pc.setRemoteDescription(desc)
-            .then(function() {
-                return pc.createAnswer();
-            })
-            .then(function(answer) {
-                var processedAnswer = processOfferForStereo(answer);
-                            console.log("PROCESSED ANSWER SIGNAL");
-                            console.log(processedAnswer);
-                return pc.setLocalDescription(processedAnswer);
-            })
-            .then(function() {
-                var msg = {
-                    fromId: signaling.id,
-                    toId: currentHost,
-                    type: "video-answer",
-                    sdp: pc.localDescription
-                };
-                sendToUser(msg);
-            })
-            .catch(handleGetUserMediaError);
-        } else if(data.type==="new-ice-candidate" && data.fromId===currentHost) {
+                .then(function() {
+                    return pc.createAnswer();
+                })
+                .then(function(answer) {
+                    var processedAnswer = processOfferForStereo(answer);
+                    console.log("PROCESSED ANSWER SIGNAL");
+                    console.log(processedAnswer);
+                    return pc.setLocalDescription(processedAnswer);
+                })
+                .then(function() {
+                    var msg = {
+                        fromId: signaling.id,
+                        toId: currentHost,
+                        type: "video-answer",
+                        sdp: pc.localDescription
+                    };
+                    sendToUser(msg);
+                })
+                .catch(handleGetUserMediaError);
+        } else if (data.type === "new-ice-candidate" && data.fromId === currentHost) {
             handleNewICECandidate(data);
         };
     });
@@ -304,10 +311,10 @@
 
     async function handleNewICECandidate(data) {
         console.log("handleNewICECandidateEvent");
-        if(data.candidate) {
+        if (data.candidate) {
             var candidate = new RTCIceCandidate(data.candidate);
             await pc.addIceCandidate(candidate)
-            .catch(reportError);
+                .catch(reportError);
         }
     };
 
@@ -315,31 +322,31 @@
     async function handleNegotiationNeededEvent() {
         console.log("handleNegotiationNeededEvent");
         pc.createOffer().then(function(offer) {
-            var processedOffer = processOfferForStereo(offer);
-            console.log("PROCESSED OFFER NN");
-            console.log(processedOffer);
-            return pc.setLocalDescription(offer);
-        })
-        .then(function() {
-            sendToUser({
-                fromId: signaling.id,
-                toId: currentHost,
-                type: "video-offer",
-                sdp: pc.localDescription
+                var processedOffer = processOfferForStereo(offer);
+                console.log("PROCESSED OFFER NN");
+                console.log(processedOffer);
+                return pc.setLocalDescription(offer);
             })
-        })
-        .catch(reportError);
+            .then(function() {
+                sendToUser({
+                    fromId: signaling.id,
+                    toId: currentHost,
+                    type: "video-offer",
+                    sdp: pc.localDescription
+                })
+            })
+            .catch(reportError);
     };
 
     function shutdown() {
         videoRemoteElem.srcObject = null;
-        if(nowStreaming && nowStreaming > 0 && stream) {
+        if (nowStreaming && nowStreaming > 0 && stream) {
             stream.getTracks().forEach(function(track) {
                 track.stop();
             });
         };
         stream = null;
-        if(pc) {
+        if (pc) {
             pc.close();
         };
         pc = null;
@@ -353,63 +360,63 @@
 
     //Auto output devices list grab
     async function gotDevices() {
-      // Handles being called several times to update labels. Preserve values.
-      if(audioPerm===0) {
-          alert("In order to display your audio output devices, the site may ask for microphone permissions. The microphone is not accessed, used, recorded, or saved in any way.");
-          await navigator.mediaDevices.getUserMedia({audio: true});
-          audioPerm = 1;
-      };
-      var deviceInfos = await navigator.mediaDevices.enumerateDevices();
-      console.log(deviceInfos);
-      var selectors = [audioOutputSelect];
-      const values = selectors.map(select => select.value);
-      selectors.forEach(select => {
-        while (select.firstChild) {
-          select.removeChild(select.firstChild);
+        // Handles being called several times to update labels. Preserve values.
+        if (audioPerm === 0) {
+            alert("In order to display your audio output devices, the site may ask for microphone permissions. The microphone is not accessed, used, recorded, or saved in any way.");
+            await navigator.mediaDevices.getUserMedia({ audio: true });
+            audioPerm = 1;
+        };
+        var deviceInfos = await navigator.mediaDevices.enumerateDevices();
+        console.log(deviceInfos);
+        var selectors = [audioOutputSelect];
+        const values = selectors.map(select => select.value);
+        selectors.forEach(select => {
+            while (select.firstChild) {
+                select.removeChild(select.firstChild);
+            }
+        });
+        for (let i = 0; i !== deviceInfos.length; ++i) {
+            const deviceInfo = deviceInfos[i];
+            const option = document.createElement('option');
+            option.value = deviceInfo.deviceId;
+            if (deviceInfo.kind === 'audiooutput') {
+                option.text = deviceInfo.label || `speaker ${audioOutputSelect.length + 1}`;
+                audioOutputSelect.appendChild(option);
+            } else {
+                console.log('Some other kind of source/device: ', deviceInfo);
+            }
         }
-      });
-      for (let i = 0; i !== deviceInfos.length; ++i) {
-        const deviceInfo = deviceInfos[i];
-        const option = document.createElement('option');
-        option.value = deviceInfo.deviceId;
-        if (deviceInfo.kind === 'audiooutput') {
-          option.text = deviceInfo.label || `speaker ${audioOutputSelect.length + 1}`;
-          audioOutputSelect.appendChild(option);
-        } else {
-          console.log('Some other kind of source/device: ', deviceInfo);
-        }
-      }
-      selectors.forEach((select, selectorIndex) => {
-        if (Array.prototype.slice.call(select.childNodes).some(n => n.value === values[selectorIndex])) {
-          select.value = values[selectorIndex];
-        }
-      });
+        selectors.forEach((select, selectorIndex) => {
+            if (Array.prototype.slice.call(select.childNodes).some(n => n.value === values[selectorIndex])) {
+                select.value = values[selectorIndex];
+            }
+        });
     };
 
     // Attach audio output device to video element using device/sink ID.
     function attachSinkId(element, sinkId) {
-      if (typeof element.sinkId !== 'undefined') {
-        element.setSinkId(sinkId)
-            .then(() => {
-              console.log(`Success, audio output device attached: ${sinkId}`);
-            })
-            .catch(error => {
-              let errorMessage = error;
-              if (error.name === 'SecurityError') {
-                errorMessage = `You need to use HTTPS for selecting audio output device: ${error}`;
-              }
-              console.error(errorMessage);
-              // Jump back to first output device in the list as it's the default.
-              audioOutputSelect.selectedIndex = 0;
-            });
-      } else {
-        console.warn('Browser does not support output device selection.');
-      }
+        if (typeof element.sinkId !== 'undefined') {
+            element.setSinkId(sinkId)
+                .then(() => {
+                    console.log(`Success, audio output device attached: ${sinkId}`);
+                })
+                .catch(error => {
+                    let errorMessage = error;
+                    if (error.name === 'SecurityError') {
+                        errorMessage = `You need to use HTTPS for selecting audio output device: ${error}`;
+                    }
+                    console.error(errorMessage);
+                    // Jump back to first output device in the list as it's the default.
+                    audioOutputSelect.selectedIndex = 0;
+                });
+        } else {
+            console.warn('Browser does not support output device selection.');
+        }
     };
 
     function changeAudioDestination() {
-      const audioDestination = audioOutputSelect.value;
-      attachSinkId(videoRemoteElem, audioDestination);
+        const audioDestination = audioOutputSelect.value;
+        attachSinkId(videoRemoteElem, audioDestination);
     };
 
 
@@ -421,19 +428,25 @@
     };
 
 
-
-    async function getCredential() {
-
-            var fetchUrl = "/cred?userId=" + signaling.id;
-            fetch(fetchUrl).then(function(response) {
-                response.text().then(function(text) {
-                    console.log(text);
-                })
-            });
+    function setConfiguration(turnCredentials) {
+        const configurationD = {
+            iceServers: [{
+                    urls: ['stun:stun.robertianburton.com:3478']
+                },
+                {
+                    username: turnCredentials.username,
+                    credential: turnCredentials.password,
+                    urls: [
+                        "turn:turn.robertianburton.com:3478",
+                        "turn:turn.robertianburton.com:3478?transport=udp",
+                        "turn:turn.robertianburton.com:3478?transport=tcp"
+                    ]
+                }
+            ]
+        };
+        configuration = configurationD;
+        console.log(configuration);
     };
-
-
-
 
 
 
