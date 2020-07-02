@@ -444,7 +444,7 @@
                 }
             ]
         };
-        /*configuration = configurationD;*/
+        configuration = configurationD;
         console.log(configuration);
     };
 
