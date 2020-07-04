@@ -96,21 +96,6 @@
 
         }
     };
-    const configurationA = {
-        iceServers: [{
-                urls: ['stun:stun.robertianburton.com:3478']
-            },
-            {
-                username: "testuser",
-                credential: "testpassword",
-                urls: [
-                    "turn:turn.robertianburton.com:3478",
-                    "turn:turn.robertianburton.com:3478?transport=udp",
-                    "turn:turn.robertianburton.com:3478?transport=tcp"
-                ]
-            }
-        ]
-    };
     const configurationB = {
         iceServers: [{
             urls: [
@@ -121,7 +106,7 @@
             ]
         }]
     };
-    var configuration = configurationA;
+    var configuration = configurationB;
 
     function formatDate(date, format) {
         date = date.toJSON().split(/[:/.TZ-]/);
@@ -445,7 +430,6 @@
             ]
         };
         configuration = configurationD;
-        console.log(configuration);
     };
 
 
