@@ -74,7 +74,7 @@
 
         friendListItems = document.getElementById('friendListItems');
 
-
+        
 
 
         console.log("Host JS Startup Complete.");
@@ -141,7 +141,7 @@
             ]
         }]
     };
-    const configuration = configurationA;
+    var configuration = configurationA;
 
     function formatDate(date, format) {
         date = date.toJSON().split(/[:/.TZ-]/);
@@ -164,7 +164,6 @@
     };
 
     function sendAddHostToServer() {
-        /*userName = user || `User${Math.floor(Math.random() * 1000000)}`;*/
         sendToServer({ 'type': 'addHost', 'id': signaling.id });
     };
 
@@ -185,6 +184,15 @@
             userIdField = document.getElementById('userIdField');
             userIdField.innerHTML = ": " + signaling.id;
             sendAddHostToServer();
+        });
+
+        signaling.on("signalFromServer", async (data) => {
+            console.log("Received from Server. Printing data...");
+            console.log(data);
+            if (data.type === "turnCredentials") {
+                console.log("Handling Turn Credentials");
+                setConfiguration(data.turnCredentials);
+            };
         });
 
         signalingObject.on("signalToUser", async (data) => {
@@ -382,6 +390,7 @@
 
         signaling = io();
         userIdField.innerHTML = ": Waiting...";
+        sendToServer({ 'type': 'getTurnCredentials' });
         bindSignalingHandlers(signaling);
     };
 
@@ -393,7 +402,25 @@
     };
 
 
-
+    function setConfiguration(turnCredentials) {
+        const configurationD = {
+            iceServers: [{
+                    urls: ['stun:stun.robertianburton.com:3478']
+                },
+                {
+                    username: turnCredentials.username,
+                    credential: turnCredentials.password,
+                    urls: [
+                        "turn:turn.robertianburton.com:3478",
+                        "turn:turn.robertianburton.com:3478?transport=udp",
+                        "turn:turn.robertianburton.com:3478?transport=tcp"
+                    ]
+                }
+            ]
+        };
+        configuration = configurationD;
+        console.log(configuration);
+    };
 
 
 
