@@ -47,7 +47,7 @@ function sendHostList(socket) {
 function sendTurnCredentials(socket) {
 	var userId = socket.id;
 	var secret = process.env.TURN_KEY;
-	var unixTimeStamp = parseInt(Date.now()/1000) + 8*3600,   // this credential would be valid for the next 8 hours
+	var unixTimeStamp = parseInt(Date.now()/1000) + 8*3600,   // this credential is valid for the next 8 hours
         username = [unixTimeStamp, userId].join(':'),
         password,
         hmac = crypto.createHmac('sha1', secret);
@@ -60,7 +60,6 @@ function sendTurnCredentials(socket) {
         password: password
     };
     var resultAsString = JSON.stringify(result)
-	/*res.send(resultAsString);*/
 	var transmitData = {type: 'turnCredentials', turnCredentials: result};
 	io.emit("signalFromServer", transmitData);
 };

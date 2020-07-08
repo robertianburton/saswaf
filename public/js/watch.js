@@ -228,12 +228,12 @@
         console.log("Received from Server. Printing data...");
         console.log(data);
         if (data.type === "hostList" && currentHost == null) {
+            console.log("Server Message Type: Host List");
             hostList = data.hostList;
             hostIdField.innerHTML = '';
-            console.log("Cleared hostIdField");
             fillHostList();
         } else if (data.type === "turnCredentials") {
-            console.log("Handling Turn Credentials");
+            console.log("Server Message Type: Turn Credentials");
             setConfiguration(data.turnCredentials);
         };
     });
@@ -245,7 +245,6 @@
             currentHost = null;
             shutdown();
             sectionHostList.style.display = "block";
-            console.log("254 Showing Host List");
             hostList = data.hostList;
             fillHostList();
         };
