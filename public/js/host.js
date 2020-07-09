@@ -211,8 +211,6 @@
                             .catch(reportError);
                     };
 
-
-
                     pclist[data.fromId].onicecandidate = handleICECandidateEvent;
                     /*pclist[data.fromId].oniceconnectionstatechange = onConnectionStateChange;*/
                     handleNegotiationNeededEvent(data.fromId);
@@ -220,8 +218,6 @@
             } else if (data.type === "video-answer") {
                 var desc = new RTCSessionDescription(data.sdp);
                 await pclist[data.fromId].setRemoteDescription(desc).catch(reportError);
-                /*console.log("In video-answer, printing pclist entry");
-                console.log(pclist[data.fromId]);*/
 
                 if (!pclist[data.fromId].nowStreaming) {
                     console.log("HAPPENING")
@@ -229,12 +225,6 @@
                     stream.getTracks().forEach((track) => pclist[data.fromId].addTrack(track, stream));
                     pclist[data.fromId].nowStreaming = 3;
                 };
-                /*
-                try{
-                    stream.getTracks().forEach((track) => pclist[data.fromId].addTrack(track));
-                } catch (err) {
-                    console.error(err)
-                };*/
             } else if (data.type === "new-ice-candidate") {
                 handleNewICECandidate(data);
             };
@@ -267,9 +257,7 @@
             default:
                 alert("Error opening your camera and/or microphone: " + e.message);
                 break;
-        }
-
-        /*closeVideoCall();*/
+        };
     };
 
     function handleNegotiationNeededEvent(friendId) {
@@ -346,27 +334,12 @@
         nowStreaming = 1;
         if (nowStreaming === 1) {
             nowStreaming = 2;
-            /*stream = await navigator.mediaDevices.getUserMedia(constraints);*/
-            /*await navigator.mediaDevices.getDisplayMedia(constraints).then(function(getDisplayMediaResult) {
-                stream = getDisplayMediaResult;
-            }).catch(handleGetUserMediaError);*/
-            /*console.log("Capabilities:");*/
-            /*console.log(stream.getVideoTracks()[0].getCapabilities());*/
-            /*stream.getTracks().forEach((track) => pc.addTrack(track, stream));*/
-
 
             var tracks = [];
             await navigator.mediaDevices.getDisplayMedia(constraints).then(function(getDisplayMediaResult) {
                 tracks = tracks.concat(getDisplayMediaResult.getTracks());
             }).catch(handleGetUserMediaError);
 
-
-
-            /*await navigator.mediaDevices.getUserMedia(audioConstraints).then(function(getUserMediaResult) {
-                tracks = tracks.concat(getUserMediaResult.getTracks());
-            }).catch(handleGetUserMediaError);
-
-*/
             stream = new MediaStream(tracks);
 
             videoLocalElem.srcObject = stream;
@@ -429,3 +402,16 @@
 
     window.addEventListener('load', startup, false);
 })();
+
+
+
+
+/*Snippets*/
+/*stream = await navigator.mediaDevices.getUserMedia(constraints);*/
+/*await navigator.mediaDevices.getDisplayMedia(constraints).then(function(getDisplayMediaResult) {
+    stream = getDisplayMediaResult;
+}).catch(handleGetUserMediaError);*/
+/*console.log("Capabilities:");*/
+/*console.log(stream.getVideoTracks()[0].getCapabilities());*/
+/*stream.getTracks().forEach((track) => pc.addTrack(track, stream));*/
+
