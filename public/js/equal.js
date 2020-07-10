@@ -88,21 +88,6 @@
             
         }
     };
-    const configurationA = {
-        iceServers: [
-            {
-                urls: ['stun:stun.robertianburton.com:3478']
-            },
-            {
-                username: "testuser",
-                credential: "testpassword",
-                urls: [
-                    "turn:turn.robertianburton.com:3478",
-                    "turn:turn.robertianburton.com:3478?transport=udp",
-                    "turn:turn.robertianburton.com:3478?transport=tcp"
-                ]
-            }
-    ]};
     const configurationB = {
         iceServers: [{urls: [
         'stun:stun.l.google.com:19302',
@@ -110,7 +95,7 @@
         'stun:stun2.l.google.com:19302',
         'stun:stun.l.google.com:19302?transport=udp',
     ]}]};
-    const configuration = configurationA;
+    const configuration = configurationB;
     
 
     // send any ice candidates to the other peer

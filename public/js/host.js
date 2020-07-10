@@ -74,9 +74,6 @@
 
         friendListItems = document.getElementById('friendListItems');
 
-        
-
-
         console.log("Host JS Startup Complete.");
     }
 
