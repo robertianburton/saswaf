@@ -129,7 +129,6 @@ io.on("connection", function (socket) {
     socket.on("disconnecting", (reason) => {
         hostList.delete(socket.id);
         activeChatUsers.delete(socket.userId);
-        /*io.emit("user disconnecting", socket.id);*/
         var socketToRemove = socket.id;
         socket.broadcast.emit("leaver", {fromId: socketToRemove});
         printToConsole("User disconnecting: " + socketToRemove + " because " + reason);
@@ -148,3 +147,4 @@ io.on("connection", function (socket) {
 
 // 2020-06-13 Host & Watch was tested with friends and worked great!
 // 2020-06-20 Another good test. Some choppiness in non-critical screen elements can occur.
+// 2020-07-09 Finished a third weekly session of watching something together, still great (especially with the stereo audio!)
