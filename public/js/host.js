@@ -81,10 +81,10 @@
     const constraints = {
         video: {
             width: {
-                max: 1600
+                max: 1920
             },
             height: {
-                max: 900
+                max: 1080
             },
             frameRate: {
                 max: 30
