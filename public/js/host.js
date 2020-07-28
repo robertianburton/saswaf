@@ -17,6 +17,8 @@
     var friendList = new Set();
     var friendListItems = null;
     var pclist = [];
+    var resWidth = 1600;
+    var resHeight = 900;
 
     function startup() {
         console.log("Host JS Starting Up...");
@@ -81,10 +83,10 @@
     const constraints = {
         video: {
             width: {
-                max: 1920
+                max: resWidth
             },
             height: {
-                max: 1080
+                max: resHeight
             },
             frameRate: {
                 max: 30
