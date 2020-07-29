@@ -144,6 +144,7 @@ io.on("connection", function (socket) {
 // Audio gain: https://stackoverflow.com/questions/38873061/how-to-increase-mic-gain-in-webrtc
 // Turn server credential get setup: https://www.robinwieruch.de/node-express-server-rest-api
 // Turn credential generation: https://stackoverflow.com/questions/35766382/coturn-how-to-use-turn-rest-api
+// URL parameters: Qwerty's reply on: https://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
 
 // 2020-06-13 Host & Watch was tested with friends and worked great!
 // 2020-06-20 Another good test. Some choppiness in non-critical screen elements can occur.

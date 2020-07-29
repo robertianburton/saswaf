@@ -19,6 +19,17 @@
     var pclist = [];
     var resWidth = 1600;
     var resHeight = 900;
+    var qd = {};
+
+    var qd = {};
+
+    if (location.search) location.search.substr(1).split("&").forEach(function(item) {
+        var s = item.split("="),
+            k = s[0],
+            v = s[1] && decodeURIComponent(s[1]); //  null-coalescing / short-circuit
+        //(k in qd) ? qd[k].push(v) : qd[k] = [v]
+        (qd[k] = qd[k] || []).push(v) // null-coalescing / short-circuit
+    });
 
     function startup() {
         console.log("Host JS Starting Up...");
@@ -65,9 +76,16 @@
         buttonLogConnection.addEventListener('click', function(ev) {
             console.log("Log Connection");
             console.log(pc);
-            console.log(signaling.id);
+            if (signaling) {
+                console.log(signaling.id);
+            };
             if (stream) {
                 console.log(stream);
+            };
+            console.log("URL Parameters:");
+            console.log(qd);
+            if(constraints) {
+                console.log(constraints);
             };
             ev.preventDefault();
         }, false);
@@ -79,6 +97,13 @@
         console.log("Host JS Startup Complete.");
     }
 
+    if(qd.width) {
+        resWidth = qd.width[0]
+    };
+
+    if(qd.height) {
+        resHeight = qd.height[0]
+    };
 
     const constraints = {
         video: {
@@ -413,4 +438,3 @@
 /*console.log("Capabilities:");*/
 /*console.log(stream.getVideoTracks()[0].getCapabilities());*/
 /*stream.getTracks().forEach((track) => pc.addTrack(track, stream));*/
-
