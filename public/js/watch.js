@@ -91,11 +91,12 @@
         console.log("Watch JS Startup Complete.");
 
         if (qd.host) {
-            sendHostConnection()
+            sectionHostList.style.display = "none";
+            setTimeout(() => {  sendHostConnection() }, 2000);
         };
     };
 
-    const signaling = io();
+    var signaling = io();
     const constraints = {
         video: true,
         audio: {
