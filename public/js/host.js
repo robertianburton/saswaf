@@ -19,7 +19,6 @@
     var pclist = [];
     var resWidth = 1600;
     var resHeight = 900;
-    var qd = {};
 
     var qd = {};
 

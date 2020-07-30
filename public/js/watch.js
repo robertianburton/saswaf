@@ -15,6 +15,15 @@
     var nowStreaming = 0;
     var audioOutputSelect = null;
     var audioPerm = 0;
+    var qd = {};
+
+    if (location.search) location.search.substr(1).split("&").forEach(function(item) {
+        var s = item.split("="),
+            k = s[0],
+            v = s[1] && decodeURIComponent(s[1]); //  null-coalescing / short-circuit
+        //(k in qd) ? qd[k].push(v) : qd[k] = [v]
+        (qd[k] = qd[k] || []).push(v) // null-coalescing / short-circuit
+    });
 
     function startup() {
         console.log("Watch JS Starting Up...");
@@ -80,7 +89,11 @@
         console.log("Socket ID: " + signaling.id);
 
         console.log("Watch JS Startup Complete.");
-    }
+
+        if(qd.host) {
+            sendHostConnection()
+        };
+    };
 
     const signaling = io();
     const constraints = {
@@ -150,6 +163,14 @@
             );
         };
         userIdField.innerHTML = ': ' + signaling.id;
+    };
+
+    function sendHostConnection() {
+        sectionHostList.style.display = "none";
+        console.log("Requesting connection to " + qd.host[0]);
+        sendToUser({ fromId: signaling.id, toId: qd.host[0], type: "newFriend" });
+        currentHost = qd.host[0];
+        hostIdField.innerHTML = ': ' + currentHost;
     };
 
     function checkPeerConnection() {
