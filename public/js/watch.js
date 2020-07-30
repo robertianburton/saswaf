@@ -64,6 +64,7 @@
         buttonLogConnection.addEventListener('click', function(ev) {
             console.log("Log Connection");
             console.log(pc);
+            videoRemoteElem.play();
             ev.preventDefault();
         }, false);
 
