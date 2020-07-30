@@ -83,7 +83,7 @@
             };
             console.log("URL Parameters:");
             console.log(qd);
-            if(constraints) {
+            if (constraints) {
                 console.log(constraints);
             };
             ev.preventDefault();
@@ -96,11 +96,11 @@
         console.log("Host JS Startup Complete.");
     }
 
-    if(qd.width) {
+    if (qd.width) {
         resWidth = qd.width[0]
     };
 
-    if(qd.height) {
+    if (qd.height) {
         resHeight = qd.height[0]
     };
 
@@ -186,11 +186,30 @@
         }
     };
 
+    function getHostUrl() {
+        var result = location.protocol + "//" + location.hostname + ":" + location.port + "/watch?host=" + signaling.id;
+        return result;
+    };
+
+    function copyHostUrl() {
+        console.log("Copying URL");
+        navigator.clipboard.writeText(getHostUrl()).then(function() {
+            console.log("Url copied!");
+        }, function() {
+            console.log("Url copy failed!");
+        });
+    };
+
     function bindSignalingHandlers(signalingObject) {
         signalingObject.on("connect", async (data) => {
             console.log("Socket ID: " + signaling.id);
             userIdField = document.getElementById('userIdField');
-            userIdField.innerHTML = ": " + signaling.id;
+            userIdField.innerHTML = ': <thing id="hostUrlText">' + getHostUrl() + '</p>';
+
+            userIdField.addEventListener('click', function(ev) {
+                copyHostUrl();
+            }, false);
+
             sendAddHostToServer();
         });
 

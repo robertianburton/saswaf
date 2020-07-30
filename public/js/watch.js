@@ -90,7 +90,7 @@
 
         console.log("Watch JS Startup Complete.");
 
-        if(qd.host) {
+        if (qd.host) {
             sendHostConnection()
         };
     };
@@ -203,7 +203,7 @@
                 shutdown();
                 break;
         };
-        if (pc.iceConnectionState == 'disconnected') {
+        if (pc && pc.iceConnectionState == 'disconnected') {
             console.log('Disconnected. Closing.');
             shutdown();
         }
@@ -318,8 +318,10 @@
         console.log("handleNewICECandidateEvent");
         if (data.candidate) {
             var candidate = new RTCIceCandidate(data.candidate);
-            await pc.addIceCandidate(candidate)
-                .catch(reportError);
+            if (pc) {
+                await pc.addIceCandidate(candidate)
+                    .catch(reportError);
+            }
         }
     };
 
