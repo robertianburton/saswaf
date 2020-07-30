@@ -187,7 +187,11 @@
     };
 
     function getHostUrl() {
-        var result = location.protocol + "//" + location.hostname + ":" + location.port + "/watch?host=" + signaling.id;
+        var port = "";
+        if (location.port) {
+            port = ":" + location.port
+        };
+        var result = location.protocol + "//" + location.hostname + port + "/watch?host=" + signaling.id;
         return result;
     };
 
