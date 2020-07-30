@@ -237,6 +237,7 @@
 
         stream = event.streams[0];
         videoRemoteElem.srcObject = stream;
+        videoRemoteElem.play();
 
         nowStreaming = 1;
     };
