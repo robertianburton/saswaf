@@ -93,7 +93,7 @@
 
         if (qd.host) {
             sectionHostList.style.display = "none";
-            setTimeout(() => {  sendHostConnection() }, 2000);
+            setTimeout(() => {  sendHostConnection() }, 1000);
         };
     };
 
