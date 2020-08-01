@@ -62,9 +62,15 @@
 
         buttonLogConnection = document.getElementById('buttonLogConnection');
         buttonLogConnection.addEventListener('click', function(ev) {
-            console.log("Log Connection");
-            console.log(pc);
-            videoRemoteElem.play();
+            printToConsole("*** Log Connection ***");
+            if (signaling) {
+                printToConsole("Signaling ID:");
+                console.log(signaling.id);
+            };
+            if(pc) {
+                printToConsole("Peer Connection:");
+                console.log(pc);
+            };
             ev.preventDefault();
         }, false);
 
@@ -85,7 +91,7 @@
 
         sendToServer({ 'type': 'getTurnCredentials' });
 
-        sendToServer({ 'type': 'requestHostList' });
+        /*sendToServer({ 'type': 'requestHostList' });*/
 
         console.log("Socket ID: " + signaling.id);
 
@@ -93,7 +99,7 @@
 
         if (qd.host) {
             sectionHostList.style.display = "none";
-            setTimeout(() => {  sendHostConnection() }, 1000);
+            setTimeout(() => { userIdField.innerHTML = ': ' + signaling.id; sendHostConnection(); document.title = "saswaf > watch > " + qd.host[0]}, 1000);
         };
     };
 
@@ -251,12 +257,12 @@
     signaling.on("signalFromServer", async (data) => {
         console.log("Received from Server. Printing data...");
         console.log(data);
-        if (data.type === "hostList" && currentHost == null) {
+        /*if (data.type === "hostList" && currentHost == null) {
             console.log("Server Message Type: Host List");
             hostList = data.hostList;
             hostIdField.innerHTML = '';
             fillHostList();
-        } else if (data.type === "turnCredentials") {
+        } else*/ if (data.type === "turnCredentials") {
             console.log("Server Message Type: Turn Credentials");
             setConfiguration(data.turnCredentials);
         };
