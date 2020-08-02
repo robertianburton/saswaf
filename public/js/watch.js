@@ -6,14 +6,14 @@
     var buttonLogConnection = null;
     var videoRemoteElem = null;
     var pc = null;
-    var hostListButtons = null;
+    var hostListButtons = document.getElementById('hostListButtons');
     var hostList = [];
     var currentHost = null;
-    var hostIdField = null;
-    var userIdField = null;
-    var sectionHostList = null;
+    var hostIdField = document.getElementById('hostIdField');
+    var userIdField = document.getElementById('userIdField');
+    var sectionHostList = document.getElementById('sectionHostList');
     var nowStreaming = 0;
-    var audioOutputSelect = null;
+    var audioOutputSelect = document.getElementById('audioOutput');
     var audioPerm = 0;
     var qd = {};
 
@@ -81,26 +81,15 @@
             ev.preventDefault();
         }, false);
 
-        sectionHostList = document.getElementById('sectionHostList');
-        hostIdField = document.getElementById('hostIdField');
-        userIdField = document.getElementById('userIdField');
-        hostListButtons = document.getElementById('hostListButtons');
-        audioOutputSelect = document.getElementById('audioOutput');
-
         audioOutputSelect.onchange = changeAudioDestination;
 
         sendToServer({ 'type': 'getTurnCredentials' });
-
-        /*sendToServer({ 'type': 'requestHostList' });*/
 
         console.log("Socket ID: " + signaling.id);
 
         console.log("Watch JS Startup Complete.");
 
-        if (qd.host) {
-            sectionHostList.style.display = "none";
-            setTimeout(() => { userIdField.innerHTML = ': ' + signaling.id; sendHostConnection(); document.title = "saswaf > watch > " + qd.host[0]}, 1000);
-        };
+        
     };
 
     var signaling = io();
@@ -277,6 +266,16 @@
             sectionHostList.style.display = "block";
             hostList = data.hostList;
             fillHostList();
+        };
+    });
+
+    signaling.on("connect", async (data) => {
+        printToConsole("Connected. Signaling ID: " + signaling.id);
+        if (qd.host) {
+            sectionHostList.style.display = "none";
+            userIdField.innerHTML = ': ' + signaling.id;
+            sendHostConnection();
+            document.title = "saswaf > watch > " + qd.host[0];
         };
     });
 
