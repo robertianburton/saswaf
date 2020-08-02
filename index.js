@@ -15,7 +15,7 @@ const app = express()
     .get('/host', (req, res) => res.render('pages/host'))
     .get('/watch', (req, res) => res.render('pages/watch'))
     .get('/stereo', (req, res) => res.render('pages/stereo'));
-    /*.get('/cred', (req, res) => getTurnCredentials(req,res));*/
+/*.get('/cred', (req, res) => getTurnCredentials(req,res));*/
 
 const server = app.listen(PORT, () => printToConsole(`Listening on ${ PORT }`));
 
@@ -27,19 +27,24 @@ var hostList = new Set();
 
 function formatDate(date, format) {
     date = date.toJSON().split(/[:/.TZ-]/);
-    return format.replace(/[ymdhisu]/g, function (letter) {
+    return format.replace(/[ymdhisu]/g, function(letter) {
         return date['ymdhisu'.indexOf(letter)];
     });
 };
 
-function printToConsole(data) {
-    console.log(formatDate(new Date(), 'ymd hisu')+" "+JSON.stringify(data));
+function printToConsole() {
+    var str = "";
+    for (var i = 0; i < arguments.length; i++) {
+        str = str + JSON.stringify(arguments[i]);
+    }
+
+    console.log(formatDate(new Date(), 'ymd hisu') + " " + str);
 };
 
 function sendTurnCredentials(socket) {
-	var userId = socket.id;
-	var secret = process.env.TURN_KEY;
-	var unixTimeStamp = parseInt(Date.now()/1000) + 8*3600,   // this credential is valid for the next 8 hours
+    var userId = socket.id;
+    var secret = process.env.TURN_KEY;
+    var unixTimeStamp = parseInt(Date.now() / 1000) + 8 * 3600, // this credential is valid for the next 8 hours
         username = [unixTimeStamp, userId].join(':'),
         password,
         hmac = crypto.createHmac('sha1', secret);
@@ -52,24 +57,24 @@ function sendTurnCredentials(socket) {
         password: password
     };
     var resultAsString = JSON.stringify(result)
-	var transmitData = {type: 'turnCredentials', turnCredentials: result};
-	io.emit("signalFromServer", transmitData);
+    var transmitData = { type: 'turnCredentials', turnCredentials: result };
+    io.emit("signalFromServer", transmitData);
 };
 
 
-io.on("connection", function (socket) {
-    printToConsole("Made socket connection: " + socket.id);
+io.on("connection", function(socket) {
+    printToConsole("Made socket connection: ", socket.id);
 
-    socket.on("new user", function (data) {
+    socket.on("new user", function(data) {
         socket.userId = data;
         activeChatUsers.add(data);
         io.emit("new user", [...activeChatUsers]);
         printToConsole("New user. Added: " + data);
     });
 
-    socket.on("chat message", function (data) {
+    socket.on("chat message", function(data) {
         io.emit("chat message", data);
-        printToConsole("New message from "+ data.sender);
+        printToConsole("New message from " + data.sender);
     });
 
     socket.on("screenSignalFromScreen", (data) => {
@@ -77,7 +82,7 @@ io.on("connection", function (socket) {
         printToConsole("New Screen Signal From Host: " + socket.id);
     });
 
-    socket.on("screenSignalFromAudience", function (data) {
+    socket.on("screenSignalFromAudience", function(data) {
         socket.broadcast.emit("screenSignalFromAudience", data);
         printToConsole("New Screen Signal From Audience: " + socket.id);
     });
@@ -93,26 +98,25 @@ io.on("connection", function (socket) {
     });
 
     socket.on("signalToUser", (data) => {
-    	if(data.toId) {
-        	io.to(data.toId).emit('signalToUser', data);
-    	} else {
-    		socket.broadcast.emit('signalToUser', data);
-    	};
+        if (data.toId) {
+            io.to(data.toId).emit('signalToUser', data);
+        } else {
+            socket.broadcast.emit('signalToUser', data);
+        };
         printToConsole("SignalToUser From " + data.fromId + " to " + data.toId + ":");
         printToConsole(data);
     });
 
     socket.on("signalToServer", (data) => {
-    	printToConsole("SignalToServer From " + socket.id + ":");
+        printToConsole("SignalToServer From " + socket.id + ":");
         printToConsole(data);
-        if(data.type==='addHost') {
+        if (data.type === 'addHost') {
             printToConsole("addHost: " + socket.id);
             hostList.add(socket.id);
             printToConsole("hostList:");
-            printToConsole(hostList);
             console.log(hostList);
-        } else if(data.type==='getTurnCredentials') {
-        	sendTurnCredentials(socket);
+        } else if (data.type === 'getTurnCredentials') {
+            sendTurnCredentials(socket);
         };
     });
 
@@ -120,7 +124,7 @@ io.on("connection", function (socket) {
         hostList.delete(socket.id);
         activeChatUsers.delete(socket.userId);
         var socketToRemove = socket.id;
-        socket.broadcast.emit("leaver", {fromId: socketToRemove});
+        socket.broadcast.emit("leaver", { fromId: socketToRemove });
         printToConsole("User disconnecting: " + socketToRemove + " because " + reason);
     });
 });
