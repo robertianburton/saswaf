@@ -6,17 +6,15 @@
     var buttonLogConnection = null;
     var videoRemoteElem = null;
     var pc = null;
-    var hostListButtons = document.getElementById('hostListButtons');
-    var hostList = [];
     var currentHost = null;
     var hostIdField = document.getElementById('hostIdField');
     var userIdField = document.getElementById('userIdField');
-    var sectionHostList = document.getElementById('sectionHostList');
     var nowStreaming = 0;
     var audioOutputSelect = document.getElementById('audioOutput');
     var audioPerm = 0;
     var qd = {};
 
+    // Local query descriptors
     if (location.search) location.search.substr(1).split("&").forEach(function(item) {
         var s = item.split("="),
             k = s[0],
@@ -140,30 +138,7 @@
         signaling.emit("signalToUser", data);
     };
 
-    function fillHostList() {
-        hostListButtons.innerHTML = "";
-        if (hostList && hostList.length > 0) {
-            hostList.forEach(
-                (host) => {
-                    hostListButtons.innerHTML += '<button type="button" class="list-group-item list-group-item-action" id="host_' + host + '">' + host + '</button>';
-                    var thisitem = document.getElementById('host_' + host);
-                    thisitem.addEventListener('click', function(ev) {
-                        sectionHostList.style.display = "none";
-                        console.log("Clicked " + host);
-                        sendToUser({ fromId: signaling.id, toId: host, type: "newFriend" });
-                        currentHost = host;
-                        hostIdField.innerHTML = ': ' + currentHost;
-                        ev.preventDefault();
-                    }, false);
-
-                }
-            );
-        };
-        userIdField.innerHTML = ': ' + signaling.id;
-    };
-
     function sendHostConnection() {
-        sectionHostList.style.display = "none";
         console.log("Requesting connection to " + qd.host[0]);
         sendToUser({ fromId: signaling.id, toId: qd.host[0], type: "newFriend" });
         currentHost = qd.host[0];
@@ -246,12 +221,7 @@
     signaling.on("signalFromServer", async (data) => {
         console.log("Received from Server. Printing data...");
         console.log(data);
-        /*if (data.type === "hostList" && currentHost == null) {
-            console.log("Server Message Type: Host List");
-            hostList = data.hostList;
-            hostIdField.innerHTML = '';
-            fillHostList();
-        } else*/ if (data.type === "turnCredentials") {
+        if (data.type === "turnCredentials") {
             console.log("Server Message Type: Turn Credentials");
             setConfiguration(data.turnCredentials);
         };
@@ -263,16 +233,12 @@
         if (data.fromId === currentHost) {
             currentHost = null;
             shutdown();
-            sectionHostList.style.display = "block";
-            hostList = data.hostList;
-            fillHostList();
         };
     });
 
     signaling.on("connect", async (data) => {
         printToConsole("Connected. Signaling ID: " + signaling.id);
         if (qd.host) {
-            sectionHostList.style.display = "none";
             userIdField.innerHTML = ': ' + signaling.id;
             sendHostConnection();
             document.title = "saswaf > watch > " + qd.host[0];

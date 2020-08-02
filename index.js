@@ -36,14 +36,6 @@ function printToConsole(data) {
     console.log(formatDate(new Date(), 'ymd hisu')+" "+JSON.stringify(data));
 };
 
-function sendHostList(socket) {
-    printToConsole("Sending Host List");
-    var transmitData = {type: 'hostList', hostList: Array.from(hostList)};
-    printToConsole(transmitData);
-    io.emit("signalFromServer", transmitData);
-
-};
-
 function sendTurnCredentials(socket) {
 	var userId = socket.id;
 	var secret = process.env.TURN_KEY;
@@ -115,12 +107,10 @@ io.on("connection", function (socket) {
         printToConsole(data);
         if(data.type==='addHost') {
             printToConsole("addHost: " + socket.id);
-            hostList.add(data.id);
+            hostList.add(socket.id);
             printToConsole("hostList:");
             printToConsole(hostList);
-            sendHostList(socket);
-        } else if(data.type==='requestHostList') {
-            sendHostList(socket);
+            console.log(hostList);
         } else if(data.type==='getTurnCredentials') {
         	sendTurnCredentials(socket);
         };
@@ -132,7 +122,6 @@ io.on("connection", function (socket) {
         var socketToRemove = socket.id;
         socket.broadcast.emit("leaver", {fromId: socketToRemove});
         printToConsole("User disconnecting: " + socketToRemove + " because " + reason);
-        sendHostList(socket);
     });
 });
 
