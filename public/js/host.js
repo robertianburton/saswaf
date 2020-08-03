@@ -235,7 +235,7 @@
                 fillFriendList();
                 if (!pclist[data.fromId]) {
                     pclist[data.fromId] = new RTCPeerConnection(configuration);
-                    /*pclist[data.fromId].onnegotiationneeded = handleNegotiationNeededEvent;*/
+
 
                     pclist[data.fromId].onnegotiationneeded = function() {
                         printToConsole("handleNegotiationNeededEvent");
@@ -313,6 +313,7 @@
                 var processedOffer = processOfferForStereo(offer);
                 console.log("PROCESSED OFFER NN");
                 console.log(processedOffer);
+                pclist[friendId].signalingId = friendId;
                 return pclist[friendId].setLocalDescription(processedOffer);
             })
             .then(function() {
@@ -328,10 +329,11 @@
 
     function handleICECandidateEvent(data) {
         printToConsole("handleICECandidateEvent");
+        console.log(this);
         console.log(data);
         sendToUser({
             type: "new-ice-candidate",
-            toId: data.fromId,
+            toId: this.signalingId,
             fromId: signaling.id,
             candidate: data.candidate
         });

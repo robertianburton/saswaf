@@ -58,7 +58,7 @@ function sendTurnCredentials(socket) {
     };
     var resultAsString = JSON.stringify(result)
     var transmitData = { type: 'turnCredentials', turnCredentials: result };
-    io.emit("signalFromServer", transmitData);
+    io.to(userId).emit("signalFromServer", transmitData);
 };
 
 
@@ -101,7 +101,7 @@ io.on("connection", function(socket) {
         if (data.toId) {
             io.to(data.toId).emit('signalToUser', data);
         } else {
-            socket.broadcast.emit('signalToUser', data);
+            printToConsole("Message to user without an address! Received as:");
         };
         printToConsole("SignalToUser From " + data.fromId + " to " + data.toId + ":");
         printToConsole(data);
