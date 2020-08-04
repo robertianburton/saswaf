@@ -10,12 +10,10 @@ const app = express()
     .set('view engine', 'ejs')
     .get('/', (req, res) => res.render('pages/index'))
     .get('/soundcheck', (req, res) => res.render('pages/soundcheck'))
-    .get('/chat', (req, res) => res.render('pages/chat'))
     .get('/equal', (req, res) => res.render('pages/equal'))
     .get('/host', (req, res) => res.render('pages/host'))
     .get('/watch', (req, res) => res.render('pages/watch'))
     .get('/stereo', (req, res) => res.render('pages/stereo'));
-/*.get('/cred', (req, res) => getTurnCredentials(req,res));*/
 
 const server = app.listen(PORT, () => printToConsole(`Listening on ${ PORT }`));
 
@@ -72,11 +70,6 @@ io.on("connection", function(socket) {
         printToConsole("New user. Added: " + data);
     });
 
-    socket.on("chat message", function(data) {
-        io.emit("chat message", data);
-        printToConsole("New message from " + data.sender);
-    });
-
     socket.on("screenSignalFromScreen", (data) => {
         io.to(data.toId).emit('screenSignalFromScreen', data)
         printToConsole("New Screen Signal From Host: " + socket.id);
@@ -104,7 +97,13 @@ io.on("connection", function(socket) {
             printToConsole("Message to user without an address! Received as:");
         };
         printToConsole("SignalToUser From " + data.fromId + " to " + data.toId + ":");
-        printToConsole(data);
+        if (data.type && data.type === "video-answer") {
+            printToConsole("(Video answer hidden)");
+        } else if (data.type && data.type === "video-offer") {
+            printToConsole("(Video offer hidden)");
+        } else {
+        	printToConsole(data);
+        }
     });
 
     socket.on("signalToServer", (data) => {
