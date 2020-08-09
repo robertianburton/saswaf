@@ -30,8 +30,12 @@
         (qd[k] = qd[k] || []).push(v) // null-coalescing / short-circuit
     });
 
+
+
     function startup() {
         console.log("Host JS Starting Up...");
+
+
 
         videoLocalElem = document.getElementById('videoLocalElem');
 
@@ -73,19 +77,38 @@
 
         buttonLogConnection = document.getElementById('buttonLogConnection');
         buttonLogConnection.addEventListener('click', function(ev) {
-            console.log("Log Connection");
-            console.log(pc);
+            console.log("vvv Log Connection vvv");
+            console.log("Peer Connection:");
+            if (pclist) {
+                console.log(pclist);
+            };
+            console.log("Senders:");
+            if (pclist) {
+                for (var key in pclist) {
+                    console.log(pclist[key].getSenders());
+                };
+            };
+            console.log("Signaling ID:");
             if (signaling) {
                 console.log(signaling.id);
             };
+            console.log("Stream:");
             if (stream) {
                 console.log(stream);
             };
             console.log("URL Parameters:");
-            console.log(qd);
+            if (qd) {
+                console.log(qd);
+            };
+            console.log("Constraints:")
             if (constraints) {
                 console.log(constraints);
             };
+            console.log("Video Tracks:");
+            if (stream) {
+                console.log(stream.getVideoTracks());
+            }
+            console.log("^^^ Log Connection ^^^");
             ev.preventDefault();
         }, false);
 
@@ -171,10 +194,6 @@
         signaling.emit("signalToServer", data);
     };
 
-    function sendAddHostToServer() {
-        sendToServer({ 'type': 'addHost', 'id': signaling.id });
-    };
-
     function fillFriendList() {
         friendListItems.innerHTML = '';
         if (friendList.size > 0) {
@@ -205,7 +224,7 @@
     };
 
     function bindSignalingHandlers(signalingObject) {
-        signalingObject.on("connect", async (data) => {
+        signaling.on("connect", async (data) => {
             console.log("Socket ID: " + signaling.id);
             userIdField = document.getElementById('userIdField');
             userIdField.innerHTML = ': <thing id="hostUrlText">' + getHostUrl() + '</p>';
@@ -213,8 +232,6 @@
             userIdField.addEventListener('click', function(ev) {
                 copyHostUrl();
             }, false);
-
-            sendAddHostToServer();
         });
 
         signaling.on("signalFromServer", async (data) => {
@@ -226,7 +243,7 @@
             };
         });
 
-        signalingObject.on("signalToUser", async (data) => {
+        signaling.on("signalToUser", async (data) => {
             printToConsole("SignalToUser From " + data.fromId + " to " + data.toId + ":");
             console.log(data);
             if (data.type === "newFriend") {
@@ -276,7 +293,7 @@
             };
         });
 
-        signalingObject.on("leaver", async (data) => {
+        signaling.on("leaver", async (data) => {
             console.log(data);
 
             if (pclist[data.fromId]) {
@@ -386,18 +403,63 @@
             var tracks = [];
             await navigator.mediaDevices.getDisplayMedia(constraints).then(function(getDisplayMediaResult) {
                 tracks = tracks.concat(getDisplayMediaResult.getTracks());
+            }).then(function() {
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                };
+                stream = new MediaStream(tracks);
+                videoLocalElem.srcObject = stream;
+
+
+                if (pclist) {
+                    var videoTrack = stream.getVideoTracks()[0];
+                    var audioTrack = stream.getAudioTracks()[0];
+
+                    for (var key in pclist) {
+
+                        var senderVideo = pclist[key].getSenders().find(function(s) {
+                            console.log(s);
+                            if (s && s.track && s.track.kind && videoTrack && videoTrack.kind) {
+                                return s.track.kind == videoTrack.kind;
+                            }
+                        });
+
+                        var senderAudio = pclist[key].getSenders().find(function(s) {
+                            console.log(s);
+                            if (s && s.track && s.track.kind && audioTrack && audioTrack.kind) {
+                                return s.track.kind == audioTrack.kind;
+                            }
+                        });
+
+                        if (senderVideo && videoTrack) {
+                            senderVideo.replaceTrack(videoTrack);
+                        };
+
+                        if (senderAudio && audioTrack) {
+                            senderAudio.replaceTrack(audioTrack);
+                        };
+                    };
+                };
+
+
+
+
+
+                nowStreaming = 3;
             }).catch(handleGetUserMediaError);
 
-            stream = new MediaStream(tracks);
 
-            videoLocalElem.srcObject = stream;
-            nowStreaming = 3;
+
+
         };
 
-        signaling = io();
-        userIdField.innerHTML = ": Waiting...";
-        sendToServer({ 'type': 'getTurnCredentials' });
-        bindSignalingHandlers(signaling);
+        if (!signaling) {
+            signaling = io();
+            userIdField.innerHTML = ": Waiting...";
+            sendToServer({ 'type': 'getTurnCredentials' });
+            bindSignalingHandlers(signaling);
+        }
+
     };
 
 

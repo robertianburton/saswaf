@@ -19,8 +19,6 @@ const server = app.listen(PORT, () => printToConsole(`Listening on ${ PORT }`));
 
 const io = socket(server);
 
-var hostList = new Set();
-
 function formatDate(date, format) {
     date = date.toJSON().split(/[:/.TZ-]/);
     return format.replace(/[ymdhisu]/g, function(letter) {
@@ -33,7 +31,6 @@ function printToConsole() {
     for (var i = 0; i < arguments.length; i++) {
         str = str + JSON.stringify(arguments[i]);
     }
-
     console.log(formatDate(new Date(), 'ymd hisu') + " " + str);
 };
 
@@ -90,18 +87,12 @@ io.on("connection", function(socket) {
     socket.on("signalToServer", (data) => {
         printToConsole("SignalToServer From " + socket.id + ":");
         printToConsole(data);
-        if (data.type === 'addHost') {
-            printToConsole("addHost: " + socket.id);
-            hostList.add(socket.id);
-            printToConsole("hostList:");
-            console.log(hostList);
-        } else if (data.type === 'getTurnCredentials') {
+		if (data.type === 'getTurnCredentials') {
             sendTurnCredentials(socket);
         };
     });
 
     socket.on("disconnecting", (reason) => {
-        hostList.delete(socket.id);
         var socketToRemove = socket.id;
         socket.broadcast.emit("leaver", { fromId: socketToRemove });
         printToConsole("User disconnecting: " + socketToRemove + " because " + reason);
