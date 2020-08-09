@@ -19,8 +19,6 @@ const server = app.listen(PORT, () => printToConsole(`Listening on ${ PORT }`));
 
 const io = socket(server);
 
-const activeChatUsers = new Set();
-
 var hostList = new Set();
 
 function formatDate(date, format) {
@@ -63,23 +61,6 @@ function sendTurnCredentials(socket) {
 io.on("connection", function(socket) {
     printToConsole("Made socket connection: ", socket.id);
 
-    socket.on("new user", function(data) {
-        socket.userId = data;
-        activeChatUsers.add(data);
-        io.emit("new user", [...activeChatUsers]);
-        printToConsole("New user. Added: " + data);
-    });
-
-    socket.on("screenSignalFromScreen", (data) => {
-        io.to(data.toId).emit('screenSignalFromScreen', data)
-        printToConsole("New Screen Signal From Host: " + socket.id);
-    });
-
-    socket.on("screenSignalFromAudience", function(data) {
-        socket.broadcast.emit("screenSignalFromAudience", data);
-        printToConsole("New Screen Signal From Audience: " + socket.id);
-    });
-
     socket.on("screenSignalFromEqual", (data) => {
         socket.broadcast.emit("screenSignalFromEqual", data);
         printToConsole("New Screen Signal From Equal: " + socket.id);
@@ -121,7 +102,6 @@ io.on("connection", function(socket) {
 
     socket.on("disconnecting", (reason) => {
         hostList.delete(socket.id);
-        activeChatUsers.delete(socket.userId);
         var socketToRemove = socket.id;
         socket.broadcast.emit("leaver", { fromId: socketToRemove });
         printToConsole("User disconnecting: " + socketToRemove + " because " + reason);
