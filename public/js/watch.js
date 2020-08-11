@@ -107,7 +107,7 @@
     const configurationB = {
         iceServers: [{
             urls: [
-                'stun:stun.rounds.com:3478'
+                'stun:stun.robertianburton.com:3478'
             ]
         }]
     };
@@ -409,7 +409,7 @@
     function setConfiguration(turnCredentials) {
         const configurationD = {
             iceServers: [{
-                    urls: ['stun:stun.rounds.com:3478']
+                    urls: ['stun:stun.robertianburton.com:3478']
                 },
                 {
                     username: turnCredentials.username,
