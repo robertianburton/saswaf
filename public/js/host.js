@@ -165,10 +165,7 @@
     const configurationB = {
         iceServers: [{
             urls: [
-                'stun:stun.l.google.com:19302',
-                'stun:stun1.l.google.com:19302',
-                'stun:stun2.l.google.com:19302',
-                'stun:stun.l.google.com:19302?transport=udp',
+                'stun:stun.rounds.com:3478'
             ]
         }]
     };
@@ -469,11 +466,13 @@
         return offer;
     };
 
+/* stun.rounds.com:3478 */
+/*stun.counterpath.com:3478*/
 
     function setConfiguration(turnCredentials) {
         const configurationD = {
             iceServers: [{
-                    urls: ['stun:stun.robertianburton.com:3478']
+                    urls: ['stun:stun.rounds.com:3478']
                 },
                 {
                     username: turnCredentials.username,
