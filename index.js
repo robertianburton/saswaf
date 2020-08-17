@@ -5,6 +5,15 @@ const PORT = process.env.PORT || 5000;
 const crypto = require('crypto');
 
 const app = express()
+	.enable('trust proxy')
+	.use(function (req, res, next) {
+        if (req.secure || process.env.ENV==='DEV') {
+                // request was via https, so do no special handling
+                next();
+        } else {
+                // request was via http, so redirect to https
+                res.redirect('https://' + req.headers.host + req.url);
+        }})
     .use(express.static(path.join(__dirname, 'public')))
     .set('views', path.join(__dirname, 'views'))
     .set('view engine', 'ejs')
