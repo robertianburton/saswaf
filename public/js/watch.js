@@ -340,7 +340,7 @@
     async function gotDevices() {
         // Handles being called several times to update labels. Preserve values.
         if (audioPerm === 0) {
-            alert("In order to display your audio output devices, the site may ask for microphone permissions. The microphone is not accessed, used, recorded, or saved in any way.");
+            alert("In order to display your audio output devices, the site may ask for microphone permissions. The site does not use it, but it is required by the web browser in order to get the list of audio outputs.");
             await navigator.mediaDevices.getUserMedia({ audio: true });
             audioPerm = 1;
         };
