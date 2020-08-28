@@ -173,7 +173,10 @@
             ]
         }]
     };
-    var configuration = configurationB;
+    const configurationC = {
+        iceServers: [{   urls: [ "stun:us-turn2.xirsys.com" ]}, {   username: "k3IAtn2K1yMCrpypkP_CJCyEV7m3FHThFwcUnIxp_4i8-ZuFR4JQN0zqjllYFBXYAAAAAF7DZDF5YWtldHlTYXhlcw==",   credential: "6f541688-998b-11ea-8e17-0242ac140004",   urls: [       "turn:us-turn2.xirsys.com:80?transport=udp",       "turn:us-turn2.xirsys.com:3478?transport=udp",       "turn:us-turn2.xirsys.com:80?transport=tcp",       "turn:us-turn2.xirsys.com:3478?transport=tcp",       "turns:us-turn2.xirsys.com:443?transport=tcp",       "turns:us-turn2.xirsys.com:5349?transport=tcp"   ]}]
+    };
+    var configuration = configurationC;
 
     function formatDate(date, format) {
         date = date.toJSON().split(/[:/.TZ-]/);
@@ -493,7 +496,7 @@
                 }
             ]
         };
-        configuration = configurationD;
+        configuration = configurationC;
     };
 
 
