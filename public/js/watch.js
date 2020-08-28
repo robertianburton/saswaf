@@ -151,8 +151,7 @@
             pc.onicecandidate = handleICECandidateEvent;
         }
     };
-
-
+    
     function onConnectionStateChange(event) {
         console.log("Connection State Change...");
         switch (pc.connectionState) {
@@ -205,7 +204,7 @@
 
         stream = event.streams[0];
         videoRemoteElem.srcObject = stream;
-        videoRemoteElem.play();
+        /*videoRemoteElem.play();*/
 
         nowStreaming = 1;
     };
