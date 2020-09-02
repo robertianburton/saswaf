@@ -174,11 +174,14 @@
     };
 
     function sendToUser(data) {
+        console.log("Sending To User: ");
         console.log(data);
         signaling.emit("signalToUser", data);
     };
 
     function sendToServer(data) {
+        console.log("Sending To Server: ");
+        console.log(data);
         signaling.emit("signalToServer", data);
     };
 
@@ -223,16 +226,26 @@
         });
 
         signaling.on("signalFromServer", async (data) => {
-            console.log("Received from Server. Printing data...");
+            printToConsole("Received from Server... Printing data:");
             console.log(data);
             if (data.type === "turnCredentials") {
                 console.log("Handling Turn Credentials");
                 setConfiguration(data.turnCredentials);
+            } else if (data.type === "leaver") {
+                console.log("Notified of Leaver");
+                if (pclist[data.fromId]) {
+                    const senders = pclist[data.fromId].getSenders();
+                    senders.forEach((sender) => pclist[data.fromId].removeTrack(sender));
+                    pclist[data.fromId].close();
+                };
+                friendList.delete(data.fromId);
+                console.log("Removing " + data.fromId);
+                fillFriendList();
             };
         });
 
         signaling.on("signalToUser", async (data) => {
-            printToConsole("SignalToUser From " + data.fromId + " to " + data.toId + ":");
+            printToConsole("Received from User... " + data.fromId + " to " + data.toId + ":");
             console.log(data);
             if (data.type === "newFriend") {
                 friendList.add(data.fromId);
@@ -278,19 +291,6 @@
             } else if (data.type === "new-ice-candidate") {
                 handleNewICECandidate(data);
             };
-        });
-
-        signaling.on("leaver", async (data) => {
-            console.log(data);
-
-            if (pclist[data.fromId]) {
-                const senders = pclist[data.fromId].getSenders();
-                senders.forEach((sender) => pclist[data.fromId].removeTrack(sender));
-                pclist[data.fromId].close();
-            };
-            friendList.delete(data.fromId);
-            console.log("Removing " + data.fromId);
-            fillFriendList();
         });
     };
 

@@ -104,7 +104,7 @@ io.on("connection", function (socket) {
 
     socket.on("disconnecting", (reason) => {
         var socketToRemove = socket.id;
-        socket.broadcast.emit("leaver", { fromId: socketToRemove });
+        socket.broadcast.emit("signalFromServer", { type: "leaver", fromId: socketToRemove, reason: reason});
         printToConsole("User disconnecting: " + socketToRemove + " because " + reason);
     });
 });

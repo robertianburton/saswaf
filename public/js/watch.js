@@ -115,12 +115,13 @@
     };
 
     function sendToServer(data) {
+        console.log("Sending To Server: ");
         console.log(data);
         signaling.emit("signalToServer", data);
     };
 
     function sendToUser(data) {
-        console.log("Sending: ");
+        console.log("Sending To User: ");
         console.log(data);
         signaling.emit("signalToUser", data);
     };
@@ -205,20 +206,16 @@
     };
 
     signaling.on("signalFromServer", async (data) => {
-        console.log("Received from Server. Printing data...");
+        console.log("Received from Server... Printing data:");
         console.log(data);
         if (data.type === "turnCredentials") {
             console.log("Server Message Type: Turn Credentials");
             setConfiguration(data.turnCredentials);
-        };
-    });
-
-    signaling.on("leaver", async (data) => {
-        console.log("Received from Server. Printing data...");
-        console.log(data);
-        if (data.fromId === currentHost) {
-            currentHost = null;
-            shutdown();
+        } else if (data.type === "leaver") {
+            if (data.fromId === currentHost) {
+                currentHost = null;
+                shutdown();
+            };
         };
     });
 
@@ -232,7 +229,7 @@
     });
 
     signaling.on("signalToUser", async (data) => {
-        printToConsole("SignalToUser From " + data.fromId + " to " + data.toId + ":");
+        printToConsole("Received from User... " + data.fromId + " to " + data.toId + ":");
         console.log(data);
         if (data.type === "video-offer" && data.fromId === currentHost) {
             checkPeerConnection();
