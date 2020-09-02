@@ -6,13 +6,9 @@
     var buttonLogConnection = null;
     var userIdField = null;
     var videoLocalElem = null;
-    var screenHostId = null;
-    let makingOffer = false;
-    let ignoreOffer = false;
     var nowStreaming = 0;
     var stream = null;
     var pc = null;
-    let polite = true;
     var signaling;
     var friendList = new Set();
     var friendListItems = null;
@@ -22,6 +18,7 @@
 
     var qd = {};
 
+    //Split query parameters
     if (location.search) location.search.substr(1).split("&").forEach(function (item) {
         var s = item.split("="),
             k = s[0],
@@ -149,19 +146,6 @@
             'sampleSize': 16
         }
     };
-    var audioConstraints = {
-        video: false,
-        audio: {
-            'channelCount': { 'min': 2 },
-            'echoCancellation': false,
-            'autoGainControl': false,
-            'googAutoGainControl': false,
-            'noiseSuppression': false,
-            'sampleRate': 44100,
-            'sampleSize': 16
-
-        }
-    };
     const configurationB = {
         iceServers: [{
             urls: [
@@ -279,7 +263,6 @@
                     };
 
                     pclist[data.fromId].onicecandidate = handleICECandidateEvent;
-                    /*pclist[data.fromId].oniceconnectionstatechange = onConnectionStateChange;*/
                     handleNegotiationNeededEvent(data.fromId);
                 }
             } else if (data.type === "video-answer") {
@@ -372,30 +355,6 @@
     function reportError(e) {
         console.log("Report Error");
         console.error(e);
-    };
-
-    function onConnectionStateChange(event) {
-        switch (pc.connectionState) {
-            case "connected":
-                console.log("Connection Connected!");
-                // The connection has become fully connected
-                break;
-            case "disconnected":
-            case "failed":
-                // One or more transports has terminated unexpectedly or in an error
-                console.log("Failed! Closing!");
-                shutdown();
-                break;
-            case "closed":
-                // The connection has been closed
-                console.log("Closed! Closing!");
-                shutdown();
-                break;
-        };
-        if (pc.iceConnectionState == 'disconnected') {
-            console.log('Disconnected. Closing.');
-            shutdown();
-        }
     };
 
     async function start() {

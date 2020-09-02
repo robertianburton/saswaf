@@ -14,7 +14,7 @@
     var audioPerm = 0;
     var qd = {};
 
-    // Local query descriptors
+    //Split query parameters
     if (location.search) location.search.substr(1).split("&").forEach(function (item) {
         var s = item.split("="),
             k = s[0],
@@ -91,19 +91,6 @@
     };
 
     var signaling = io();
-    const constraints = {
-        video: true,
-        audio: {
-            'channelCount': { 'ideal': 2 },
-            'echoCancellation': false,
-            'autoGainControl': false,
-            'googAutoGainControl': false,
-            'noiseSuppression': false,
-            'sampleRate': 44100,
-            'sampleSize': 16
-
-        }
-    };
     const configurationB = {
         iceServers: [{
             urls: [
