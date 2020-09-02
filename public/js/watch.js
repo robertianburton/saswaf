@@ -39,21 +39,12 @@
         buttonVideoSizeResponsive = document.getElementById('buttonVideoSizeResponsive');
         buttonVideoSizeResponsive.addEventListener('click', function (ev) {
             videoRemoteElem.style.width = "100%";
-
             ev.preventDefault();
         }, false);
 
         buttonVideoSizePage = document.getElementById('buttonVideoSizePage');
         buttonVideoSizePage.addEventListener('click', function (ev) {
-            videoRemoteElem.style.width = window.innerWidth;
-
-            var docH = $(document).height();
-            var vidH = $('#videoRemoteElem').height();
-            var videoScale = ($('#videoRemoteElem').width() / $('#videoRemoteElem').height());
-            var topH = docH - vidH;
-            var workableH = Math.floor((window.innerHeight - topH - 0) * videoScale);
-
-            videoRemoteElem.style.width = workableH + "px";
+            videoRemoteElem.style.width =  document.body.clientWidth + "px";
             videoRemoteElem.scrollIntoView();
             ev.preventDefault();
         }, false);

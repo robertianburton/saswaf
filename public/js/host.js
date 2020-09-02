@@ -8,7 +8,6 @@
     var videoLocalElem = null;
     var nowStreaming = 0;
     var stream = null;
-    var pc = null;
     var signaling;
     var friendList = new Set();
     var friendListItems = null;
@@ -46,21 +45,12 @@
         buttonVideoSizeResponsive = document.getElementById('buttonVideoSizeResponsive');
         buttonVideoSizeResponsive.addEventListener('click', function (ev) {
             videoLocalElem.style.width = "100%";
-
             ev.preventDefault();
         }, false);
 
         buttonVideoSizePage = document.getElementById('buttonVideoSizePage');
         buttonVideoSizePage.addEventListener('click', function (ev) {
-            videoLocalElem.style.width = window.innerWidth;
-
-            var docH = $(document).height();
-            var vidH = $('#videoElem').height();
-            var videoScale = ($('#videoElem').width() / $('#videoLocalElem').height());
-            var topH = docH - vidH;
-            var workableH = Math.floor((window.innerHeight - topH - 0) * videoScale);
-
-            videoLocalElem.style.width = workableH + "px";
+            videoLocalElem.style.width =  document.body.clientWidth + "px";
             videoLocalElem.scrollIntoView();
             ev.preventDefault();
         }, false);

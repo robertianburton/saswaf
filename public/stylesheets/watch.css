@@ -6,4 +6,10 @@ video {
 body {
 	background-color: #000000;
 	color: #EEEEEE;
+	-ms-overflow-style: none;  /* IE and Edge */
+  	scrollbar-width: none;
+}
+
+body::-webkit-scrollbar {
+    display: none;
 }
