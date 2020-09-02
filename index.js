@@ -5,15 +5,16 @@ const PORT = process.env.PORT || 5000;
 const crypto = require('crypto');
 
 const app = express()
-	.enable('trust proxy')
-	.use(function (req, res, next) {
-        if (req.secure || process.env.ENV==='DEV') {
-                // request was via https, so do no special handling
-                next();
+    .enable('trust proxy')
+    .use(function (req, res, next) {
+        if (req.secure || process.env.ENV === 'DEV') {
+            // request was via https, so do no special handling
+            next();
         } else {
-                // request was via http, so redirect to https
-                res.redirect('https://' + req.headers.host + req.url);
-        }})
+            // request was via http, so redirect to https
+            res.redirect('https://' + req.headers.host + req.url);
+        }
+    })
     .use(express.static(path.join(__dirname, 'public')))
     .set('views', path.join(__dirname, 'views'))
     .set('view engine', 'ejs')
@@ -24,13 +25,13 @@ const app = express()
     .get('/watch', (req, res) => res.render('pages/watch'))
     .get('/stereo', (req, res) => res.render('pages/stereo'));
 
-const server = app.listen(PORT, () => printToConsole(`Listening on ${ PORT }`));
+const server = app.listen(PORT, () => printToConsole(`Listening on ${PORT}`));
 
 const io = socket(server);
 
 function formatDate(date, format) {
     date = date.toJSON().split(/[:/.TZ-]/);
-    return format.replace(/[ymdhisu]/g, function(letter) {
+    return format.replace(/[ymdhisu]/g, function (letter) {
         return date['ymdhisu'.indexOf(letter)];
     });
 };
@@ -64,7 +65,7 @@ function sendTurnCredentials(socket) {
 };
 
 
-io.on("connection", function(socket) {
+io.on("connection", function (socket) {
     printToConsole("Made socket connection: ", socket.id);
 
     socket.on("screenSignalFromEqual", (data) => {
@@ -89,14 +90,14 @@ io.on("connection", function(socket) {
         } else if (data.type && data.type === "video-offer") {
             printToConsole("(Video offer hidden)");
         } else {
-        	printToConsole(data);
+            printToConsole(data);
         }
     });
 
     socket.on("signalToServer", (data) => {
         printToConsole("SignalToServer From " + socket.id + ":");
         printToConsole(data);
-		if (data.type === 'getTurnCredentials') {
+        if (data.type === 'getTurnCredentials') {
             sendTurnCredentials(socket);
         };
     });

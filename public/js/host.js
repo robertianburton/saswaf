@@ -1,4 +1,4 @@
-(function() {
+(function () {
 
     var buttonVideoSizeSource = null;
     var buttonVideoSizePage = null;
@@ -22,7 +22,7 @@
 
     var qd = {};
 
-    if (location.search) location.search.substr(1).split("&").forEach(function(item) {
+    if (location.search) location.search.substr(1).split("&").forEach(function (item) {
         var s = item.split("="),
             k = s[0],
             v = s[1] && decodeURIComponent(s[1]); //  null-coalescing / short-circuit
@@ -40,21 +40,21 @@
         videoLocalElem = document.getElementById('videoLocalElem');
 
         buttonVideoSizeSource = document.getElementById('buttonVideoSizeSource');
-        buttonVideoSizeSource.addEventListener('click', function(ev) {
+        buttonVideoSizeSource.addEventListener('click', function (ev) {
             videoLocalElem.style.width = "auto";
             videoLocalElem.scrollIntoView();
             ev.preventDefault();
         }, false);
 
         buttonVideoSizeResponsive = document.getElementById('buttonVideoSizeResponsive');
-        buttonVideoSizeResponsive.addEventListener('click', function(ev) {
+        buttonVideoSizeResponsive.addEventListener('click', function (ev) {
             videoLocalElem.style.width = "100%";
 
             ev.preventDefault();
         }, false);
 
         buttonVideoSizePage = document.getElementById('buttonVideoSizePage');
-        buttonVideoSizePage.addEventListener('click', function(ev) {
+        buttonVideoSizePage.addEventListener('click', function (ev) {
             videoLocalElem.style.width = window.innerWidth;
 
             var docH = $(document).height();
@@ -69,14 +69,14 @@
         }, false);
 
         buttonStart = document.getElementById('buttonStart');
-        buttonStart.addEventListener('click', function(ev) {
+        buttonStart.addEventListener('click', function (ev) {
             console.log("Start Button");
             start();
             ev.preventDefault();
         }, false);
 
         buttonLogConnection = document.getElementById('buttonLogConnection');
-        buttonLogConnection.addEventListener('click', function(ev) {
+        buttonLogConnection.addEventListener('click', function (ev) {
             console.log("vvv Log Connection vvv");
             console.log("Peer Connection:");
             if (pclist) {
@@ -174,13 +174,13 @@
         }]
     };
     const configurationC = {
-        iceServers: [{   urls: [ "stun:us-turn2.xirsys.com" ]}, {   username: "k3IAtn2K1yMCrpypkP_CJCyEV7m3FHThFwcUnIxp_4i8-ZuFR4JQN0zqjllYFBXYAAAAAF7DZDF5YWtldHlTYXhlcw==",   credential: "6f541688-998b-11ea-8e17-0242ac140004",   urls: [       "turn:us-turn2.xirsys.com:80?transport=udp",       "turn:us-turn2.xirsys.com:3478?transport=udp",       "turn:us-turn2.xirsys.com:80?transport=tcp",       "turn:us-turn2.xirsys.com:3478?transport=tcp",       "turns:us-turn2.xirsys.com:443?transport=tcp",       "turns:us-turn2.xirsys.com:5349?transport=tcp"   ]}]
+        iceServers: [{ urls: ["stun:us-turn2.xirsys.com"] }, { username: "k3IAtn2K1yMCrpypkP_CJCyEV7m3FHThFwcUnIxp_4i8-ZuFR4JQN0zqjllYFBXYAAAAAF7DZDF5YWtldHlTYXhlcw==", credential: "6f541688-998b-11ea-8e17-0242ac140004", urls: ["turn:us-turn2.xirsys.com:80?transport=udp", "turn:us-turn2.xirsys.com:3478?transport=udp", "turn:us-turn2.xirsys.com:80?transport=tcp", "turn:us-turn2.xirsys.com:3478?transport=tcp", "turns:us-turn2.xirsys.com:443?transport=tcp", "turns:us-turn2.xirsys.com:5349?transport=tcp"] }]
     };
     var configuration = configurationC;
 
     function formatDate(date, format) {
         date = date.toJSON().split(/[:/.TZ-]/);
-        return format.replace(/[ymdhisu]/g, function(letter) {
+        return format.replace(/[ymdhisu]/g, function (letter) {
             return date['ymdhisu'.indexOf(letter)];
         });
     };
@@ -220,9 +220,9 @@
 
     function copyHostUrl() {
         console.log("Copying URL");
-        navigator.clipboard.writeText(getHostUrl()).then(function() {
+        navigator.clipboard.writeText(getHostUrl()).then(function () {
             console.log("Url copied!");
-        }, function() {
+        }, function () {
             console.log("Url copy failed!");
         });
     };
@@ -233,7 +233,7 @@
             userIdField = document.getElementById('userIdField');
             userIdField.innerHTML = ': <thing id="hostUrlText">' + getHostUrl() + '</p>';
 
-            userIdField.addEventListener('click', function(ev) {
+            userIdField.addEventListener('click', function (ev) {
                 copyHostUrl();
             }, false);
         });
@@ -258,16 +258,16 @@
                     pclist[data.fromId] = new RTCPeerConnection(configuration);
 
 
-                    pclist[data.fromId].onnegotiationneeded = function() {
+                    pclist[data.fromId].onnegotiationneeded = function () {
                         printToConsole("handleNegotiationNeededEvent");
                         console.log(data.fromId);
-                        pclist[data.fromId].createOffer().then(function(offer) {
-                                var processedOffer = processOfferForStereo(offer);
-                                console.log("PROCESSED OFFER NN");
-                                console.log(processedOffer);
-                                return pclist[data.fromId].setLocalDescription(processedOffer);
-                            })
-                            .then(function() {
+                        pclist[data.fromId].createOffer().then(function (offer) {
+                            var processedOffer = processOfferForStereo(offer);
+                            console.log("PROCESSED OFFER NN");
+                            console.log(processedOffer);
+                            return pclist[data.fromId].setLocalDescription(processedOffer);
+                        })
+                            .then(function () {
                                 sendToUser({
                                     fromId: signaling.id,
                                     toId: data.fromId,
@@ -330,14 +330,14 @@
     function handleNegotiationNeededEvent(friendId) {
         printToConsole("handleNegotiationNeededEvent");
         console.log(friendId);
-        pclist[friendId].createOffer().then(function(offer) {
-                var processedOffer = processOfferForStereo(offer);
-                console.log("PROCESSED OFFER NN");
-                console.log(processedOffer);
-                pclist[friendId].signalingId = friendId;
-                return pclist[friendId].setLocalDescription(processedOffer);
-            })
-            .then(function() {
+        pclist[friendId].createOffer().then(function (offer) {
+            var processedOffer = processOfferForStereo(offer);
+            console.log("PROCESSED OFFER NN");
+            console.log(processedOffer);
+            pclist[friendId].signalingId = friendId;
+            return pclist[friendId].setLocalDescription(processedOffer);
+        })
+            .then(function () {
                 sendToUser({
                     fromId: signaling.id,
                     toId: friendId,
@@ -405,9 +405,9 @@
             nowStreaming = 2;
 
             var tracks = [];
-            await navigator.mediaDevices.getDisplayMedia(constraints).then(function(getDisplayMediaResult) {
+            await navigator.mediaDevices.getDisplayMedia(constraints).then(function (getDisplayMediaResult) {
                 tracks = tracks.concat(getDisplayMediaResult.getTracks());
-            }).then(function() {
+            }).then(function () {
                 if (stream) {
                     stream.getTracks().forEach(track => track.stop());
                 };
@@ -421,14 +421,14 @@
 
                     for (var key in pclist) {
 
-                        var senderVideo = pclist[key].getSenders().find(function(s) {
+                        var senderVideo = pclist[key].getSenders().find(function (s) {
                             console.log(s);
                             if (s && s.track && s.track.kind && videoTrack && videoTrack.kind) {
                                 return s.track.kind == videoTrack.kind;
                             }
                         });
 
-                        var senderAudio = pclist[key].getSenders().find(function(s) {
+                        var senderAudio = pclist[key].getSenders().find(function (s) {
                             console.log(s);
                             if (s && s.track && s.track.kind && audioTrack && audioTrack.kind) {
                                 return s.track.kind == audioTrack.kind;
@@ -473,27 +473,27 @@
         return offer;
     };
 
-/* stun.rounds.com:3478 */
-/*stun.counterpath.com:3478*/
+    /* stun.rounds.com:3478 */
+    /*stun.counterpath.com:3478*/
 
     function setConfiguration(turnCredentials) {
         const configurationD = {
             iceServers: [{
-                    urls: ['stun:stun.robertianburton.com:3478',
+                urls: ['stun:stun.robertianburton.com:3478',
                     'stun:stun.l.google.com:19302',
-                'stun:stun1.l.google.com:19302',
-                'stun:stun2.l.google.com:19302',
-                'stun:stun.l.google.com:19302?transport=udp']
-                },
-                {
-                    username: turnCredentials.username,
-                    credential: turnCredentials.password,
-                    urls: [
-                        "turn:turn.robertianburton.com:3478",
-                        "turn:turn.robertianburton.com:3478?transport=udp",
-                        "turn:turn.robertianburton.com:3478?transport=tcp"
-                    ]
-                }
+                    'stun:stun1.l.google.com:19302',
+                    'stun:stun2.l.google.com:19302',
+                    'stun:stun.l.google.com:19302?transport=udp']
+            },
+            {
+                username: turnCredentials.username,
+                credential: turnCredentials.password,
+                urls: [
+                    "turn:turn.robertianburton.com:3478",
+                    "turn:turn.robertianburton.com:3478?transport=udp",
+                    "turn:turn.robertianburton.com:3478?transport=tcp"
+                ]
+            }
             ]
         };
         configuration = configurationC;

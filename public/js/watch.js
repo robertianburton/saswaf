@@ -1,4 +1,4 @@
-(function() {
+(function () {
 
     var buttonVideoSizeSource = null;
     var buttonVideoSizePage = null;
@@ -15,7 +15,7 @@
     var qd = {};
 
     // Local query descriptors
-    if (location.search) location.search.substr(1).split("&").forEach(function(item) {
+    if (location.search) location.search.substr(1).split("&").forEach(function (item) {
         var s = item.split("="),
             k = s[0],
             v = s[1] && decodeURIComponent(s[1]); //  null-coalescing / short-circuit
@@ -30,21 +30,21 @@
         videoRemoteElem.srcObject = null;
 
         buttonVideoSizeSource = document.getElementById('buttonVideoSizeSource');
-        buttonVideoSizeSource.addEventListener('click', function(ev) {
+        buttonVideoSizeSource.addEventListener('click', function (ev) {
             videoRemoteElem.style.width = "auto";
             videoRemoteElem.scrollIntoView();
             ev.preventDefault();
         }, false);
 
         buttonVideoSizeResponsive = document.getElementById('buttonVideoSizeResponsive');
-        buttonVideoSizeResponsive.addEventListener('click', function(ev) {
+        buttonVideoSizeResponsive.addEventListener('click', function (ev) {
             videoRemoteElem.style.width = "100%";
 
             ev.preventDefault();
         }, false);
 
         buttonVideoSizePage = document.getElementById('buttonVideoSizePage');
-        buttonVideoSizePage.addEventListener('click', function(ev) {
+        buttonVideoSizePage.addEventListener('click', function (ev) {
             videoRemoteElem.style.width = window.innerWidth;
 
             var docH = $(document).height();
@@ -59,13 +59,13 @@
         }, false);
 
         buttonLogConnection = document.getElementById('buttonLogConnection');
-        buttonLogConnection.addEventListener('click', function(ev) {
+        buttonLogConnection.addEventListener('click', function (ev) {
             printToConsole("*** Log Connection ***");
             if (signaling) {
                 printToConsole("Signaling ID:");
                 console.log(signaling.id);
             };
-            if(pc) {
+            if (pc) {
                 printToConsole("Peer Connection:");
                 console.log(pc);
             };
@@ -73,7 +73,7 @@
         }, false);
 
         buttonAudioOutputs = document.getElementById('buttonAudioOutputs');
-        buttonAudioOutputs.addEventListener('click', function(ev) {
+        buttonAudioOutputs.addEventListener('click', function (ev) {
             console.log("Audio Outputs");
             gotDevices();
             ev.preventDefault();
@@ -87,7 +87,7 @@
 
         console.log("Watch JS Startup Complete.");
 
-        
+
     };
 
     var signaling = io();
@@ -112,13 +112,13 @@
         }]
     };
     const configurationC = {
-        iceServers: [{   urls: [ "stun:us-turn2.xirsys.com" ]}, {   username: "k3IAtn2K1yMCrpypkP_CJCyEV7m3FHThFwcUnIxp_4i8-ZuFR4JQN0zqjllYFBXYAAAAAF7DZDF5YWtldHlTYXhlcw==",   credential: "6f541688-998b-11ea-8e17-0242ac140004",   urls: [       "turn:us-turn2.xirsys.com:80?transport=udp",       "turn:us-turn2.xirsys.com:3478?transport=udp",       "turn:us-turn2.xirsys.com:80?transport=tcp",       "turn:us-turn2.xirsys.com:3478?transport=tcp",       "turns:us-turn2.xirsys.com:443?transport=tcp",       "turns:us-turn2.xirsys.com:5349?transport=tcp"   ]}]
+        iceServers: [{ urls: ["stun:us-turn2.xirsys.com"] }, { username: "k3IAtn2K1yMCrpypkP_CJCyEV7m3FHThFwcUnIxp_4i8-ZuFR4JQN0zqjllYFBXYAAAAAF7DZDF5YWtldHlTYXhlcw==", credential: "6f541688-998b-11ea-8e17-0242ac140004", urls: ["turn:us-turn2.xirsys.com:80?transport=udp", "turn:us-turn2.xirsys.com:3478?transport=udp", "turn:us-turn2.xirsys.com:80?transport=tcp", "turn:us-turn2.xirsys.com:3478?transport=tcp", "turns:us-turn2.xirsys.com:443?transport=tcp", "turns:us-turn2.xirsys.com:5349?transport=tcp"] }]
     };
     var configuration = configurationC;
 
     function formatDate(date, format) {
         date = date.toJSON().split(/[:/.TZ-]/);
-        return format.replace(/[ymdhisu]/g, function(letter) {
+        return format.replace(/[ymdhisu]/g, function (letter) {
             return date['ymdhisu'.indexOf(letter)];
         });
     };
@@ -251,16 +251,16 @@
             checkPeerConnection();
             var desc = new RTCSessionDescription(data.sdp);
             pc.setRemoteDescription(desc)
-                .then(function() {
+                .then(function () {
                     return pc.createAnswer();
                 })
-                .then(function(answer) {
+                .then(function (answer) {
                     var processedAnswer = processOfferForStereo(answer);
                     console.log("PROCESSED ANSWER SIGNAL");
                     console.log(processedAnswer);
                     return pc.setLocalDescription(processedAnswer);
                 })
-                .then(function() {
+                .then(function () {
                     var msg = {
                         fromId: signaling.id,
                         toId: currentHost,
@@ -301,13 +301,13 @@
     // let the "negotiationneeded" event trigger offer generation
     async function handleNegotiationNeededEvent() {
         console.log("handleNegotiationNeededEvent");
-        pc.createOffer().then(function(offer) {
-                var processedOffer = processOfferForStereo(offer);
-                console.log("PROCESSED OFFER NN");
-                console.log(processedOffer);
-                return pc.setLocalDescription(offer);
-            })
-            .then(function() {
+        pc.createOffer().then(function (offer) {
+            var processedOffer = processOfferForStereo(offer);
+            console.log("PROCESSED OFFER NN");
+            console.log(processedOffer);
+            return pc.setLocalDescription(offer);
+        })
+            .then(function () {
                 sendToUser({
                     fromId: signaling.id,
                     toId: currentHost,
@@ -321,7 +321,7 @@
     function shutdown() {
         videoRemoteElem.srcObject = null;
         if (nowStreaming && nowStreaming > 0 && stream) {
-            stream.getTracks().forEach(function(track) {
+            stream.getTracks().forEach(function (track) {
                 track.stop();
             });
         };
@@ -411,17 +411,17 @@
     function setConfiguration(turnCredentials) {
         const configurationD = {
             iceServers: [{
-                    urls: ['stun:stun.robertianburton.com:3478']
-                },
-                {
-                    username: turnCredentials.username,
-                    credential: turnCredentials.password,
-                    urls: [
-                        "turn:turn.robertianburton.com:3478",
-                        "turn:turn.robertianburton.com:3478?transport=udp",
-                        "turn:turn.robertianburton.com:3478?transport=tcp"
-                    ]
-                }
+                urls: ['stun:stun.robertianburton.com:3478']
+            },
+            {
+                username: turnCredentials.username,
+                credential: turnCredentials.password,
+                urls: [
+                    "turn:turn.robertianburton.com:3478",
+                    "turn:turn.robertianburton.com:3478?transport=udp",
+                    "turn:turn.robertianburton.com:3478?transport=tcp"
+                ]
+            }
             ]
         };
         configuration = configurationC;
