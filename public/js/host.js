@@ -50,7 +50,7 @@
 
         buttonVideoSizePage = document.getElementById('buttonVideoSizePage');
         buttonVideoSizePage.addEventListener('click', function (ev) {
-            videoLocalElem.style.width =  document.body.clientWidth + "px";
+            videoLocalElem.style.width = document.body.clientWidth + "px";
             videoLocalElem.scrollIntoView();
             ev.preventDefault();
         }, false);
@@ -243,28 +243,7 @@
                 fillFriendList();
                 if (!pclist[data.fromId]) {
                     pclist[data.fromId] = new RTCPeerConnection(configuration);
-
-
-                    pclist[data.fromId].onnegotiationneeded = function () {
-                        printToConsole("handleNegotiationNeededEvent");
-                        console.log(data.fromId);
-                        pclist[data.fromId].createOffer().then(function (offer) {
-                            var processedOffer = processOfferForStereo(offer);
-                            console.log("PROCESSED OFFER NN");
-                            console.log(processedOffer);
-                            return pclist[data.fromId].setLocalDescription(processedOffer);
-                        })
-                            .then(function () {
-                                sendToUser({
-                                    fromId: signaling.id,
-                                    toId: data.fromId,
-                                    type: "video-offer",
-                                    sdp: pclist[data.fromId].localDescription
-                                });
-                            })
-                            .catch(reportError);
-                    };
-
+                    pclist[data.fromId].onnegotiationneeded = handleNegotiationNeededEvent.bind(data.fromId);
                     pclist[data.fromId].onicecandidate = handleICECandidateEvent;
                     handleNegotiationNeededEvent(data.fromId);
                 }
@@ -302,6 +281,9 @@
 
     function handleNegotiationNeededEvent(friendId) {
         printToConsole("handleNegotiationNeededEvent");
+        if(friendId && friendId.target) {
+            friendId = friendId.target.signalingId
+        };
         console.log(friendId);
         pclist[friendId].createOffer().then(function (offer) {
             var processedOffer = processOfferForStereo(offer);
