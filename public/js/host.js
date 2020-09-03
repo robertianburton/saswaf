@@ -1,35 +1,85 @@
 (function () {
 
-    var buttonVideoSizeSource = null;
-    var buttonVideoSizePage = null;
-    var buttonVideoSizeResponsive = null;
-    var buttonLogConnection = null;
-    var userIdField = null;
-    var videoLocalElem = null;
-    var nowStreaming = 0;
-    var stream = null;
-    var signaling;
-    var friendList = new Set();
-    var friendListItems = null;
-    var pclist = [];
-    var resWidth = 1600;
-    var resHeight = 900;
-
-    var qd = {};
-
-    //Split query parameters
-    if (location.search) location.search.substr(1).split("&").forEach(function (item) {
-        var s = item.split("="),
-            k = s[0],
-            v = s[1] && decodeURIComponent(s[1]); //  null-coalescing / short-circuit
-        //(k in qd) ? qd[k].push(v) : qd[k] = [v]
-        (qd[k] = qd[k] || []).push(v) // null-coalescing / short-circuit
-    });
-
-
+    // Declare scope-wide variables
+    var buttonVideoSizeSource, buttonVideoSizePage, buttonVideoSizeResponsive, buttonLogConnection, userIdField, videoLocalElem, nowStreaming, stream, signaling, friendList, friendListItems, pclist, resWidth, resHeight, qd, configurationB, configurationC, configuration, constraints;
 
     function startup() {
         console.log("Host JS Starting Up...");
+
+        buttonVideoSizeSource = null;
+        buttonVideoSizePage = null;
+        buttonVideoSizeResponsive = null;
+        buttonLogConnection = null;
+        userIdField = null;
+        videoLocalElem = null;
+        nowStreaming = 0;
+        stream = null;
+        signaling;
+        friendList = new Set();
+        friendListItems = null;
+        pclist = [];
+        resWidth = 1600;
+        resHeight = 900;
+
+        qd = {};
+
+        //Split query parameters
+        if (location.search) location.search.substr(1).split("&").forEach(function (item) {
+            var s = item.split("="),
+                k = s[0],
+                v = s[1] && decodeURIComponent(s[1]); //  null-coalescing / short-circuit
+            //(k in qd) ? qd[k].push(v) : qd[k] = [v]
+            (qd[k] = qd[k] || []).push(v) // null-coalescing / short-circuit
+        });
+
+        if (qd.width) {
+            resWidth = qd.width[0]
+        };
+
+        if (qd.height) {
+            resHeight = qd.height[0]
+        };
+
+        constraints = {
+            video: {
+                width: {
+                    max: resWidth
+                },
+                height: {
+                    max: resHeight
+                },
+                frameRate: {
+                    max: 30
+                }
+            },
+            audio: {
+                'channelCount': { 'ideal': 2 },
+                'echoCancellation': false,
+                'autoGainControl': false,
+                'googAutoGainControl': false,
+                'noiseSuppression': false,
+                'sampleRate': 44100,
+                'sampleSize': 16
+            }
+        };
+        configurationB = {
+            iceServers: [{
+                urls: [
+                    'stun:stun.robertianburton.com:3478',
+                    'stun:stun.l.google.com:19302',
+                    'stun:stun1.l.google.com:19302',
+                    'stun:stun2.l.google.com:19302',
+                    'stun:stun.l.google.com:19302?transport=udp',
+                ]
+            }]
+        };
+        configurationC = {
+            iceServers: [{ urls: ["stun:us-turn2.xirsys.com"] }, { username: "k3IAtn2K1yMCrpypkP_CJCyEV7m3FHThFwcUnIxp_4i8-ZuFR4JQN0zqjllYFBXYAAAAAF7DZDF5YWtldHlTYXhlcw==", credential: "6f541688-998b-11ea-8e17-0242ac140004", urls: ["turn:us-turn2.xirsys.com:80?transport=udp", "turn:us-turn2.xirsys.com:3478?transport=udp", "turn:us-turn2.xirsys.com:80?transport=tcp", "turn:us-turn2.xirsys.com:3478?transport=tcp", "turns:us-turn2.xirsys.com:443?transport=tcp", "turns:us-turn2.xirsys.com:5349?transport=tcp"] }]
+        };
+        configuration = configurationC;
+
+
+
 
 
 
@@ -104,53 +154,7 @@
         friendListItems = document.getElementById('friendListItems');
 
         console.log("Host JS Startup Complete.");
-    }
-
-    if (qd.width) {
-        resWidth = qd.width[0]
     };
-
-    if (qd.height) {
-        resHeight = qd.height[0]
-    };
-
-    const constraints = {
-        video: {
-            width: {
-                max: resWidth
-            },
-            height: {
-                max: resHeight
-            },
-            frameRate: {
-                max: 30
-            }
-        },
-        audio: {
-            'channelCount': { 'ideal': 2 },
-            'echoCancellation': false,
-            'autoGainControl': false,
-            'googAutoGainControl': false,
-            'noiseSuppression': false,
-            'sampleRate': 44100,
-            'sampleSize': 16
-        }
-    };
-    const configurationB = {
-        iceServers: [{
-            urls: [
-                'stun:stun.robertianburton.com:3478',
-                'stun:stun.l.google.com:19302',
-                'stun:stun1.l.google.com:19302',
-                'stun:stun2.l.google.com:19302',
-                'stun:stun.l.google.com:19302?transport=udp',
-            ]
-        }]
-    };
-    const configurationC = {
-        iceServers: [{ urls: ["stun:us-turn2.xirsys.com"] }, { username: "k3IAtn2K1yMCrpypkP_CJCyEV7m3FHThFwcUnIxp_4i8-ZuFR4JQN0zqjllYFBXYAAAAAF7DZDF5YWtldHlTYXhlcw==", credential: "6f541688-998b-11ea-8e17-0242ac140004", urls: ["turn:us-turn2.xirsys.com:80?transport=udp", "turn:us-turn2.xirsys.com:3478?transport=udp", "turn:us-turn2.xirsys.com:80?transport=tcp", "turn:us-turn2.xirsys.com:3478?transport=tcp", "turns:us-turn2.xirsys.com:443?transport=tcp", "turns:us-turn2.xirsys.com:5349?transport=tcp"] }]
-    };
-    var configuration = configurationC;
 
     function formatDate(date, format) {
         date = date.toJSON().split(/[:/.TZ-]/);
@@ -209,7 +213,6 @@
             console.log("Socket ID: " + signaling.id);
             userIdField = document.getElementById('userIdField');
             userIdField.innerHTML = ': <thing id="hostUrlText">' + getHostUrl() + '</p>';
-
             userIdField.addEventListener('click', function (ev) {
                 copyHostUrl();
             }, false);
@@ -330,11 +333,10 @@
     };
 
     async function start() {
-
         nowStreaming = 1;
+
         if (nowStreaming === 1) {
             nowStreaming = 2;
-
             var tracks = [];
             await navigator.mediaDevices.getDisplayMedia(constraints).then(function (getDisplayMediaResult) {
                 tracks = tracks.concat(getDisplayMediaResult.getTracks());
@@ -344,7 +346,6 @@
                 };
                 stream = new MediaStream(tracks);
                 videoLocalElem.srcObject = stream;
-
 
                 if (pclist) {
                     var videoTrack = stream.getVideoTracks()[0];
@@ -375,17 +376,8 @@
                         };
                     };
                 };
-
-
-
-
-
                 nowStreaming = 3;
             }).catch(handleGetUserMediaError);
-
-
-
-
         };
 
         if (!signaling) {
@@ -394,19 +386,13 @@
             sendToServer({ 'type': 'getTurnCredentials' });
             bindSignalingHandlers(signaling);
         }
-
     };
-
-
 
     function processOfferForStereo(offer) {
         offer.sdp = offer.sdp.replace('useinbandfec=1', 'stereo=1; sprop-stereo=1; maxaveragebitrate=131072; cbr=1');
         return offer;
     };
-
-    /* stun.rounds.com:3478 */
-    /*stun.counterpath.com:3478*/
-
+   
     function setConfiguration(turnCredentials) {
         const configurationD = {
             iceServers: [{
@@ -430,32 +416,12 @@
         configuration = configurationC;
     };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     window.addEventListener('load', startup, false);
 })();
 
 
-
+/* stun.rounds.com:3478 */
+/*stun.counterpath.com:3478*/
 
 /*Snippets*/
 /*stream = await navigator.mediaDevices.getUserMedia(constraints);*/
