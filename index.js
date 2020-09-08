@@ -44,6 +44,8 @@ function printToConsole() {
     console.log(formatDate(new Date(), 'ymd hisu') + " " + str);
 };
 
+
+
 function sendTurnCredentials(socket) {
     var userId = socket.id;
     var secret = process.env.TURN_KEY;

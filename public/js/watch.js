@@ -14,6 +14,8 @@
     var audioPerm = 0;
     var qd = {};
 
+
+    
     //Split query parameters
     if (location.search) location.search.substr(1).split("&").forEach(function (item) {
         var s = item.split("="),
@@ -77,7 +79,6 @@
         console.log("Socket ID: " + signaling.id);
 
         console.log("Watch JS Startup Complete.");
-
 
     };
 
