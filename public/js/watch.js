@@ -75,7 +75,7 @@
 
         buttonLogConnection = document.getElementById('buttonLogConnection');
         buttonLogConnection.addEventListener('click', function (ev) {
-            printToConsole("*** Log Connection ***");
+            printToConsole("vvv Log Connection vvv");
             if (signaling) {
                 printToConsole("Signaling ID:");
                 console.log(signaling.id);
@@ -88,6 +88,7 @@
                 printToConsole("Get Receivers:");
                 console.log(pc.getReceivers());
             };
+            printToConsole("^^^ Log Connection ^^^");
             ev.preventDefault();
         }, false);
 
@@ -109,9 +110,6 @@
         console.log("Watch JS Startup Complete.");
 
     };
-
-
-
 
     function formatDate(date, format) {
         date = date.toJSON().split(/[:/.TZ-]/);
@@ -194,7 +192,7 @@
         }
     };
 
-    // once remote track media arrives, show it in remote video element
+    // Once remote track media arrives, show it in remote video element
     function onTrack(event) {
         console.log("Getting tracks!");
         // don't set srcObject again if it is already set.
@@ -219,6 +217,7 @@
         console.error(e);
     };
 
+    // Take the connection and bind the signal handlers to it
     function bindSignalingHandlers(signalingObject) {
         signaling.on("signalFromServer", async (data) => {
             console.log("Received from Server... Printing data:");
@@ -298,7 +297,7 @@
         }
     };
 
-    // let the "negotiationneeded" event trigger offer generation
+    // Let the "negotiationneeded" event trigger offer generation
     async function handleNegotiationNeededEvent() {
         console.log("handleNegotiationNeededEvent");
         pc.createOffer().then(function (offer) {
@@ -318,6 +317,7 @@
             .catch(reportError);
     };
 
+    // Shutdown the stream and peer connection
     function shutdown() {
         videoRemoteElem.srcObject = null;
         if (nowStreaming && nowStreaming > 0 && stream) {
@@ -333,12 +333,7 @@
         nowStreaming = 0;
     };
 
-
-
-
-
-
-    //Auto output devices list grab
+    // Grab the list of audio devices to populate the selector
     async function gotDevices() {
         // Handles being called several times to update labels. Preserve values.
         if (audioPerm === 0) {
@@ -394,20 +389,19 @@
         }
     };
 
+    // Store the audio output selection and call the sink linker
     function changeAudioDestination() {
         const audioDestination = audioOutputSelect.value;
         attachSinkId(videoRemoteElem, audioDestination);
     };
 
-
-
-
+    // Process the SDP for the connection offer and add the necessary flags for stereo audio and max bitrate
     function processOfferForStereo(offer) {
         offer.sdp = offer.sdp.replace('useinbandfec=1', 'stereo=1; sprop-stereo=1; maxaveragebitrate=131072; cbr=1');
         return offer;
     };
 
-
+    // Take the turn credentials that have been sent and apply them to the configuration
     function setConfiguration(turnCredentials) {
         const configurationD = {
             iceServers: [{
