@@ -207,9 +207,9 @@
         videoRemoteElem.srcObject = stream;
         /*videoRemoteElem.play();*/
 
-        pc.getReceivers().forEach(function (receiver) {
-            receiver.playoutDelayHint = 2
-        });
+        // pc.getReceivers().forEach(function (receiver) {
+        //     receiver.playoutDelayHint = 2
+        // });
 
         nowStreaming = 1;
     };
