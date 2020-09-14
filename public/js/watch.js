@@ -84,6 +84,10 @@
                 printToConsole("Peer Connection:");
                 console.log(pc);
             };
+            if (pc) {
+                printToConsole("Get Receivers:");
+                console.log(pc.getReceivers());
+            };
             ev.preventDefault();
         }, false);
 
@@ -202,6 +206,10 @@
         stream = event.streams[0];
         videoRemoteElem.srcObject = stream;
         /*videoRemoteElem.play();*/
+
+        pc.getReceivers().forEach(function (receiver) {
+            receiver.playoutDelayHint = 2
+        });
 
         nowStreaming = 1;
     };
