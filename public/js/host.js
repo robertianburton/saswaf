@@ -413,7 +413,7 @@
             }
             ]
         };
-        configuration = configurationC;
+        configuration = configurationD;
     };
 
     window.addEventListener('load', startup, false);

@@ -212,9 +212,6 @@
     };
 
     function bindSignalingHandlers(signalingObject) {
-
-
-
         signaling.on("signalFromServer", async (data) => {
             console.log("Received from Server... Printing data:");
             console.log(data);
@@ -269,6 +266,7 @@
             };
         });
     };
+
     function handleICECandidateEvent(data) {
         console.log("handleICECandidateEvent");
         if (data.candidate) {
@@ -418,14 +416,8 @@
             }
             ]
         };
-        configuration = configurationC;
+        configuration = configurationD;
     };
-
-
-
-
-
-
 
     window.addEventListener('load', startup, false);
 })();
