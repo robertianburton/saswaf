@@ -1,31 +1,53 @@
 (function () {
 
-    var buttonVideoSizeSource = null;
-    var buttonVideoSizePage = null;
-    var buttonVideoSizeResponsive = null;
-    var buttonLogConnection = null;
-    var videoRemoteElem = null;
-    var pc = null;
-    var currentHost = null;
-    var hostIdField = document.getElementById('hostIdField');
-    var userIdField = document.getElementById('userIdField');
-    var nowStreaming = 0;
-    var audioOutputSelect = document.getElementById('audioOutput');
-    var audioPerm = 0;
-    var qd = {};
+    // Declare scope-wide variables
+    var buttonVideoSizeSource, buttonVideoSizePage, buttonVideoSizeResponsive, buttonLogConnection, videoRemoteElem, pc, currentHost, hostIdField, userIdField, nowStreaming, audioOutputSelect, audioPerm, qd, configurationB, configurationC, configuration, signaling;
 
 
-    
-    //Split query parameters
-    if (location.search) location.search.substr(1).split("&").forEach(function (item) {
-        var s = item.split("="),
-            k = s[0],
-            v = s[1] && decodeURIComponent(s[1]); //  null-coalescing / short-circuit
-        //(k in qd) ? qd[k].push(v) : qd[k] = [v]
-        (qd[k] = qd[k] || []).push(v) // null-coalescing / short-circuit
-    });
 
     function startup() {
+
+        buttonVideoSizeSource = null;
+        buttonVideoSizePage = null;
+        buttonVideoSizeResponsive = null;
+        buttonLogConnection = null;
+        videoRemoteElem = null;
+        pc = null;
+        currentHost = null;
+        hostIdField = document.getElementById('hostIdField');
+        userIdField = document.getElementById('userIdField');
+        nowStreaming = 0;
+        audioOutputSelect = document.getElementById('audioOutput');
+        audioPerm = 0;
+        qd = {};
+        signaling = io();
+
+        
+        //Split query parameters
+        if (location.search) location.search.substr(1).split("&").forEach(function (item) {
+            var s = item.split("="),
+                k = s[0],
+                v = s[1] && decodeURIComponent(s[1]); //  null-coalescing / short-circuit
+            //(k in qd) ? qd[k].push(v) : qd[k] = [v]
+            (qd[k] = qd[k] || []).push(v) // null-coalescing / short-circuit
+        });
+
+
+
+        configurationB = {
+            iceServers: [{
+                urls: [
+                    'stun:stun.robertianburton.com:3478'
+                ]
+            }]
+        };
+        configurationC = {
+            iceServers: [{ urls: ["stun:us-turn2.xirsys.com"] }, { username: "k3IAtn2K1yMCrpypkP_CJCyEV7m3FHThFwcUnIxp_4i8-ZuFR4JQN0zqjllYFBXYAAAAAF7DZDF5YWtldHlTYXhlcw==", credential: "6f541688-998b-11ea-8e17-0242ac140004", urls: ["turn:us-turn2.xirsys.com:80?transport=udp", "turn:us-turn2.xirsys.com:3478?transport=udp", "turn:us-turn2.xirsys.com:80?transport=tcp", "turn:us-turn2.xirsys.com:3478?transport=tcp", "turns:us-turn2.xirsys.com:443?transport=tcp", "turns:us-turn2.xirsys.com:5349?transport=tcp"] }]
+        };
+        configuration = configurationC;
+
+
+
         console.log("Watch JS Starting Up...");
 
         videoRemoteElem = document.getElementById('videoRemoteElem');
@@ -46,7 +68,7 @@
 
         buttonVideoSizePage = document.getElementById('buttonVideoSizePage');
         buttonVideoSizePage.addEventListener('click', function (ev) {
-            videoRemoteElem.style.width =  document.body.clientWidth + "px";
+            videoRemoteElem.style.width = document.body.clientWidth + "px";
             videoRemoteElem.scrollIntoView();
             ev.preventDefault();
         }, false);
@@ -74,6 +96,8 @@
 
         audioOutputSelect.onchange = changeAudioDestination;
 
+        bindSignalingHandlers(signaling);
+
         sendToServer({ 'type': 'getTurnCredentials' });
 
         console.log("Socket ID: " + signaling.id);
@@ -82,18 +106,8 @@
 
     };
 
-    var signaling = io();
-    const configurationB = {
-        iceServers: [{
-            urls: [
-                'stun:stun.robertianburton.com:3478'
-            ]
-        }]
-    };
-    const configurationC = {
-        iceServers: [{ urls: ["stun:us-turn2.xirsys.com"] }, { username: "k3IAtn2K1yMCrpypkP_CJCyEV7m3FHThFwcUnIxp_4i8-ZuFR4JQN0zqjllYFBXYAAAAAF7DZDF5YWtldHlTYXhlcw==", credential: "6f541688-998b-11ea-8e17-0242ac140004", urls: ["turn:us-turn2.xirsys.com:80?transport=udp", "turn:us-turn2.xirsys.com:3478?transport=udp", "turn:us-turn2.xirsys.com:80?transport=tcp", "turn:us-turn2.xirsys.com:3478?transport=tcp", "turns:us-turn2.xirsys.com:443?transport=tcp", "turns:us-turn2.xirsys.com:5349?transport=tcp"] }]
-    };
-    var configuration = configurationC;
+
+
 
     function formatDate(date, format) {
         date = date.toJSON().split(/[:/.TZ-]/);
@@ -197,60 +211,64 @@
         console.error(e);
     };
 
-    signaling.on("signalFromServer", async (data) => {
-        console.log("Received from Server... Printing data:");
-        console.log(data);
-        if (data.type === "turnCredentials") {
-            console.log("Server Message Type: Turn Credentials");
-            setConfiguration(data.turnCredentials);
-        } else if (data.type === "leaver") {
-            if (data.fromId === currentHost) {
-                currentHost = null;
-                shutdown();
+    function bindSignalingHandlers(signalingObject) {
+
+
+
+        signaling.on("signalFromServer", async (data) => {
+            console.log("Received from Server... Printing data:");
+            console.log(data);
+            if (data.type === "turnCredentials") {
+                console.log("Server Message Type: Turn Credentials");
+                setConfiguration(data.turnCredentials);
+            } else if (data.type === "leaver") {
+                if (data.fromId === currentHost) {
+                    currentHost = null;
+                    shutdown();
+                };
             };
-        };
-    });
+        });
 
-    signaling.on("connect", async (data) => {
-        printToConsole("Connected. Signaling ID: " + signaling.id);
-        if (qd.host) {
-            userIdField.innerHTML = ': ' + signaling.id;
-            sendHostConnection();
-            document.title = "saswaf > watch > " + qd.host[0];
-        };
-    });
+        signaling.on("connect", async (data) => {
+            printToConsole("Connected. Signaling ID: " + signaling.id);
+            if (qd.host) {
+                userIdField.innerHTML = ': ' + signaling.id;
+                sendHostConnection();
+                document.title = "saswaf > watch > " + qd.host[0];
+            };
+        });
 
-    signaling.on("signalToUser", async (data) => {
-        printToConsole("Received from User... " + data.fromId + " to " + data.toId + ":");
-        console.log(data);
-        if (data.type === "video-offer" && data.fromId === currentHost) {
-            checkPeerConnection();
-            var desc = new RTCSessionDescription(data.sdp);
-            pc.setRemoteDescription(desc)
-                .then(function () {
-                    return pc.createAnswer();
-                })
-                .then(function (answer) {
-                    var processedAnswer = processOfferForStereo(answer);
-                    console.log("PROCESSED ANSWER SIGNAL");
-                    console.log(processedAnswer);
-                    return pc.setLocalDescription(processedAnswer);
-                })
-                .then(function () {
-                    var msg = {
-                        fromId: signaling.id,
-                        toId: currentHost,
-                        type: "video-answer",
-                        sdp: pc.localDescription
-                    };
-                    sendToUser(msg);
-                })
-                .catch(handleGetUserMediaError);
-        } else if (data.type === "new-ice-candidate" && data.fromId === currentHost) {
-            handleNewICECandidate(data);
-        };
-    });
-
+        signaling.on("signalToUser", async (data) => {
+            printToConsole("Received from User... " + data.fromId + " to " + data.toId + ":");
+            console.log(data);
+            if (data.type === "video-offer" && data.fromId === currentHost) {
+                checkPeerConnection();
+                var desc = new RTCSessionDescription(data.sdp);
+                pc.setRemoteDescription(desc)
+                    .then(function () {
+                        return pc.createAnswer();
+                    })
+                    .then(function (answer) {
+                        var processedAnswer = processOfferForStereo(answer);
+                        console.log("PROCESSED ANSWER SIGNAL");
+                        console.log(processedAnswer);
+                        return pc.setLocalDescription(processedAnswer);
+                    })
+                    .then(function () {
+                        var msg = {
+                            fromId: signaling.id,
+                            toId: currentHost,
+                            type: "video-answer",
+                            sdp: pc.localDescription
+                        };
+                        sendToUser(msg);
+                    })
+                    .catch(handleGetUserMediaError);
+            } else if (data.type === "new-ice-candidate" && data.fromId === currentHost) {
+                handleNewICECandidate(data);
+            };
+        });
+    };
     function handleICECandidateEvent(data) {
         console.log("handleICECandidateEvent");
         if (data.candidate) {
