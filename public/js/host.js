@@ -1,7 +1,7 @@
 (function () {
 
     // Declare scope-wide variables
-    var buttonVideoSizeSource, buttonVideoSizePage, buttonVideoSizeResponsive, buttonLogConnection, userIdField, videoLocalElem, nowStreaming, stream, signaling, friendList, friendListItems, pclist, resWidth, resHeight, qd, configurationB, configurationC, configuration, constraints;
+    var audioOutputSelect, buttonVideoSizeSource, buttonVideoSizePage, buttonVideoSizeResponsive, buttonLogConnection, userIdField, videoLocalElem, nowStreaming, stream, signaling, friendList, friendListItems, pclist, resWidth, resHeight, qd, configurationB, configurationC, configuration, constraints;
 
     function startup() {
         console.log("Host JS Starting Up...");
@@ -15,6 +15,7 @@
         nowStreaming = 0;
         stream = null;
         signaling;
+        audioOutputSelect = document.getElementById('audioOutput');
         friendList = new Set();
         friendListItems = null;
         pclist = [];
@@ -378,6 +379,8 @@
                 };
                 nowStreaming = 3;
             }).catch(handleGetUserMediaError);
+
+            getAudioDeviceList();
         };
 
         if (!signaling) {
@@ -387,6 +390,62 @@
             bindSignalingHandlers(signaling);
         }
     };
+
+    // Grab the list of audio devices to populate the selector
+    async function getAudioDeviceList() {
+        var deviceInfos = await navigator.mediaDevices.enumerateDevices();
+        var selectors = [audioOutputSelect];
+        const values = selectors.map(select => select.value);
+        selectors.forEach(select => {
+            while (select.firstChild) {
+                select.removeChild(select.firstChild);
+            }
+        });
+        for (let i = 0; i !== deviceInfos.length; ++i) {
+            const deviceInfo = deviceInfos[i];
+            const option = document.createElement('option');
+            option.value = deviceInfo.deviceId;
+            if (deviceInfo.kind === 'audiooutput') {
+                option.text = deviceInfo.label || `speaker ${audioOutputSelect.length + 1}`;
+                audioOutputSelect.appendChild(option);
+            } else {
+                // console.log('Some other kind of source/device: ', deviceInfo);
+            }
+        }
+        selectors.forEach((select, selectorIndex) => {
+            if (Array.prototype.slice.call(select.childNodes).some(n => n.value === values[selectorIndex])) {
+                select.value = values[selectorIndex];
+            }
+        });
+    };
+
+    // Attach audio output device to video element using device/sink ID.
+    function attachSinkId(element, sinkId) {
+        if (typeof element.sinkId !== 'undefined') {
+            element.setSinkId(sinkId)
+                .then(() => {
+                    console.log(`Success, audio output device attached: ${sinkId}`);
+                })
+                .catch(error => {
+                    let errorMessage = error;
+                    if (error.name === 'SecurityError') {
+                        errorMessage = `You need to use HTTPS for selecting audio output device: ${error}`;
+                    }
+                    console.error(errorMessage);
+                    // Jump back to first output device in the list as it's the default.
+                    audioOutputSelect.selectedIndex = 0;
+                });
+        } else {
+            console.warn('Browser does not support output device selection.');
+        }
+    };
+
+    // Store the audio output selection and call the sink linker
+    function changeAudioDestination() {
+        const audioDestination = audioOutputSelect.value;
+        attachSinkId(videoRemoteElem, audioDestination);
+    };
+
 
     function processOfferForStereo(offer) {
         offer.sdp = offer.sdp.replace('useinbandfec=1', 'stereo=1; sprop-stereo=1; maxaveragebitrate=131072; cbr=1');

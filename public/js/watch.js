@@ -95,7 +95,7 @@
         buttonAudioOutputs = document.getElementById('buttonAudioOutputs');
         buttonAudioOutputs.addEventListener('click', function (ev) {
             console.log("Audio Outputs");
-            gotDevices();
+            getAudioDeviceList();
             ev.preventDefault();
         }, false);
 
@@ -334,7 +334,7 @@
     };
 
     // Grab the list of audio devices to populate the selector
-    async function gotDevices() {
+    async function getAudioDeviceList() {
         // Handles being called several times to update labels. Preserve values.
         if (audioPerm === 0) {
             alert("In order to display your audio output devices, the site may ask for microphone permissions. The site does not use it, but it is required by the web browser in order to get the list of audio outputs.");
@@ -342,7 +342,6 @@
             audioPerm = 1;
         };
         var deviceInfos = await navigator.mediaDevices.enumerateDevices();
-        console.log(deviceInfos);
         var selectors = [audioOutputSelect];
         const values = selectors.map(select => select.value);
         selectors.forEach(select => {
@@ -358,7 +357,7 @@
                 option.text = deviceInfo.label || `speaker ${audioOutputSelect.length + 1}`;
                 audioOutputSelect.appendChild(option);
             } else {
-                console.log('Some other kind of source/device: ', deviceInfo);
+                // console.log('Some other kind of source/device: ', deviceInfo);
             }
         }
         selectors.forEach((select, selectorIndex) => {
