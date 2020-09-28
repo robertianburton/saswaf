@@ -150,6 +150,8 @@
             ev.preventDefault();
         }, false);
 
+        audioOutputSelect.onchange = changeAudioDestination;
+
         userIdField = document.getElementById('userIdField');
 
         friendListItems = document.getElementById('friendListItems');
@@ -443,7 +445,7 @@
     // Store the audio output selection and call the sink linker
     function changeAudioDestination() {
         const audioDestination = audioOutputSelect.value;
-        attachSinkId(videoRemoteElem, audioDestination);
+        attachSinkId(videoLocalElem, audioDestination);
     };
 
 
