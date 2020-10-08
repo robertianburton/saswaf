@@ -156,6 +156,8 @@
 
         friendListItems = document.getElementById('friendListItems');
 
+        fillFriendList();
+
         console.log("Host JS Startup Complete.");
     };
 
@@ -183,13 +185,11 @@
     };
 
     function fillFriendList() {
-        friendListItems.innerHTML = '';
+        friendListItems.innerHTML = 'Friends: ';
         if (friendList.size > 0) {
-            friendList.forEach(
-                (friend) => {
-                    friendListItems.innerHTML += '<button type="button" class="list-group-item list-group-item-action">' + friend + '</button>';
-                }
-            );
+            friendListItems.innerHTML += Array.from(friendList).join(', ');
+        } else {
+            friendListItems.innerHTML += "None - Go find one!"
         }
     };
 
@@ -454,6 +454,7 @@
         return offer;
     };
    
+    // Take the received turn credentials and set the ice configuration
     function setConfiguration(turnCredentials) {
         const configurationD = {
             iceServers: [{

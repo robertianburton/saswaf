@@ -2,3 +2,10 @@ video {
 	width: 100%;
 	height: auto !important;
 }
+
+body {
+	background-color: #000000;
+	color: #EEEEEE;
+	-ms-overflow-style: none;  /* IE and Edge */
+  	scrollbar-width: none;
+}
