@@ -363,8 +363,11 @@
         selectors.forEach((select, selectorIndex) => {
             if (Array.prototype.slice.call(select.childNodes).some(n => n.value === values[selectorIndex])) {
                 select.value = values[selectorIndex];
+                console.log("Seeing");
+                console.log(select.value);
             }
         });
+        console.log(values);
     };
 
     // Attach audio output device to video element using device/sink ID.

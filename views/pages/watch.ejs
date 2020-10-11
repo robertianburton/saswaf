@@ -37,10 +37,13 @@
             </div>
         </div>
         <br>
-        <div class="d-flex select justify-content-center">
-            <select id="audioOutput">
-                <option value="" disabled selected hidden>Audio Output Device</option>
-            </select>
+        <div class="d-flex justify-content-center">
+            <div class="btn-group mx-2" role="group" aria-label="Audio Output Devices">
+                <select name="audioOutputName" id="audioOutput"
+                    class="form-control dropdown-select btn btn-secondary btn-sm">
+                    <option value="" disabled selected hidden>Audio Output Device</option>
+                </select>
+            </div>
         </div>
         <br>
     </main>
