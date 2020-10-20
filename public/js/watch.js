@@ -420,7 +420,7 @@
             }
             ]
         };
-        configuration = configurationD;
+        configuration = configurationC;
     };
 
     window.addEventListener('load', startup, false);
