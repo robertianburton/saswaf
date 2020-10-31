@@ -194,20 +194,15 @@
 
     // Once remote track media arrives, show it in remote video element
     function onTrack(event) {
-        console.log("Getting tracks!");
+        console.log("Receiving tracks!");
         // don't set srcObject again if it is already set.
         if (videoRemoteElem.srcObject) return;
 
-        console.log("SET THE TRACKS!!!!");
+        console.log("Setting tracks!");
         console.log(event);
 
         stream = event.streams[0];
         videoRemoteElem.srcObject = stream;
-        /*videoRemoteElem.play();*/
-
-        // pc.getReceivers().forEach(function (receiver) {
-        //     receiver.playoutDelayHint = 2
-        // });
 
         nowStreaming = 1;
     };
@@ -254,7 +249,7 @@
                     })
                     .then(function (answer) {
                         var processedAnswer = processOfferForStereo(answer);
-                        console.log("PROCESSED ANSWER SIGNAL");
+                        console.log("Processed Answer:");
                         console.log(processedAnswer);
                         return pc.setLocalDescription(processedAnswer);
                     })
@@ -302,7 +297,7 @@
         console.log("handleNegotiationNeededEvent");
         pc.createOffer().then(function (offer) {
             var processedOffer = processOfferForStereo(offer);
-            console.log("PROCESSED OFFER NN");
+            console.log("Processed Offer:");
             console.log(processedOffer);
             return pc.setLocalDescription(offer);
         })
@@ -363,8 +358,6 @@
         selectors.forEach((select, selectorIndex) => {
             if (Array.prototype.slice.call(select.childNodes).some(n => n.value === values[selectorIndex])) {
                 select.value = values[selectorIndex];
-                console.log("Seeing");
-                console.log(select.value);
             }
         });
         console.log(values);

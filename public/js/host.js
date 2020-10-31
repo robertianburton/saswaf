@@ -222,7 +222,7 @@
         });
 
         signaling.on("signalFromServer", async (data) => {
-            printToConsole("Received from Server... Printing data:");
+            printToConsole("Received Signal from Server:");
             console.log(data);
             if (data.type === "turnCredentials") {
                 console.log("Handling Turn Credentials");
@@ -258,7 +258,6 @@
                 await pclist[data.fromId].setRemoteDescription(desc).catch(reportError);
 
                 if (!pclist[data.fromId].nowStreaming) {
-                    console.log("HAPPENING")
                     pclist[data.fromId].nowStreaming = 2;
                     stream.getTracks().forEach((track) => pclist[data.fromId].addTrack(track, stream));
                     pclist[data.fromId].nowStreaming = 3;
@@ -293,7 +292,7 @@
         console.log(friendId);
         pclist[friendId].createOffer().then(function (offer) {
             var processedOffer = processOfferForStereo(offer);
-            console.log("PROCESSED OFFER NN");
+            console.log("Processed Offer:");
             console.log(processedOffer);
             pclist[friendId].signalingId = friendId;
             return pclist[friendId].setLocalDescription(processedOffer);
@@ -311,8 +310,6 @@
 
     function handleICECandidateEvent(data) {
         printToConsole("handleICECandidateEvent");
-        console.log(this);
-        console.log(data);
         sendToUser({
             type: "new-ice-candidate",
             toId: this.signalingId,
