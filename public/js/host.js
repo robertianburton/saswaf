@@ -215,7 +215,7 @@
         signaling.on("connect", async (data) => {
             console.log("Socket ID: " + signaling.id);
             userIdField = document.getElementById('userIdField');
-            userIdField.innerHTML = ': <thing id="hostUrlText">' + getHostUrl() + '</p>';
+            userIdField.innerHTML = ': <thing id="hostUrlText">' + getHostUrl() + ' <a href="#">(Copy)</a>'+'</p>';
             userIdField.addEventListener('click', function (ev) {
                 copyHostUrl();
             }, false);
