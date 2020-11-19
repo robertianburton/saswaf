@@ -5,7 +5,7 @@ Need to quickly share your screen with someone, complete with high-quality deskt
 
 Too many screensharing apps treat video as second class content in favor of bandwidth savings. Some platforms are great for broadcasting your screen out to the world, but require you to download, install, and configure software to set it all up. Even if you know how, do you really want to have to start that up every time you want to quickly share your screen?
 
-Saswaf is your solution. Let the video calling or chat apps handle the conversation, and saswaf can serve your guests the smooth, high quality video they deserve.
+Saswaf is your solution. Let the video calling or chat apps handle the conversation, and saswaf can serve your guests the smooth, high quality video they deserve. Saswaf screen sharing is encrpyted using Datagram Transport Layer Security (DTLS) and there is no server in the middle opening your content. 
 
 Get Started
 1. Go to the host tab
