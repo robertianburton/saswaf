@@ -1,4 +1,4 @@
-(function() {
+(function () {
 
     var buttonVideoSizeSource = null;
     var buttonVideoSizePage = null;
@@ -32,21 +32,21 @@
         selectors = [audioInputSelect, audioOutputSelect];
 
         buttonVideoSizeSource = document.getElementById('buttonVideoSizeSource');
-        buttonVideoSizeSource.addEventListener('click', function(ev) {
+        buttonVideoSizeSource.addEventListener('click', function (ev) {
             videoRemoteElem.style.width = "auto";
             videoRemoteElem.scrollIntoView();
             ev.preventDefault();
         }, false);
 
         buttonVideoSizeResponsive = document.getElementById('buttonVideoSizeResponsive');
-        buttonVideoSizeResponsive.addEventListener('click', function(ev) {
+        buttonVideoSizeResponsive.addEventListener('click', function (ev) {
             videoRemoteElem.style.width = "100%";
 
             ev.preventDefault();
         }, false);
 
         buttonVideoSizePage = document.getElementById('buttonVideoSizePage');
-        buttonVideoSizePage.addEventListener('click', function(ev) {
+        buttonVideoSizePage.addEventListener('click', function (ev) {
             videoRemoteElem.style.width = window.innerWidth;
 
             var docH = $(document).height();
@@ -61,14 +61,14 @@
         }, false);
 
         buttonStart = document.getElementById('buttonStart');
-        buttonStart.addEventListener('click', function(ev) {
+        buttonStart.addEventListener('click', function (ev) {
             console.log("Start Button");
             start();
             ev.preventDefault();
         }, false);
 
         buttonLogConnection = document.getElementById('buttonLogConnection');
-        buttonLogConnection.addEventListener('click', function(ev) {
+        buttonLogConnection.addEventListener('click', function (ev) {
 
             console.log("Log Connection");
             console.log(pc);
@@ -77,7 +77,7 @@
         }, false);
 
         buttonAudioDevices = document.getElementById('buttonAudioDevices');
-        buttonAudioDevices.addEventListener('click', function(ev) {
+        buttonAudioDevices.addEventListener('click', function (ev) {
             console.log("Audio Outputs");
             fillList();
             ev.preventDefault();
@@ -102,22 +102,21 @@
             'noiseSuppression': false,
             'sampleRate': 44100,
             'sampleSize': 16
-
         }
     };
     const configurationA = {
         iceServers: [{
-                urls: ['stun:stun.robertianburton.com:3478']
-            },
-            {
-                username: "testuser",
-                credential: "testpassword",
-                urls: [
-                    "turn:turn.robertianburton.com:3478",
-                    "turn:turn.robertianburton.com:3478?transport=udp",
-                    "turn:turn.robertianburton.com:3478?transport=tcp"
-                ]
-            }
+            urls: ['stun:stun.robertianburton.com:3478']
+        },
+        {
+            username: "testuser",
+            credential: "testpassword",
+            urls: [
+                "turn:turn.robertianburton.com:3478",
+                "turn:turn.robertianburton.com:3478?transport=udp",
+                "turn:turn.robertianburton.com:3478?transport=tcp"
+            ]
+        }
         ]
     };
     const configurationB = {
@@ -139,9 +138,9 @@
         console.log(data);
         signaling.emit(
             "screenSignalFromStereo", {
-                fromId: signaling.id,
-                candidate: data.candidate
-            }
+            fromId: signaling.id,
+            candidate: data.candidate
+        }
         )
     };
 
@@ -190,24 +189,24 @@
         console.log("Start");
         nowStreaming = 1;
         checkPeerConnection();
-        return pc.createOffer().then(function(offer) {
-                console.log("MAKING OFFER");
-                console.log(offer);
+        return pc.createOffer().then(function (offer) {
+            console.log("MAKING OFFER");
+            console.log(offer);
 
-                var processedOffer = processOfferForStereo(offer);
-                console.log("PROCESSED OFFER START");
-                console.log(processedOffer);
-                return pc.setLocalDescription(processedOffer);
-            })
-            .then(function() {
+            var processedOffer = processOfferForStereo(offer);
+            console.log("PROCESSED OFFER START");
+            console.log(processedOffer);
+            return pc.setLocalDescription(processedOffer);
+        })
+            .then(function () {
                 signaling.emit(
                     "screenSignalFromStereo", {
-                        fromId: signaling.id,
-                        desc: pc.localDescription
-                    }
+                    fromId: signaling.id,
+                    desc: pc.localDescription
+                }
                 );
             })
-            .catch(function(err) { console.error(err) });
+            .catch(function (err) { console.error(err) });
     };
 
     // once remote track media arrives, show it in remote video element
@@ -258,7 +257,7 @@
         videoLocalElem.srcObject = null;
         videoRemoteElem.srcObject = null;
         if (nowStreaming > 0) {
-            stream.getTracks().forEach(function(track) {
+            stream.getTracks().forEach(function (track) {
                 track.stop();
             });
         };
@@ -272,7 +271,7 @@
         navigator.mediaDevices.enumerateDevices()
             .then(data => console.log(
                 data.forEach(
-                    async function(device) {
+                    async function (device) {
                         var txt = await device.getCapabilities();
                         console.log(device);
                         console.log(txt);
@@ -311,7 +310,7 @@
             if (nowStreaming === 1) {
                 nowStreaming = 2;
                 /*stream = await navigator.mediaDevices.getUserMedia(constraints);*/
-                await navigator.mediaDevices.getUserMedia(constraints).then(function(getUserMediaResult) {
+                await navigator.mediaDevices.getUserMedia(constraints).then(function (getUserMediaResult) {
                     stream = getUserMediaResult;
                 }).catch(handleGetUserMediaError);
                 fillList();
@@ -440,7 +439,7 @@
         var senders = pc.getSenders();
         senders.forEach((sender) => pc.removeTrack(sender));
 
-        await navigator.mediaDevices.getUserMedia(constraints).then(function(getUserMediaResult) {
+        await navigator.mediaDevices.getUserMedia(constraints).then(function (getUserMediaResult) {
             console.log(stream);
             stream = null;
             stream = getUserMediaResult;
