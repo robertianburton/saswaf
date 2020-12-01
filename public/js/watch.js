@@ -1,7 +1,7 @@
 (function () {
 
     // Declare scope-wide variables
-    var buttonVideoSizeSource, buttonVideoSizePage, buttonVideoSizeResponsive, buttonLogConnection, videoRemoteElem, pc, currentHost, hostIdField, userIdField, nowStreaming, audioOutputSelect, audioPerm, qd, configurationB, configurationC, configuration, signaling;
+    var isDebug, buttonVideoSizeSource, buttonVideoSizePage, buttonVideoSizeResponsive, buttonLogConnection, videoRemoteElem, pc, currentHost, hostIdField, userIdField, nowStreaming, audioOutputSelect, audioPerm, qd, configurationB, configurationC, configuration, signaling;
 
 
 
@@ -13,6 +13,7 @@
         buttonLogConnection = null;
         videoRemoteElem = null;
         pc = null;
+        isDebug = 0;
         currentHost = null;
         hostIdField = document.getElementById('hostIdField');
         userIdField = document.getElementById('userIdField');
@@ -104,6 +105,12 @@
         bindSignalingHandlers(signaling);
 
         sendToServer({ 'type': 'getTurnCredentials' });
+
+        if(qd.isDebug && qd.isDebug[0]==='1') {
+            isDebug = 1;
+            console.log("Debug Mode On");
+            buttonLogConnection.classList.remove('d-none');
+        };
 
         console.log("Socket ID: " + signaling.id);
 
