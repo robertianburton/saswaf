@@ -150,9 +150,7 @@
             console.log("^^^ Log Connection ^^^");
             ev.preventDefault();
         }, false);
-
-        audioOutputSelect.onchange = changeAudioDestination;
-
+        
         userIdField = document.getElementById('userIdField');
 
         friendListItems = document.getElementById('friendListItems');
@@ -216,7 +214,7 @@
         signaling.on("connect", async (data) => {
             console.log("Socket ID: " + signaling.id);
             userIdField = document.getElementById('userIdField');
-            userIdField.innerHTML = ': <thing id="hostUrlText">' + getHostUrl() + ' <a href="#">(Copy)</a>'+'</p>';
+            userIdField.innerHTML = ': <thing id="hostUrlText">' + getHostUrl() + ' <a href="#">(Copy)</a>' + '</p>';
             userIdField.addEventListener('click', function (ev) {
                 copyHostUrl();
             }, false);
@@ -287,7 +285,7 @@
 
     function handleNegotiationNeededEvent(friendId) {
         printToConsole("handleNegotiationNeededEvent");
-        if(friendId && friendId.target) {
+        if (friendId && friendId.target) {
             friendId = friendId.target.signalingId
         };
         console.log(friendId);
@@ -394,32 +392,21 @@
     // Grab the list of audio devices to populate the selector
     async function getAudioDeviceList() {
         var deviceInfos = await navigator.mediaDevices.enumerateDevices();
-        var selectors = [audioOutputSelect];
-        const values = selectors.map(select => select.value);
-        selectors.forEach(select => {
-            while (select.firstChild) {
-                select.removeChild(select.firstChild);
-            }
-        });
 
         for (let i = 0; i !== deviceInfos.length; ++i) {
             const deviceInfo = deviceInfos[i];
-            const option = document.createElement('option');
-            option.value = deviceInfo.deviceId;
             if (deviceInfo.kind === 'audiooutput') {
-                option.text = deviceInfo.label || `speaker ${audioOutputSelect.length + 1}`;
-                audioOutputSelect.appendChild(option);
 
                 var dropdownOption = document.createElement('a');
                 dropdownOption.classList.add('dropdown-item');
                 dropdownOption.classList.add('audio-output-device-list-option');
                 dropdownOption.href = "#";
-                dropdownOption.id = "audioMenuDevice"+i;
+                dropdownOption.id = "audioMenuDevice" + i;
                 dropdownOption.value = deviceInfo.deviceId;
                 dropdownOption.text = deviceInfo.label || `speaker ${audioOutputSelect.length + 1}`;
                 dropdownOption.addEventListener('click', function (ev) {
                     var elementz = document.getElementsByClassName('audio-output-device-list-option font-weight-bold');
-                    for (var j=0; j< elementz.length;j++) {
+                    for (var j = 0; j < elementz.length; j++) {
                         elementz[j].classList.remove('font-weight-bold');
                     };
                     ev.target.classList.add('font-weight-bold');
@@ -433,16 +420,11 @@
                 // console.log('Some other kind of source/device: ', deviceInfo);
             }
         }
-        selectors.forEach((select, selectorIndex) => {
-            if (Array.prototype.slice.call(select.childNodes).some(n => n.value === values[selectorIndex])) {
-                select.value = values[selectorIndex];
-            }
-        });
 
-
+        //Bold the default audio device
         var elementz = document.getElementsByClassName('audio-output-device-list-option');
-        for (var j=0; j< elementz.length;j++) {
-            if(elementz[j].value === "default") {
+        for (var j = 0; j < elementz.length; j++) {
+            if (elementz[j].value === "default") {
                 elementz[j].classList.add('font-weight-bold');
             }
         };
@@ -482,7 +464,7 @@
         offer.sdp = offer.sdp.replace('useinbandfec=1', 'stereo=1; sprop-stereo=1; maxaveragebitrate=131072; cbr=1');
         return offer;
     };
-   
+
     // Take the received turn credentials and set the ice configuration
     function setConfiguration(turnCredentials) {
         const configurationD = {
