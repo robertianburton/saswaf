@@ -1,7 +1,7 @@
 (function () {
 
     // Declare scope-wide variables
-    var audioOutputSelect, buttonVideoSizeSource, buttonVideoSizePage, buttonVideoSizeResponsive, buttonLogConnection, userIdField, videoLocalElem, nowStreaming, stream, signaling, friendList, friendListItems, pclist, resWidth, resHeight, qd, configurationB, configurationC, configuration, constraints;
+    var audioDeviceList, audioOutputSelect, buttonVideoSizeSource, buttonVideoSizePage, buttonVideoSizeResponsive, buttonLogConnection, userIdField, videoLocalElem, nowStreaming, stream, signaling, friendList, friendListItems, pclist, resWidth, resHeight, qd, configurationB, configurationC, configuration, constraints;
 
     function startup() {
         console.log("Host JS Starting Up...");
@@ -16,6 +16,7 @@
         stream = null;
         signaling;
         audioOutputSelect = document.getElementById('audioOutput');
+        audioDeviceList = document.getElementById('buttonAudioMenu');
         friendList = new Set();
         friendListItems = null;
         pclist = [];
@@ -400,6 +401,7 @@
                 select.removeChild(select.firstChild);
             }
         });
+
         for (let i = 0; i !== deviceInfos.length; ++i) {
             const deviceInfo = deviceInfos[i];
             const option = document.createElement('option');
@@ -407,6 +409,26 @@
             if (deviceInfo.kind === 'audiooutput') {
                 option.text = deviceInfo.label || `speaker ${audioOutputSelect.length + 1}`;
                 audioOutputSelect.appendChild(option);
+
+                var dropdownOption = document.createElement('a');
+                dropdownOption.classList.add('dropdown-item');
+                dropdownOption.classList.add('audio-output-device-list-option');
+                dropdownOption.href = "#";
+                dropdownOption.id = "audioMenuDevice"+i;
+                dropdownOption.value = deviceInfo.deviceId;
+                dropdownOption.text = deviceInfo.label || `speaker ${audioOutputSelect.length + 1}`;
+                dropdownOption.addEventListener('click', function (ev) {
+                    var elementz = document.getElementsByClassName('audio-output-device-list-option font-weight-bold');
+                    for (var j=0; j< elementz.length;j++) {
+                        elementz[j].classList.remove('font-weight-bold');
+                    };
+                    ev.target.classList.add('font-weight-bold');
+
+                    changeAudioDestination(deviceInfo.deviceId);
+                }, false);
+
+                audioDeviceList.appendChild(dropdownOption);
+
             } else {
                 // console.log('Some other kind of source/device: ', deviceInfo);
             }
@@ -416,6 +438,16 @@
                 select.value = values[selectorIndex];
             }
         });
+
+
+        var elementz = document.getElementsByClassName('audio-output-device-list-option');
+        for (var j=0; j< elementz.length;j++) {
+            if(elementz[j].value === "default") {
+                elementz[j].classList.add('font-weight-bold');
+            }
+        };
+
+
     };
 
     // Attach audio output device to video element using device/sink ID.
@@ -440,8 +472,8 @@
     };
 
     // Store the audio output selection and call the sink linker
-    function changeAudioDestination() {
-        const audioDestination = audioOutputSelect.value;
+    function changeAudioDestination(value) {
+        const audioDestination = value;
         attachSinkId(videoLocalElem, audioDestination);
     };
 
