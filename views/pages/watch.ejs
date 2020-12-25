@@ -44,17 +44,16 @@
             <div class="btn-group mx-2" role="group" aria-label="Get Audio Outputs">
                 <button type="button" class="btn btn-primary" id="buttonAudioOutputs">Get Audio Outputs</button>
             </div>
+            <div class="btn-group mx-2" role="group" aria-label="Audio Menu">
+				<a class="btn btn-primary dropdown-toggle" href="#" role="button" id="dropdownAudioMenuLink"
+					data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					Audio
+				</a>
+				<div class="dropdown-menu dropdown-menu-dark" id="buttonAudioMenu">
+					<h5 class="dropdown-header">Output</h5>
+				</div>
+			</div>
 		</div>
-
-        <br>
-        <div class="d-flex justify-content-center">
-            <div class="btn-group mx-2" role="group" aria-label="Audio Output Devices">
-                <select name="audioOutputName" id="audioOutput"
-                    class="form-control dropdown-select btn btn-secondary btn-sm">
-                    <option value="" disabled selected hidden>Audio Output Device</option>
-                </select>
-            </div>
-        </div>
         <br>
     </main>
     <% include ../partials/footer.ejs %>

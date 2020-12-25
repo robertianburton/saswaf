@@ -1,7 +1,7 @@
 (function () {
 
     // Declare scope-wide variables
-    var isDebug, buttonVideoSizeSource, buttonVideoSizePage, buttonVideoSizeResponsive, buttonLogConnection, videoRemoteElem, pc, currentHost, hostIdField, userIdField, nowStreaming, audioOutputSelect, audioPerm, qd, configurationB, configurationC, configuration, signaling;
+    var audioDeviceList, isDebug, buttonVideoSizeSource, buttonVideoSizePage, buttonVideoSizeResponsive, buttonLogConnection, videoRemoteElem, pc, currentHost, hostIdField, userIdField, nowStreaming, audioOutputSelect, audioPerm, qd, configurationB, configurationC, configuration, signaling;
 
 
 
@@ -19,6 +19,7 @@
         userIdField = document.getElementById('userIdField');
         nowStreaming = 0;
         audioOutputSelect = document.getElementById('audioOutput');
+        audioDeviceList = document.getElementById('buttonAudioMenu');
         audioPerm = 0;
         qd = {};
         signaling = io();
@@ -99,8 +100,6 @@
             getAudioDeviceList();
             ev.preventDefault();
         }, false);
-
-        audioOutputSelect.onchange = changeAudioDestination;
 
         bindSignalingHandlers(signaling);
 
@@ -344,30 +343,41 @@
             audioPerm = 1;
         };
         var deviceInfos = await navigator.mediaDevices.enumerateDevices();
-        var selectors = [audioOutputSelect];
-        const values = selectors.map(select => select.value);
-        selectors.forEach(select => {
-            while (select.firstChild) {
-                select.removeChild(select.firstChild);
-            }
-        });
         for (let i = 0; i !== deviceInfos.length; ++i) {
             const deviceInfo = deviceInfos[i];
-            const option = document.createElement('option');
-            option.value = deviceInfo.deviceId;
             if (deviceInfo.kind === 'audiooutput') {
-                option.text = deviceInfo.label || `speaker ${audioOutputSelect.length + 1}`;
-                audioOutputSelect.appendChild(option);
+
+                var dropdownOption = document.createElement('a');
+                dropdownOption.classList.add('dropdown-item');
+                dropdownOption.classList.add('audio-output-device-list-option');
+                dropdownOption.href = "#";
+                dropdownOption.id = "audioMenuDevice" + i;
+                dropdownOption.value = deviceInfo.deviceId;
+                dropdownOption.text = deviceInfo.label || `speaker ${audioOutputSelect.length + 1}`;
+                dropdownOption.addEventListener('click', function (ev) {
+                    var elementz = document.getElementsByClassName('audio-output-device-list-option font-weight-bold');
+                    for (var j = 0; j < elementz.length; j++) {
+                        elementz[j].classList.remove('font-weight-bold');
+                    };
+                    ev.target.classList.add('font-weight-bold');
+
+                    changeAudioDestination(deviceInfo.deviceId);
+                }, false);
+
+                audioDeviceList.appendChild(dropdownOption);
+
             } else {
                 // console.log('Some other kind of source/device: ', deviceInfo);
             }
         }
-        selectors.forEach((select, selectorIndex) => {
-            if (Array.prototype.slice.call(select.childNodes).some(n => n.value === values[selectorIndex])) {
-                select.value = values[selectorIndex];
+
+        //Bold the default audio device
+        var elementz = document.getElementsByClassName('audio-output-device-list-option');
+        for (var j = 0; j < elementz.length; j++) {
+            if (elementz[j].value === "default") {
+                elementz[j].classList.add('font-weight-bold');
             }
-        });
-        console.log(values);
+        };
     };
 
     // Attach audio output device to video element using device/sink ID.
@@ -392,8 +402,8 @@
     };
 
     // Store the audio output selection and call the sink linker
-    function changeAudioDestination() {
-        const audioDestination = audioOutputSelect.value;
+    function changeAudioDestination(value) {
+        const audioDestination = value;
         attachSinkId(videoRemoteElem, audioDestination);
     };
 
