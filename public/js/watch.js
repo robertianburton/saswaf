@@ -1,7 +1,7 @@
 (function () {
 
     // Declare scope-wide variables
-    var audioDeviceList, isDebug, buttonVideoSizeSource, buttonVideoSizePage, buttonVideoSizeResponsive, buttonLogConnection, videoRemoteElem, pc, currentHost, hostIdField, userIdField, nowStreaming, audioOutputSelect, audioPerm, qd, configurationB, configurationC, configuration, signaling;
+    var debugButtonBar, audioDeviceList, isDebug, buttonVideoSizeSource, buttonVideoSizePage, buttonVideoSizeResponsive, buttonLogConnection, videoRemoteElem, pc, currentHost, hostIdField, userIdField, nowStreaming, audioOutputSelect, audioPerm, qd, configurationB, configurationC, configuration, signaling;
 
 
 
@@ -20,6 +20,7 @@
         nowStreaming = 0;
         audioOutputSelect = document.getElementById('audioOutput');
         audioDeviceList = document.getElementById('buttonAudioMenu');
+        debugButtonBar = document.getElementById('debugButtonBar');
         audioPerm = 0;
         qd = {};
         signaling = io();
@@ -108,7 +109,7 @@
         if(qd.isDebug && qd.isDebug[0]==='1') {
             isDebug = 1;
             console.log("Debug Mode On");
-            buttonLogConnection.classList.remove('d-none');
+            debugButtonBar.classList.remove('d-none');
         };
 
         console.log("Socket ID: " + signaling.id);
