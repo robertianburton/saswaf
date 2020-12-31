@@ -1,8 +1,9 @@
 (function () {
 
     // Declare scope-wide variables
-    var audioDeviceList, audioOutputSelect, buttonVideoSizeSource, buttonVideoSizePage, buttonVideoSizeResponsive, buttonLogConnection, userIdField, videoLocalElem, nowStreaming, stream, signaling, friendList, friendListItems, pclist, resWidth, resHeight, qd, configurationB, configurationC, configuration, constraints;
+    var debugButtonBar, isDebug, audioDeviceList, audioOutputSelect, buttonVideoSizeSource, buttonVideoSizePage, buttonVideoSizeResponsive, buttonLogConnection, userIdField, videoLocalElem, nowStreaming, stream, signaling, friendList, friendListItems, pclist, resWidth, resHeight, qd, configurationB, configurationC, configuration, constraints;
 
+    // Set up hooks, query descriptors, and configuration on load
     function startup() {
         console.log("Host JS Starting Up...");
 
@@ -13,10 +14,12 @@
         userIdField = null;
         videoLocalElem = null;
         nowStreaming = 0;
+        isDebug = 0;
         stream = null;
         signaling;
         audioOutputSelect = document.getElementById('audioOutput');
         audioDeviceList = document.getElementById('buttonAudioMenu');
+        debugButtonBar = document.getElementById('debugButtonBar');
         friendList = new Set();
         friendListItems = null;
         pclist = [];
@@ -156,6 +159,12 @@
         friendListItems = document.getElementById('friendListItems');
 
         fillFriendList();
+
+        if(qd.isDebug && qd.isDebug[0]==='1') {
+            isDebug = 1;
+            console.log("Debug Mode On");
+            debugButtonBar.classList.remove('d-none');
+        };
 
         console.log("Host JS Startup Complete.");
     };

@@ -3,9 +3,9 @@
     // Declare scope-wide variables
     var debugButtonBar, audioDeviceList, isDebug, buttonVideoSizeSource, buttonVideoSizePage, buttonVideoSizeResponsive, buttonLogConnection, videoRemoteElem, pc, currentHost, hostIdField, userIdField, nowStreaming, audioOutputSelect, audioPerm, qd, configurationB, configurationC, configuration, signaling;
 
-
-
+    // Set up hooks, query descriptors, and configuration on load
     function startup() {
+        console.log("Watch JS Starting Up...");
 
         buttonVideoSizeSource = null;
         buttonVideoSizePage = null;

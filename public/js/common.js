@@ -6,6 +6,7 @@ function setNavbar() {
 	var currentPage = url[url.length - 1];
 	for (i; i < navLinks.length; i++) {
 		var pageCode = navLinks[i].href.split("/");
+		console.log("PageCode: " + pageCode);
 		if (pageCode[pageCode.length - 1] == currentPage) {
 			navLinks[i].className = navLinks[i].className + " active";
 		};
