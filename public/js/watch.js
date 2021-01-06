@@ -145,7 +145,7 @@
         console.log("Requesting connection to " + qd.host[0]);
         sendToUser({ fromId: signaling.id, toId: qd.host[0], type: "newFriend" });
         currentHost = qd.host[0];
-        hostIdField.innerHTML = ': ' + currentHost;
+        hostIdField.innerHTML = 'Host: ' + currentHost;
     };
 
     function checkPeerConnection() {
@@ -238,7 +238,7 @@
         signaling.on("connect", async (data) => {
             printToConsole("Connected. Signaling ID: " + signaling.id);
             if (qd.host) {
-                userIdField.innerHTML = ': ' + signaling.id;
+                userIdField.innerHTML = 'Your ID: ' + signaling.id;
                 sendHostConnection();
                 document.title = "saswaf > watch > " + qd.host[0];
             };
