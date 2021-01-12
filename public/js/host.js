@@ -1,7 +1,7 @@
 (function () {
 
     // Declare scope-wide variables
-    var debugButtonBar, isDebug, audioDeviceList, audioOutputSelect, buttonVideoSizeSource, buttonVideoSizePage, buttonVideoSizeResponsive, buttonLogConnection, userIdField, videoLocalElem, nowStreaming, stream, signaling, friendList, friendListItems, pclist, resWidth, resHeight, qd, configurationB, configurationC, configuration, constraints;
+    var audioPerm, debugButtonBar, isDebug, audioDeviceList, audioOutputSelect, buttonVideoSizeSource, buttonVideoSizePage, buttonVideoSizeResponsive, buttonLogConnection, userIdField, videoLocalElem, nowStreaming, stream, signaling, friendList, friendListItems, pclist, resWidth, resHeight, qd, configurationB, configurationC, configuration, constraints;
 
     // Set up hooks, query descriptors, and configuration on load
     function startup() {
@@ -15,6 +15,7 @@
         videoLocalElem = null;
         nowStreaming = 0;
         isDebug = 0;
+        audioPerm = 0;
         stream = null;
         signaling;
         audioOutputSelect = document.getElementById('audioOutput');
@@ -151,6 +152,13 @@
                 console.log(stream.getVideoTracks());
             }
             console.log("^^^ Log Connection ^^^");
+            ev.preventDefault();
+        }, false);
+        
+        buttonAudioOutputs = document.getElementById('buttonAudioOutputs');
+        buttonAudioOutputs.addEventListener('click', function (ev) {
+            console.log("Audio Outputs");
+            getAudioDeviceList();
             ev.preventDefault();
         }, false);
         
@@ -401,6 +409,12 @@
     // Grab the list of audio devices to populate the selector
     async function getAudioDeviceList() {
         var deviceInfos = await navigator.mediaDevices.enumerateDevices();
+
+        if (audioPerm === 0) {
+            alert("In order to display your audio output devices, the site may ask for microphone permissions. The site does not use it, but it is required by the web browser in order to get the list of audio outputs.");
+            await navigator.mediaDevices.getUserMedia({ audio: true });
+            audioPerm = 1;
+        };
 
         for (let i = 0; i !== deviceInfos.length; ++i) {
             const deviceInfo = deviceInfos[i];
