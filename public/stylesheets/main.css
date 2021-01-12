@@ -2,3 +2,7 @@
     background-color: #e9dcf1;
     /*background-color:none !important;*/
     }
+
+#buttonCopyLink:active{
+    background-color: #4cc2a4
+}

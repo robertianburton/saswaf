@@ -1,7 +1,7 @@
 (function () {
 
     // Declare scope-wide variables
-    var audioPerm, debugButtonBar, isDebug, audioDeviceList, audioOutputSelect, buttonVideoSizeSource, buttonVideoSizePage, buttonVideoSizeResponsive, buttonLogConnection, userIdField, videoLocalElem, nowStreaming, stream, signaling, friendList, friendListItems, pclist, resWidth, resHeight, qd, configurationB, configurationC, configuration, constraints;
+    var audioPerm, buttonCopyLink, debugButtonBar, isDebug, audioDeviceList, audioOutputSelect, buttonVideoSizeSource, buttonVideoSizePage, buttonVideoSizeResponsive, buttonLogConnection, userIdField, videoLocalElem, nowStreaming, stream, signaling, friendList, friendListItems, pclist, resWidth, resHeight, qd, configurationB, configurationC, configuration, constraints;
 
     // Set up hooks, query descriptors, and configuration on load
     function startup() {
@@ -115,6 +115,12 @@
         buttonStart.addEventListener('click', function (ev) {
             console.log("Start Button");
             start();
+            ev.preventDefault();
+        }, false);
+
+        buttonCopyLink = document.getElementById('buttonCopyLink');
+        buttonCopyLink.addEventListener('click', function (ev) {
+            copyHostUrl();
             ev.preventDefault();
         }, false);
 
@@ -396,6 +402,8 @@
             }).catch(handleGetUserMediaError);
 
             getAudioDeviceList();
+            document.getElementById('buttonCopyLinkBar').classList.remove('d-none');
+            document.getElementById('buttonStartBar').classList.add('d-none');
         };
 
         if (!signaling) {
