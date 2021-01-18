@@ -401,7 +401,7 @@
                 nowStreaming = 3;
             }).catch(handleGetUserMediaError);
 
-            getAudioDeviceList();
+            // getAudioDeviceList();
             document.getElementById('buttonCopyLinkBar').classList.remove('d-none');
             document.getElementById('buttonStartBar').classList.add('d-none');
         };
@@ -418,11 +418,15 @@
     async function getAudioDeviceList() {
         var deviceInfos = await navigator.mediaDevices.enumerateDevices();
 
+        // Get the user media device permissions if they aren't taken yet.
         if (audioPerm === 0) {
             alert("In order to display your audio output devices, the site may ask for microphone permissions. The site does not use it, but it is required by the web browser in order to get the list of audio outputs.");
             await navigator.mediaDevices.getUserMedia({ audio: true });
             audioPerm = 1;
         };
+        
+        // Clear out the existing list
+        $('.audio-output-device-list-option').remove();
 
         for (let i = 0; i !== deviceInfos.length; ++i) {
             const deviceInfo = deviceInfos[i];
