@@ -1,7 +1,7 @@
 (function () {
 
     // Declare scope-wide variables
-    var audioPerm, buttonCopyLink, debugButtonBar, isDebug, audioDeviceList, audioOutputSelect, buttonVideoSizeSource, buttonVideoSizePage, buttonVideoSizeResponsive, buttonLogConnection, userIdField, videoLocalElem, nowStreaming, stream, signaling, friendList, friendListItems, pclist, resWidth, resHeight, qd, configurationB, configurationC, configuration, constraints;
+    var audioPerm, buttonCopyLink, debugButtonBar, isDebug, audioDeviceList, audioOutputSelect, buttonVideoSizeSource, buttonVideoSizePage, buttonVideoSizeResponsive, buttonLogConnection, userIdField, videoLocalElem, nowStreaming, stream, signaling, friendList, friendListItems, pclist, resWidth, resHeight, qd, iceConfigRib, iceConfigXirsys, iceConfigSelected, constraints;
 
     // Set up hooks, query descriptors, and configuration on load
     function startup() {
@@ -68,7 +68,7 @@
                 'sampleSize': 16
             }
         };
-        configurationB = {
+        iceConfigRib = {
             iceServers: [{
                 urls: [
                     'stun:stun.robertianburton.com:3478',
@@ -79,10 +79,10 @@
                 ]
             }]
         };
-        configurationC = {
+        iceConfigXirsys = {
             iceServers: [{ urls: ["stun:us-turn2.xirsys.com"] }, { username: "k3IAtn2K1yMCrpypkP_CJCyEV7m3FHThFwcUnIxp_4i8-ZuFR4JQN0zqjllYFBXYAAAAAF7DZDF5YWtldHlTYXhlcw==", credential: "6f541688-998b-11ea-8e17-0242ac140004", urls: ["turn:us-turn2.xirsys.com:80?transport=udp", "turn:us-turn2.xirsys.com:3478?transport=udp", "turn:us-turn2.xirsys.com:80?transport=tcp", "turn:us-turn2.xirsys.com:3478?transport=tcp", "turns:us-turn2.xirsys.com:443?transport=tcp", "turns:us-turn2.xirsys.com:5349?transport=tcp"] }]
         };
-        configuration = configurationC;
+        iceConfigSelected = iceConfigXirsys;
 
 
 
@@ -270,7 +270,7 @@
                 console.log(friendList);
                 fillFriendList();
                 if (!pclist[data.fromId]) {
-                    pclist[data.fromId] = new RTCPeerConnection(configuration);
+                    pclist[data.fromId] = new RTCPeerConnection(iceConfigSelected);
                     pclist[data.fromId].onnegotiationneeded = handleNegotiationNeededEvent.bind(data.fromId);
                     pclist[data.fromId].onicecandidate = handleICECandidateEvent;
                     handleNegotiationNeededEvent(data.fromId);
@@ -502,7 +502,7 @@
 
     // Take the received turn credentials and set the ice configuration
     function setConfiguration(turnCredentials) {
-        const configurationD = {
+        const iceConfigRibTurn = {
             iceServers: [{
                 urls: ['stun:stun.robertianburton.com:3478',
                     'stun:stun.l.google.com:19302',
@@ -521,7 +521,7 @@
             }
             ]
         };
-        configuration = configurationC;
+        iceConfigSelected = iceConfigXirsys;
     };
 
     window.addEventListener('load', startup, false);
