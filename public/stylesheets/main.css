@@ -1,8 +1,51 @@
 .jumbotron{
-    background-color: #e9dcf1;
+    background-color: #6b3786;
     /*background-color:none !important;*/
     }
 
 #buttonCopyLink:active{
     background-color: #4cc2a4
+}
+
+.dark-mode {
+	background-color: #000000;
+	color: #EEEEEE;
+	-ms-overflow-style: none;  /* IE and Edge */
+  	scrollbar-width: none;
+}
+
+#saswaf-c1, #saswaf-c2, #saswaf-c3, #saswaf-c4, #saswaf-c5, #saswaf-c6 {
+    transition: 0.4s
+}
+
+#nameBox:hover #saswaf-c1 {
+    color: #FFB354;
+    letter-spacing: 0.1em;
+    
+}
+
+#nameBox:hover #saswaf-c2  {
+    color: #53d8b7;
+    letter-spacing: 0.1em;
+}
+
+#nameBox:hover #saswaf-c3  {
+    color: #C862FF;
+    letter-spacing: 0.1em;
+}
+
+#nameBox:hover #saswaf-c4  {
+    color: #4D7CE8;
+    letter-spacing: 0.1em;
+}
+
+#nameBox:hover #saswaf-c5 {
+    color: #53d8b7;
+    letter-spacing: 0.1em;
+}
+
+#nameBox:hover #saswaf-c6 {
+    
+    color: #E8524D;
+    letter-spacing: 0.1em;
 }
