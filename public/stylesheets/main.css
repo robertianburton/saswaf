@@ -1,5 +1,6 @@
 .jumbotron{
-    background-color: #6b3786;
+    background: linear-gradient(
+        130deg,#9a4cc4 20%,#4bc2a4);
     /*background-color:none !important;*/
     }
 
