@@ -118,6 +118,7 @@
 
     };
 
+    // Given a Date, format it as a console-friendly YMDHISU format
     function formatDate(date, format) {
         date = date.toJSON().split(/[:/.TZ-]/);
         return format.replace(/[ymdhisu]/g, function (letter) {
@@ -125,22 +126,26 @@
         });
     };
 
+    // Given some data, print it to the console with a timestamp
     function printToConsole(data) {
         console.log(formatDate(new Date(), 'ymd hisu') + " " + JSON.stringify(data));
     };
 
+    // Transmit a message to the signaling server to relay on to a specific user
     function sendToServer(data) {
         console.log("Sending To Server: ");
         console.log(data);
         signaling.emit("signalToServer", data);
     };
 
+     // Transmit a message to the signaling server for the server to process
     function sendToUser(data) {
         console.log("Sending To User: ");
         console.log(data);
         signaling.emit("signalToUser", data);
     };
 
+    // Send the desired host an introductory message
     function sendHostConnection() {
         console.log("Requesting connection to " + qd.host[0]);
         sendToUser({ fromId: signaling.id, toId: qd.host[0], type: "newFriend" });
@@ -226,7 +231,7 @@
             console.log(data);
             if (data.type === "turnCredentials") {
                 console.log("Server Message Type: Turn Credentials");
-                setConfiguration(data.turnCredentials);
+                setIceConfiguration(data.turnCredentials);
             } else if (data.type === "leaver") {
                 if (data.fromId === currentHost) {
                     currentHost = null;
@@ -415,7 +420,7 @@
     };
 
     // Take the turn credentials that have been sent and apply them to the configuration
-    function setConfiguration(turnCredentials) {
+    function setIceConfiguration(turnCredentials) {
         const configurationD = {
             iceServers: [{
                 urls: ['stun:stun.robertianburton.com:3478']

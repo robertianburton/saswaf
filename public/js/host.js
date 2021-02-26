@@ -183,6 +183,7 @@
         console.log("Host JS Startup Complete.");
     };
 
+    // Given a Date, format it as a console-friendly YMDHISU format
     function formatDate(date, format) {
         date = date.toJSON().split(/[:/.TZ-]/);
         return format.replace(/[ymdhisu]/g, function (letter) {
@@ -190,22 +191,26 @@
         });
     };
 
+    // Given some data, print it to the console with a timestamp
     function printToConsole(data) {
         console.log(formatDate(new Date(), 'ymd hisu') + " " + JSON.stringify(data));
     };
 
+    // Transmit a message to the signaling server to relay on to a specific user
     function sendToUser(data) {
         console.log("Sending To User: ");
         console.log(data);
         signaling.emit("signalToUser", data);
     };
 
+    // Transmit a message to the signaling server for the server to process
     function sendToServer(data) {
         console.log("Sending To Server: ");
         console.log(data);
         signaling.emit("signalToServer", data);
     };
 
+    // Take the list of people watching and fill in the UI list of friends
     function fillFriendList() {
         friendListItems.innerHTML = 'Friends: ';
         if (friendList.size > 0) {
@@ -215,6 +220,7 @@
         }
     };
 
+    // Generate the URL to connect to watch this host
     function getHostUrl() {
         var port = "";
         if (location.port) {
@@ -224,6 +230,7 @@
         return result;
     };
 
+    // Copy the Host URL to the clipboard
     function copyHostUrl() {
         console.log("Copying URL");
         navigator.clipboard.writeText(getHostUrl()).then(function () {
@@ -248,7 +255,7 @@
             console.log(data);
             if (data.type === "turnCredentials") {
                 console.log("Handling Turn Credentials");
-                setConfiguration(data.turnCredentials);
+                setIceConfiguration(data.turnCredentials);
             } else if (data.type === "leaver") {
                 console.log("Notified of Leaver");
                 if (pclist[data.fromId]) {
@@ -501,7 +508,7 @@
     };
 
     // Take the received turn credentials and set the ice configuration
-    function setConfiguration(turnCredentials) {
+    function setIceConfiguration(turnCredentials) {
         const iceConfigRibTurn = {
             iceServers: [{
                 urls: ['stun:stun.robertianburton.com:3478',
