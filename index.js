@@ -29,6 +29,7 @@ const server = app.listen(PORT, () => printToConsole(`Listening on ${PORT}`));
 
 const io = socket(server);
 
+// Given a Date, format it as a console-friendly YMDHISU format
 function formatDate(date, format) {
     date = date.toJSON().split(/[:/.TZ-]/);
     return format.replace(/[ymdhisu]/g, function (letter) {
@@ -36,6 +37,7 @@ function formatDate(date, format) {
     });
 };
 
+// Given some data, print it to the console with a timestamp
 function printToConsole() {
     var str = "";
     for (var i = 0; i < arguments.length; i++) {
