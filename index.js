@@ -46,8 +46,7 @@ function printToConsole() {
     console.log(formatDate(new Date(), 'ymd hisu') + " " + str);
 };
 
-
-
+//Given a user's socket, generate and send TURN credentials back to it
 function sendTurnCredentials(socket) {
     var userId = socket.id;
     var secret = process.env.TURN_KEY;
@@ -68,7 +67,7 @@ function sendTurnCredentials(socket) {
     io.to(userId).emit("signalFromServer", transmitData);
 };
 
-
+// Upon connection of a socket (user), bind the other signal handlers to it
 io.on("connection", function (socket) {
     printToConsole("Made socket connection: ", socket.id);
 
@@ -108,7 +107,7 @@ io.on("connection", function (socket) {
 
     socket.on("disconnecting", (reason) => {
         var socketToRemove = socket.id;
-        socket.broadcast.emit("signalFromServer", { type: "leaver", fromId: socketToRemove, reason: reason});
+        socket.broadcast.emit("signalFromServer", { type: "leaver", fromId: socketToRemove, reason: reason });
         printToConsole("User disconnecting: " + socketToRemove + " because " + reason);
     });
 });

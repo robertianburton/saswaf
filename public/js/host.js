@@ -160,21 +160,21 @@
             console.log("^^^ Log Connection ^^^");
             ev.preventDefault();
         }, false);
-        
+
         buttonAudioOutputs = document.getElementById('buttonAudioOutputs');
         buttonAudioOutputs.addEventListener('click', function (ev) {
             console.log("Audio Outputs");
             getAudioDeviceList();
             ev.preventDefault();
         }, false);
-        
+
         userIdField = document.getElementById('userIdField');
 
         friendListItems = document.getElementById('friendListItems');
 
         fillFriendList();
 
-        if(qd.isDebug && qd.isDebug[0]==='1') {
+        if (qd.isDebug && qd.isDebug[0] === '1') {
             isDebug = 1;
             console.log("Debug Mode On");
             debugButtonBar.classList.remove('d-none');
@@ -240,6 +240,7 @@
         });
     };
 
+    // Take a connection and bind the signal handlers to it
     function bindSignalingHandlers(signalingObject) {
         signaling.on("connect", async (data) => {
             console.log("Socket ID: " + signaling.id);
@@ -297,6 +298,7 @@
         });
     };
 
+    // Handle and report various media errors that arise from the audio/video selection tool(s)
     function handleGetUserMediaError(e) {
         switch (e.name) {
             case "NotFoundError":
@@ -313,6 +315,7 @@
         };
     };
 
+    // Handle the negotiation of how to exchange media with a new friend
     function handleNegotiationNeededEvent(friendId) {
         printToConsole("handleNegotiationNeededEvent");
         if (friendId && friendId.target) {
@@ -337,6 +340,7 @@
             .catch(reportError);
     };
 
+    // When receiving a (not new) ICE candidate, log it; if there is a candidate, send it to the user
     function handleICECandidateEvent(data) {
         printToConsole("handleICECandidateEvent");
         sendToUser({
@@ -347,6 +351,7 @@
         });
     };
 
+    // Handle a new ice candidate message from the host by adding it to the respective Peer Connection
     async function handleNewICECandidate(data) {
         printToConsole("handleNewICECandidate");
         console.log(data);
@@ -356,11 +361,13 @@
             .catch(reportError);
     };
 
+    // Log an error to the console
     function reportError(e) {
         console.log("Report Error");
         console.error(e);
     };
 
+    // Handle the host pressing the Start button
     async function start() {
         nowStreaming = 1;
 
@@ -431,7 +438,7 @@
             await navigator.mediaDevices.getUserMedia({ audio: true });
             audioPerm = 1;
         };
-        
+
         // Clear out the existing list
         $('.audio-output-device-list-option').remove();
 
@@ -501,7 +508,7 @@
         attachSinkId(videoLocalElem, audioDestination);
     };
 
-
+    // Replace an offer's SDP in-band forward error correction flag with SDP that enables 132kb stereo audio
     function processOfferForStereo(offer) {
         offer.sdp = offer.sdp.replace('useinbandfec=1', 'stereo=1; sprop-stereo=1; maxaveragebitrate=131072; cbr=1');
         return offer;

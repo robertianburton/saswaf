@@ -153,6 +153,7 @@
         hostIdField.innerHTML = 'Host: ' + currentHost;
     };
 
+    // If there is not an RTC Peer Connection, create one
     function checkPeerConnection() {
         if (!pc) {
             pc = new RTCPeerConnection(iceConfigSelected);
@@ -163,6 +164,7 @@
         }
     };
 
+    // Handle and report various messages regarding the RTC Peer Connection status
     function onConnectionStateChange(event) {
         console.log("Connection State Change...");
         switch (pc.connectionState) {
@@ -188,6 +190,7 @@
         }
     };
 
+    // Handle and report various media errors that arise from the audio/video selection tool(s)
     function handleGetUserMediaError(e) {
         switch (e.name) {
             case "NotFoundError":
@@ -219,6 +222,7 @@
         nowStreaming = 1;
     };
 
+    // Log an error to the console
     function reportError(e) {
         console.log("Report Error");
         console.error(e);
@@ -281,6 +285,7 @@
         });
     };
 
+    // When receiving a (not new) ICE candidate, log it; if there is a candidate, send it to the host
     function handleICECandidateEvent(data) {
         console.log("handleICECandidateEvent");
         if (data.candidate) {
@@ -293,6 +298,7 @@
         };
     };
 
+    // Handle a new ice candidate message from the host by adding it to the Peer Connection
     async function handleNewICECandidate(data) {
         console.log("handleNewICECandidateEvent");
         if (data.candidate) {
@@ -413,7 +419,7 @@
         attachSinkId(videoRemoteElem, audioDestination);
     };
 
-    // Process the SDP for the connection offer and add the necessary flags for stereo audio and max bitrate
+    // Replace an offer's SDP in-band forward error correction flag with SDP that enables 132kb stereo audio
     function processOfferForStereo(offer) {
         offer.sdp = offer.sdp.replace('useinbandfec=1', 'stereo=1; sprop-stereo=1; maxaveragebitrate=131072; cbr=1');
         return offer;
