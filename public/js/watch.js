@@ -116,7 +116,7 @@
         videoContainer = document.getElementById('watchMain');
         if(qd.host) {
         } else {
-            videoContainer.innerHTML = '<br><div class="d-flex justify-content-center"><p>Error: No host found!</p></div>' + videoContainer.innerHTML
+            videoContainer.innerHTML = '<br><div class="d-flex justify-content-center"><p>Error: No host found! Make sure to use a link given by a host!</p></div>' + videoContainer.innerHTML
         };
         console.log("Socket ID: " + signaling.id);
 
