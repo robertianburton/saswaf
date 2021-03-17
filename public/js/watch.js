@@ -1,7 +1,7 @@
 (function () {
 
     // Declare scope-wide variables
-    var debugButtonBar, audioDeviceList, isDebug, buttonVideoSizeSource, buttonVideoSizePage, buttonVideoSizeResponsive, buttonLogConnection, videoRemoteElem, pc, currentHost, hostIdField, userIdField, nowStreaming, audioOutputSelect, audioPerm, qd, iceConfigRib, iceConfigXirsys, iceConfigSelected, signaling;
+    var debugButtonBar, videoContainer, audioDeviceList, isDebug, buttonVideoSizeSource, buttonVideoSizePage, buttonVideoSizeResponsive, buttonLogConnection, videoRemoteElem, pc, currentHost, hostIdField, userIdField, nowStreaming, audioOutputSelect, audioPerm, qd, iceConfigRib, iceConfigXirsys, iceConfigSelected, signaling;
 
     // Set up hooks, query descriptors, and configuration on load
     function startup() {
@@ -112,9 +112,16 @@
             debugButtonBar.classList.remove('d-none');
         };
 
+
+        videoContainer = document.getElementById('watchMain');
+        if(qd.host) {
+        } else {
+            videoContainer.innerHTML = '<br><div class="d-flex justify-content-center"><p>Error: No host found!</p></div>' + videoContainer.innerHTML
+        };
         console.log("Socket ID: " + signaling.id);
 
         console.log("Watch JS Startup Complete.");
+
 
     };
 
