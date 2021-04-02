@@ -300,6 +300,8 @@
 
     // Handle and report various media errors that arise from the audio/video selection tool(s)
     function handleGetUserMediaError(e) {
+        nowStreaming = 2;
+            var tracks = [];
         switch (e.name) {
             case "NotFoundError":
                 alert("Unable to open your call because no camera and/or microphone" +
@@ -415,17 +417,22 @@
                 nowStreaming = 3;
             }).catch(handleGetUserMediaError);
 
-            // getAudioDeviceList();
-            document.getElementById('buttonCopyLinkBar').classList.remove('d-none');
-            document.getElementById('buttonStartBar').classList.add('d-none');
+            if(nowStreaming == 3) {
+                // getAudioDeviceList();
+                document.getElementById('buttonCopyLinkBar').classList.remove('d-none');
+                document.getElementById('buttonStartBar').classList.add('d-none');
+
+                if (!signaling) {
+                    signaling = io();
+                    userIdField.innerHTML = ": Waiting...";
+                    sendToServer({ 'type': 'getTurnCredentials' });
+                    bindSignalingHandlers(signaling);
+                }
+
+            }
         };
 
-        if (!signaling) {
-            signaling = io();
-            userIdField.innerHTML = ": Waiting...";
-            sendToServer({ 'type': 'getTurnCredentials' });
-            bindSignalingHandlers(signaling);
-        }
+        
     };
 
     // Grab the list of audio devices to populate the selector
