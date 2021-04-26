@@ -549,9 +549,6 @@
 })();
 
 
-/* stun.rounds.com:3478 */
-/*stun.counterpath.com:3478*/
-
 /*Snippets*/
 /*stream = await navigator.mediaDevices.getUserMedia(constraints);*/
 /*await navigator.mediaDevices.getDisplayMedia(constraints).then(function(getDisplayMediaResult) {
