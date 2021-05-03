@@ -312,7 +312,7 @@
                 // Do nothing; this is the same as the user canceling the call.
                 break;
             default:
-                alert("Error opening your camera and/or microphone: " + e.message);
+                alert("Error opening your camera and/or microphone: " + e.message + ". This error also occurs if selecting a video source is canceled.");
                 break;
         };
     };
