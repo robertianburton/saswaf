@@ -27,7 +27,15 @@ const app = express()
 
 const server = app.listen(PORT, () => printToConsole(`Listening on ${PORT}`));
 
-const io = socket(server);
+const io = socket(server, {
+    cors: {
+        origin: "http://localhost",
+        methods: ["GET", "POST"],
+        credentials: true,
+        transports: ['websocket', 'polling'],
+    },
+    allowEIO3: true
+});
 
 // Given a Date, format it as a console-friendly YMDHISU format
 function formatDate(date, format) {
