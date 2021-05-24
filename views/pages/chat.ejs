@@ -1,10 +1,11 @@
+<% var rootPath = '../'; %>
 <html lang="en">
 <head>
-	<% include ../partials/header.ejs %>
+	<%- include(rootPath + 'partials/header.ejs') %>
 	<link rel="stylesheet" type="text/css" href="/stylesheets/chat.css" />
 </head>
 <body>
-	<% include ../partials/navbar.ejs %>
+	<%- include(rootPath + 'partials/navbar.ejs') %>
 	<main role="main" class="container">
 		<div>
 			<h1>Simple Chat System</h1>
@@ -21,7 +22,7 @@
 			</div>
 		</form>
 	</main>
-	<% include ../partials/footer.ejs %>
+	<%- include(rootPath + 'partials/footer.ejs') %>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
 	<script src="/js/chat.js"></script>
 </body>

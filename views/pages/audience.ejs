@@ -1,11 +1,12 @@
+<% var rootPath = '../'; %>
 <html lang="en">
 	<head>
-		<% include ../partials/header.ejs %>
+		<%- include(rootPath + 'partials/header.ejs') %>
 		<link rel="stylesheet" type="text/css" href="/stylesheets/screen.css" />
 
 	</head>
 	<body>
-		<% include ../partials/navbar.ejs %>
+		<%- include(rootPath + 'partials/navbar.ejs') %>
 		<main role="main" class="container">
 
 			<div class="d-flex justify-content-center" id="buttonBar">
@@ -24,7 +25,7 @@
 			</div>
 
 		</main>
-		<% include ../partials/footer.ejs %>
+		<%- include(rootPath + 'partials/footer.ejs') %>
 		<script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
 		<script src="/js/audience.js"></script>

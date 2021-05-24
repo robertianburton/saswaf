@@ -1,11 +1,12 @@
+<% var rootPath = '../'; %>
 <html lang="en">
 
 <head>
-	<% include ../partials/header.ejs %>
+	<%- include(rootPath + 'partials/header.ejs') %>
 </head>
 
 <body class="dark-mode">
-	<% include ../partials/navbar.ejs %>
+	<%- include(rootPath + 'partials/navbar.ejs') %>
 	<main role="main" class="container ">
 		<br>
 		<div class="jumbotron">
@@ -54,7 +55,7 @@
 		</div>
 
 	</main>
-	<% include ../partials/footer.ejs %>
+	<%- include(rootPath + 'partials/footer.ejs') %>
 </body>
 
 </html>
