@@ -1,51 +1,62 @@
-<% var rootPath = '../'; %>
-<html lang="en">
+<% var rootPath='../' ; %>
+	<html lang="en">
+
 	<head>
-		<%- include(rootPath + 'partials/header.ejs') %>
-		<link rel="stylesheet" type="text/css" href="/stylesheets/stereo.css" />
+		<%- include(rootPath + 'partials/header.ejs' ) %>
+			<link rel="stylesheet" type="text/css" href="/stylesheets/stereo.css" />
 	</head>
+
 	<body class="dark-mode">
-		<%- include(rootPath + 'partials/navbar.ejs') %>
-		<main role="main" class="container">
-			<br>
-			<div class="d-flex justify-content-center" id="buttonBar">
-				<div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
-					<div class="btn-group mx-2" role="group" aria-label="Video Window Sizes">
-						<button type="button" class="btn btn-primary" id="buttonVideoSizeResponsive">Responsive</button>
-						<button type="button" class="btn btn-primary" id="buttonVideoSizeSource">Source Scale</button>
-						<button type="button" class="btn btn-primary" id="buttonVideoSizePage">Page Scale</button>
-					</div>
-					<div class="btn-group mx-2" role="group" aria-label="Video Window Sizes">
-						<button type="button" class="btn btn-primary" id="buttonStart">Start</button>
-					</div>
-					<div class="btn-group mx-2" role="group" aria-label="Video Window Sizes">
-						<button type="button" class="btn btn-primary" id="buttonLogConnection">Log Connection</button>
-					</div>
-					<div class="btn-group mx-2" role="group" aria-label="Audio Devices">
-						<button type="button" class="btn btn-primary" id="buttonAudioDevices">Audio Devices</button>
+		<%- include(rootPath + 'partials/navbar.ejs' ) %>
+			<main role="main" class="container">
+				<br>
+				<div class="d-flex justify-content-center" id="buttonBar">
+					<div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+						<div class="btn-group mx-2" role="group" aria-label="Video Window Sizes">
+							<button type="button" class="btn btn-primary" id="buttonStart">Start</button>
+						</div>
+						<div class="btn-group mx-2" role="group" aria-label="Video Window Sizes">
+							<button type="button" class="btn btn-primary" id="buttonLogConnection">Log
+								Connection</button>
+						</div>
+						<div class="btn-group mx-2" role="group" aria-label="Audio Devices">
+							<button type="button" class="btn btn-primary" id="buttonAudioDevices">Audio Devices</button>
+						</div>
 					</div>
 				</div>
-			</div>
-			<br>
-			<p>Remote Video Element</p>
-			<div class="d-flex justify-content-center">
-				<audio id="videoRemoteElem" autoplay controls></video>
-			</div>
-			<p>Local Video Element</p>
-			<div class="d-flex justify-content-center">
-				<audio id="videoLocalElem" autoplay controls></video>
-			</div>
-			<div class="select">
-		        <label for="audioInput">Audio input source: </label><select id="audioInputSelect"></select>
-		    </div>
-		    <div class="select">
-		        <label for="audioOutput">Audio output destination: </label><select id="audioOutputSelect"></select>
-		    </div>
+				<br>
+				<div class="container">
+					<div class="row">
+						<div class="col-sm">
+							<div class="select">
+								<label for="audioInput">Audio input source: </label><select id="audioInputSelect"></select>
+							</div>
+							<p>Local Video Element</p>
+							<div class="d-flex justify-content-center">
+								<audio id="videoLocalElem" autoplay controls></video>
+							</div>
+						</div>
+						<div class="col-sm">
+							<div class="select">
+								<label for="audioOutput">Audio output destination: </label><select id="audioOutputSelect"></select>
+							</div>
+							<p>Remote Video Element</p>
+							<div class="d-flex justify-content-center">
+								<audio id="videoRemoteElem" autoplay controls></video>
+							</div>
+						</div>
+					</div>
+				</div>
 
-		</main>
-		<%- include(rootPath + 'partials/footer.ejs') %>
-		<script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
-		<script src="/js/stereo.js"></script>
+
+				
+				
+
+			</main>
+			<%- include(rootPath + 'partials/footer.ejs' ) %>
+				<script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
+				<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+				<script src="/js/stereo.js"></script>
 	</body>
-</html>
+
+	</html>

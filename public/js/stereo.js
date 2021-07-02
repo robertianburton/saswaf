@@ -31,34 +31,6 @@
         console.log(audioInputSelect);
         selectors = [audioInputSelect, audioOutputSelect];
 
-        buttonVideoSizeSource = document.getElementById('buttonVideoSizeSource');
-        buttonVideoSizeSource.addEventListener('click', function (ev) {
-            videoRemoteElem.style.width = "auto";
-            videoRemoteElem.scrollIntoView();
-            ev.preventDefault();
-        }, false);
-
-        buttonVideoSizeResponsive = document.getElementById('buttonVideoSizeResponsive');
-        buttonVideoSizeResponsive.addEventListener('click', function (ev) {
-            videoRemoteElem.style.width = "100%";
-
-            ev.preventDefault();
-        }, false);
-
-        buttonVideoSizePage = document.getElementById('buttonVideoSizePage');
-        buttonVideoSizePage.addEventListener('click', function (ev) {
-            videoRemoteElem.style.width = window.innerWidth;
-
-            var docH = $(document).height();
-            var vidH = $('#videoElem').height();
-            var videoScale = ($('#videoElem').width() / $('#videoRemoteElem').height());
-            var topH = docH - vidH;
-            var workableH = Math.floor((window.innerHeight - topH - 0) * videoScale);
-
-            videoRemoteElem.style.width = workableH + "px";
-            videoRemoteElem.scrollIntoView();
-            ev.preventDefault();
-        }, false);
 
         buttonStart = document.getElementById('buttonStart');
         buttonStart.addEventListener('click', function (ev) {
@@ -417,7 +389,6 @@
         window.stream = stream; // make stream available to console
         // Refresh button list in case labels have become available
         return navigator.mediaDevices.enumerateDevices();
-
     };
 
     function handleError(error) {
