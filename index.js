@@ -1,14 +1,19 @@
+require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const socket = require("socket.io");
 const PORT = process.env.PORT || 5000;
 const crypto = require('crypto');
 
+if (process.env.ENV === 'DEV') {
+    printToConsole("Dev Environment Detected");
+};
+
 const app = express()
     .enable('trust proxy')
     .use(function (req, res, next) {
         if (req.secure || process.env.ENV === 'DEV') {
-            // request was via https, so do no special handling
+            // request was via https or is dev env, so do no special handling
             next();
         } else {
             // request was via http, so redirect to https
